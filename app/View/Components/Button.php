@@ -4,22 +4,21 @@ namespace App\View\Components;
 
 use Illuminate\View\Component;
 
-class ItemList extends Component
+class Button extends Component
 {
-    public $columns;
-    public $items;
-    public $rows;
+    public $button;
+    public $btnClass = ['new' => 'btn-success', 'delete' => 'btn-danger'];
+    public $icon = '';
+
 
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct($columns, $rows, $items)
+    public function __construct($button)
     {
-        $this->columns = $columns;
-        $this->items = $items;
-        $this->rows = $rows;
+        $this->button = $button;
     }
 
     /**
@@ -29,6 +28,6 @@ class ItemList extends Component
      */
     public function render()
     {
-        return view('components.item-list');
+        return view('components.button');
     }
 }

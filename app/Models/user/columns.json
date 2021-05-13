@@ -1,22 +1,38 @@
-{
-  "id": {
+[
+  {
+    "id": "id",
     "label": "ID",
-    "sortable": true
+    "sortable": true,
+    "type": "string"
   },
-  "name": {
+  {
+    "id": "name",
     "label": "Name",
-    "sortable": true
+    "sortable": true,
+    "type": "string"
   },
-  "email": {
+  {
+    "id": "email",
     "label": "Email",
-    "sortable": true
+    "sortable": true,
+    "type": "string"
   },
-  "created_at": {
+  {
+    "id": "roles",
+    "label": "Roles",
+    "sortable": false,
+    "type": "array"
+  },
+  {
+    "id": "created_at",
     "label": "Created at",
-    "sortable": true
+    "sortable": true,
+    "type": "string"
   },
-  "updated_at": {
+  {
+    "id": "updated_at",
     "label": "Updated at",
-    "sortable": true
+    "sortable": true,
+    "type": "string"
   }
-}
+]

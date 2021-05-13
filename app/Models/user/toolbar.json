@@ -1,0 +1,26 @@
+[
+  {
+    "id": "new",
+    "label": "New",
+    "type": "button",
+    "icon": "fa fa-plus"
+  },
+  {
+    "id": "delete",
+    "label": "Delete",
+    "type": "button",
+    "icon": "fa fa-trash"
+  },
+  {
+    "id": "block",
+    "label": "Block",
+    "type": "button",
+    "class": "btn-secondary"
+  },
+  {
+    "id": "unblock",
+    "label": "Unblock",
+    "type": "button",
+    "class": "btn-secondary"
+  }
+]

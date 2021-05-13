@@ -52,6 +52,6 @@ trait ItemConfig
 	   throw new Exception('Load Failed');    
 	}
 
-	return json_decode($json, true);
+	return json_decode($json);
     }
 }

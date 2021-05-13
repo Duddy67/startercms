@@ -34,8 +34,32 @@ class UsersController extends Controller
     public function index()
     {
         $columns = $this->getColumns();
+        $toolbar = $this->getToolbar();
+        $users = $this->model->getItems();
+	$rows = $this->getRows($columns);
+
+        return view('admin.users', compact('users', 'columns', 'rows', 'toolbar'));
+    }
+
+    public function getRows($columns)
+    {
+        $rows = [];
         $users = $this->model->getItems();
 
-        return view('admin.users', compact('users', 'columns'));
+        foreach ($users as $user) {
+	    $row = [];
+	    foreach ($columns as $column) {
+	        if ($column->id == 'roles') {
+		    $row[$column->id] = $user->getRoleNames();
+		}
+		else {
+		    $row[$column->id] = $user->{$column->id};
+		}
+	    }
+
+	    $rows[] = $row;
+	}
+
+	return $rows;
     }
 }
