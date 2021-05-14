@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\Admin\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +41,7 @@ Route::middleware(['guest'])->group(function () {
 
 Route::middleware(['admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('admin');
-    Route::get('/admin/users', [UsersController::class, 'index'])->name('users');
+    Route::get('/admin/users', [UsersController::class, 'index'])->name('admin.users');
+    Route::get('/admin/user/{id}', [UserController::class, 'update'])->where('id', '^[1-9][1-9]{0,}')->name('admin.user.update');
 });
 

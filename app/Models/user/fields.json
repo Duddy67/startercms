@@ -1,0 +1,29 @@
+[
+  {
+    "label": "Name",
+    "type": "text",
+    "name": "name",
+    "id": "name",
+    "sortable": true
+  },
+  {
+    "label": "Email",
+    "type": "text",
+    "name": "email",
+    "id": "email",
+    "sortable": true
+  },
+  {
+    "label": "Password",
+    "type": "password",
+    "name": "password",
+    "id": "password",
+    "sortable": true
+  },
+  {
+    "label": "Confirm password",
+    "type": "confirm_passwd",
+    "id": "confirm_passwd",
+    "sortable": true
+  }
+]

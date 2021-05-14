@@ -15,6 +15,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <link rel="stylesheet" href="{{ url('/') }}/vendor/adminlte/plugins/fontawesome-free/css/all.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="{{ url('/') }}/vendor/adminlte/css/adminlte.min.css">
+  <!-- Custom style -->
+  <link rel="stylesheet" href="{{ url('/') }}/css/admin/style.css">
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -200,7 +202,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 	      <p>Users</p>
 	    </a>
 	      <ul class="nav nav-treeview">
-		<x-menu-item href="{{ route('users') }}" :sub=true :active=false>
+		<x-menu-item href="{{ route('admin.users') }}" :sub=true :active=false>
 		  Users
 		</x-menu-item>
 		<x-menu-item href="#" :sub=true :active=false>

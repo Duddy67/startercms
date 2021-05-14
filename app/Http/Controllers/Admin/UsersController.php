@@ -38,7 +38,7 @@ class UsersController extends Controller
         $users = $this->model->getItems();
 	$rows = $this->getRows($columns);
 
-        return view('admin.users', compact('users', 'columns', 'rows', 'toolbar'));
+        return view('admin.users.list', compact('users', 'columns', 'rows', 'toolbar'));
     }
 
     public function getRows($columns)
@@ -48,6 +48,7 @@ class UsersController extends Controller
 
         foreach ($users as $user) {
 	    $row = array('item_id' => $user->id);
+
 	    foreach ($columns as $column) {
 	        if ($column->id == 'roles') {
 		    $row[$column->id] = $user->getRoleNames();

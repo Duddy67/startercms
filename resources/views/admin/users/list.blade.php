@@ -6,6 +6,5 @@
 @endsection
 
 @push ('scripts')
-    <link rel="stylesheet" href="{{ url('/') }}/css/admin/style.css">
     <script src="{{ asset('/js/admin/item-list.js') }}"></script>
 @endpush
