@@ -47,7 +47,7 @@ class UsersController extends Controller
         $users = $this->model->getItems();
 
         foreach ($users as $user) {
-	    $row = [];
+	    $row = array('item_id' => $user->id);
 	    foreach ($columns as $column) {
 	        if ($column->id == 'roles') {
 		    $row[$column->id] = $user->getRoleNames();

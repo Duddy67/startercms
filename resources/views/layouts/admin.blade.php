@@ -312,5 +312,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script src="{{ url('/') }}/vendor/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- AdminLTE App -->
 <script src="{{ url('/') }}/vendor/adminlte/js/adminlte.min.js"></script>
+<!-- Additional js scripts -->
+@stack ('scripts')
 </body>
 </html>

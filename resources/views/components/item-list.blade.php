@@ -1,4 +1,4 @@
-<table class="table">
+<table id="item-list" class="table table-hover">
     <thead>
 	<th scope="col">#</th>
         @foreach ($columns as $key => $column)
@@ -7,7 +7,7 @@
     </thead>
     <tbody>
         @foreach ($rows as $i => $row)
-	    <tr>
+	    <tr class="clickable-row" data-href="{{ url('/admin/user').'/'.$row['item_id'] }}">
 		<td>
 		    <div class="form-check">
 			<input type="checkbox" class="form-check-input" data-index="{{ $i }}">
