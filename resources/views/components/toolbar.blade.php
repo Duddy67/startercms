@@ -1,7 +1,7 @@
 <nav class="navbar navbar-light bg-light">
-    <div class="row">
+    <div class="row" id="action-btn">
 	@foreach ($items as $item)
-	    <div class="mr-3" id="action-btn">
+	    <div class="mr-3">
 		@if ($item->type == 'button')
                     <x-button :button=$item />
 		@endif

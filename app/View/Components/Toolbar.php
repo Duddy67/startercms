@@ -7,8 +7,6 @@ use Illuminate\View\Component;
 class Toolbar extends Component
 {
     public $items;
-    public $btnClass = ['new' => 'btn-success', 'delete' => 'btn-danger'];
-
 
     /**
      * Create a new component instance.

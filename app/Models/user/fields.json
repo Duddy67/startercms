@@ -4,26 +4,37 @@
     "type": "text",
     "name": "name",
     "id": "name",
-    "sortable": true
+    "readonly": false,
+    "placeholder": "Name"
   },
   {
     "label": "Email",
     "type": "text",
     "name": "email",
     "id": "email",
-    "sortable": true
+    "placeholder": "Email"
   },
   {
     "label": "Password",
     "type": "password",
     "name": "password",
-    "id": "password",
-    "sortable": true
+    "id": "password"
   },
   {
     "label": "Confirm password",
     "type": "confirm_passwd",
-    "id": "confirm_passwd",
-    "sortable": true
+    "id": "confirm_passwd"
+  },
+  {
+    "label": "Created at",
+    "type": "date",
+    "name": "created_at",
+    "id": "created_at"
+  },
+  {
+    "label": "Updated at",
+    "type": "date",
+    "name": "updated_at",
+    "id": "updated_at"
   }
 ]

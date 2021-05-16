@@ -7,8 +7,9 @@ use Illuminate\View\Component;
 class Button extends Component
 {
     public $button;
-    public $btnClass = ['new' => 'btn-success', 'delete' => 'btn-danger'];
-    public $icon = '';
+    // Default classes and icons.
+    public $btnClasses = ['new' => 'btn-success', 'save' => 'btn-success', 'saveClose' => 'btn-primary', 'delete' => 'btn-danger'];
+    public $btnIcons = ['new' => 'fa-plus', 'save' => 'fa-save', 'saveClose' => 'fa-reply', 'cancel' => 'fa-times', 'delete' => 'fa-trash'];
 
 
     /**

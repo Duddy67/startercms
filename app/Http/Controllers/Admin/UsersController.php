@@ -34,11 +34,11 @@ class UsersController extends Controller
     public function index()
     {
         $columns = $this->getColumns();
-        $toolbar = $this->getToolbar();
+        $actions = $this->getActions('list');
         $users = $this->model->getItems();
 	$rows = $this->getRows($columns);
 
-        return view('admin.users.list', compact('users', 'columns', 'rows', 'toolbar'));
+        return view('admin.users.list', compact('users', 'columns', 'rows', 'actions'));
     }
 
     public function getRows($columns)

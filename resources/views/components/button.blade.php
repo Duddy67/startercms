@@ -1,11 +1,14 @@
-@php $class = ($button->id == 'new' || $button->id == 'delete') ? $btnClass[$button->id] : 'btn-primary' @endphp
+@php $class = (array_key_exists($button->id, $btnClasses)) ? $btnClasses[$button->id] : 'btn-secondary' @endphp
 
 @if (isset($button->class))
     @php $class = $button->class @endphp
 @endif
 
-@if (isset($button->icon))
-    @php $icon = '<i class="'.$button->icon.'"></i>' @endphp
+@php $icon = (array_key_exists($button->id, $btnIcons)) ? 'fa '.$btnIcons[$button->id] : '' @endphp
+@php $icon = (isset($button->icon)) ? $button->id : $icon @endphp
+
+@if (!empty($icon))
+    @php $icon = '<i class="'.$icon.'"></i>' @endphp
 @endif
 
-<button type="button" class="btn btn-space {{ $class }}">{!! $icon !!} {{ $button->label }}</button>
+<button type="button" id="{{ $button->id }}" class="btn btn-space {{ $class }}">{!! $icon !!} {{ $button->label }}</button>

@@ -7,7 +7,7 @@
     </thead>
     <tbody>
         @foreach ($rows as $i => $row)
-	    <tr class="clickable-row" data-href="{{ url('/admin/user').'/'.$row['item_id'] }}">
+	    <tr class="clickable-row" data-href="{{ url('/admin/users').'/'.$row['item_id'] }}">
 		<td>
 		    <div class="form-check">
 			<input type="checkbox" class="form-check-input" data-index="{{ $i }}">

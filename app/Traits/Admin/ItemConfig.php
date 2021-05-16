@@ -35,13 +35,15 @@ trait ItemConfig
 	return $filters;
     }
 
-    public function getToolbar()
+    public function getActions($section)
     {
-	$toolbar = $this->getData('toolbar');
+	$actions = $this->getData('actions');
 
-	// Possible operations here...
+	if ($section != 'list' && $section != 'form') {
+	    return null;
+	}
 
-	return $toolbar;
+	return $actions->{$section};
     }
 
     private function getData($type)

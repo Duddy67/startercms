@@ -42,6 +42,9 @@ Route::middleware(['guest'])->group(function () {
 Route::middleware(['admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('admin');
     Route::get('/admin/users', [UsersController::class, 'index'])->name('admin.users');
-    Route::get('/admin/user/{id}', [UserController::class, 'update'])->where('id', '^[1-9][1-9]{0,}')->name('admin.user.update');
+    Route::get('/admin/users/{id}', [UserController::class, 'update'])->where('id', '^[1-9][1-9]{0,}')->name('admin.users.update');
+    Route::post('/admin/users/{id}', [UserController::class, 'save'])->where('id', '^[1-9][1-9]{0,}');
+    Route::get('/admin/users/create', [UsersController::class, 'create'])->name('admin.users.create');
+    Route::post('/admin/users', [UserController::class, 'save']);
 });
 

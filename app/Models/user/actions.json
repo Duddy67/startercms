@@ -1,0 +1,48 @@
+{
+  "list": [
+      {
+	"id": "new",
+	"label": "New",
+	"type": "button"
+      },
+      {
+	"id": "delete",
+	"label": "Delete",
+	"type": "button"
+      },
+      {
+	"id": "block",
+	"label": "Block",
+	"type": "button",
+	"class": "btn-secondary"
+      },
+      {
+	"id": "unblock",
+	"label": "Unblock",
+	"type": "button",
+	"class": "btn-secondary"
+      }
+  ],
+  "form": [
+      {
+	"id": "saveClose",
+	"label": "Save & close",
+	"type": "button"
+      },
+      {
+	"id": "save",
+	"label": "Save",
+	"type": "button"
+      },
+      {
+	"id": "cancel",
+	"label": "Cancel",
+	"type": "button"
+      },
+      {
+	"id": "delete",
+	"label": "Delete",
+	"type": "button"
+      }
+  ]
+}
