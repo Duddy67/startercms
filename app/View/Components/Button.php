@@ -8,8 +8,8 @@ class Button extends Component
 {
     public $button;
     // Default classes and icons.
-    public $btnClasses = ['new' => 'btn-success', 'save' => 'btn-success', 'saveClose' => 'btn-primary', 'delete' => 'btn-danger'];
-    public $btnIcons = ['new' => 'fa-plus', 'save' => 'fa-save', 'saveClose' => 'fa-reply', 'cancel' => 'fa-times', 'delete' => 'fa-trash'];
+    public $btnClasses = ['create' => 'btn-success', 'save' => 'btn-success', 'saveClose' => 'btn-primary', 'delete' => 'btn-danger'];
+    public $btnIcons = ['create' => 'fa-plus', 'save' => 'fa-save', 'saveClose' => 'fa-reply', 'cancel' => 'fa-times', 'delete' => 'fa-trash'];
 
 
     /**

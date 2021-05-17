@@ -1,7 +1,7 @@
 {
   "list": [
       {
-	"id": "new",
+	"id": "create",
 	"label": "New",
 	"type": "button"
       },

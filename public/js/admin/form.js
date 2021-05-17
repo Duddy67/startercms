@@ -18,7 +18,7 @@
   }
 
   $.fn.cancel = function() {
-      alert('cancel');
+      window.location.replace($('#listUrl').val());
   }
 
   $.fn.delete = function() {

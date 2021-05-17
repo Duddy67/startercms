@@ -22,8 +22,9 @@
   },
   {
     "label": "Confirm password",
-    "type": "confirm_passwd",
-    "id": "confirm_passwd"
+    "type": "password",
+    "name": "password_confirmation",
+    "id": "password_confirmation"
   },
   {
     "label": "Created at",

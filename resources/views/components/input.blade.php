@@ -23,8 +23,14 @@
     readonly
 @endif
 
-@if (isset($attribs->value))
-    value="{{ $attribs->value }}"
+@if ($value)
+    value="{{ $value }}"
 @endif
 
 >
+
+@if (isset($attribs->name))
+    @error($attribs->name)
+	<div class="text-danger">{{ $message }}</div>
+    @enderror
+@endif

@@ -1,12 +1,20 @@
 @extends ('layouts.admin')
 
 @section ('main')
-    @php $action = (isset($user)) ? route('admin.users.update', ['id' => $user->id]) : route('admin.users.create') @endphp
+    @php $action = (isset($user)) ? route('admin.users.update', ['id' => $user->id]) : route('admin.users') @endphp
     <form method="post" action="{{ $action }}" id="itemForm">
         @csrf
         @foreach ($fields as $attribs)
-	    <x-input :attribs=$attribs />
+	    @php if (isset($user)) { 
+		     $value = old($attribs->name, $attribs->value);
+		 }
+		 else {
+		     $value = old($attribs->name);
+		 }
+	    @endphp
+	    <x-input :attribs=$attribs :value=$value />
         @endforeach
+	<input type="hidden" id="listUrl" value="{{ route('admin.users') }}">
     </form>
     <x-toolbar :items=$actions />
 @endsection
