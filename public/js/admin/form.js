@@ -2,7 +2,7 @@
 
   // Run a function when the page is fully loaded including graphics.
   $(window).on('load', function() {
-      let actions = ['save', 'saveClose', 'cancel', 'delete'];
+      let actions = ['save', 'saveClose', 'cancel', 'destroy'];
 
       actions.forEach(function (action) {
 	  $('#'+action).click( function() { $.fn[action](); });
@@ -14,15 +14,22 @@
   }
 
   $.fn.saveClose = function() {
-      alert('saveClose');
+      $('input[name="_close"]').val(1);
+      $('#itemForm').submit();
   }
 
   $.fn.cancel = function() {
       window.location.replace($('#listUrl').val());
   }
 
-  $.fn.delete = function() {
-      alert('delete');
+  $.fn.destroy = function() {
+      $('#deleteItemForm').submit();
+      /*alert($('#listUrl').val()+'/2');
+      $.ajax({
+	  type: 'DELETE',
+	  url: $('#listUrl').val()+'/2',
+	  headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+	});*/
   }
 
 })(jQuery);

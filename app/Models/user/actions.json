@@ -6,7 +6,7 @@
 	"type": "button"
       },
       {
-	"id": "delete",
+	"id": "destroy",
 	"label": "Delete",
 	"type": "button"
       },
@@ -40,7 +40,7 @@
 	"type": "button"
       },
       {
-	"id": "delete",
+	"id": "destroy",
 	"label": "Delete",
 	"type": "button"
       }

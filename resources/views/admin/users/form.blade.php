@@ -15,8 +15,14 @@
 	    <x-input :attribs=$attribs :value=$value />
         @endforeach
 	<input type="hidden" id="listUrl" value="{{ route('admin.users') }}">
+	<input type="hidden" id="close" name="_close" value="0">
     </form>
     <x-toolbar :items=$actions />
+
+    <form id="deleteItemForm" action="{{ url('/admin/users', ['id' => $user->id]) }}" method="post">
+	@method('delete')
+	@csrf
+    </form>
 @endsection
 
 @push ('scripts')

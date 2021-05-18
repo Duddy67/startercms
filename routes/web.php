@@ -44,7 +44,7 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/admin/users', [UsersController::class, 'index'])->name('admin.users');
     Route::get('/admin/users/{id}', [UserController::class, 'edit'])->where('id', '^[1-9][1-9]{0,}')->name('admin.users.edit');
     Route::post('/admin/users/{id}', [UserController::class, 'update'])->where('id', '^[1-9][1-9]{0,}')->name('admin.users.update');
-    Route::delete('/admin/users/{id}', [UserController::class, 'delete'])->where('id', '^[1-9][1-9]{0,}')->name('admin.users.delete');
+    Route::delete('/admin/users/{id}', [UserController::class, 'destroy'])->where('id', '^[1-9][1-9]{0,}')->name('admin.users.destroy');
     Route::get('/admin/users/create', [UserController::class, 'create'])->name('admin.users.create');
     Route::post('/admin/users', [UserController::class, 'store'])->name('admin.users.store');
 });
