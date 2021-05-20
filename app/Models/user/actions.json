@@ -6,7 +6,7 @@
 	"type": "button"
       },
       {
-	"id": "destroy",
+	"id": "massDestroy",
 	"label": "Delete",
 	"type": "button"
       },

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Models\Role;
 
 class User extends Authenticatable
 {
@@ -46,5 +47,23 @@ class User extends Authenticatable
     public function getItems()
     {
         return User::all();
+    }
+
+    public function getRoleOptions()
+    {
+        $roles = Role::all();
+	$options = [];
+
+	foreach ($roles as $role) {
+	    $options[] = ['value' => $role->name, 'text' => $role->name];
+	}
+
+	return $options;
+    }
+
+    public function getRoleValue()
+    {
+        $roles = $this->getRoleNames();
+	return $roles[0];
     }
 }

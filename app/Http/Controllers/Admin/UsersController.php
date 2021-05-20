@@ -36,31 +36,97 @@ class UsersController extends Controller
         $columns = $this->getColumns();
         $actions = $this->getActions('list');
         $users = $this->model->getItems();
-	$rows = $this->getRows($columns);
+	$rows = $this->getRows($columns, $users, ['roles']);
+	$this->setRowValues($rows, $columns, $users);
 
         return view('admin.users.list', compact('users', 'columns', 'rows', 'actions'));
     }
 
-    public function getRows($columns)
+    public function create()
     {
-        $rows = [];
-        $users = $this->model->getItems();
+        $fields = $this->getFields();
+        $actions = $this->getActions('form');
 
-        foreach ($users as $user) {
-	    $row = array('item_id' => $user->id);
+        return view('admin.users.form', compact('fields', 'actions'));
+    }
 
-	    foreach ($columns as $column) {
-	        if ($column->id == 'roles') {
-		    $row[$column->id] = $user->getRoleNames();
-		}
-		else {
-		    $row[$column->id] = $user->{$column->id};
-		}
-	    }
+    public function edit($id)
+    {
+        $user = User::findOrFail($id);
+        $fields = $this->getFields($user, ['password', 'password_confirmation']);
+        $actions = $this->getActions('form');
 
-	    $rows[] = $row;
+        return view('admin.users.form', compact('user', 'fields', 'actions'));
+    }
+
+    /**
+     * Update the specified user.
+     *
+     * @param  Request  $request
+     * @param  int  $id
+     * @return Response
+     */
+    public function update(Request $request, $id)
+    {
+        $this->validate($request, [
+	    'name' => 'bail|required|between:5,25|regex:/^[\pL\s\-]+$/u',
+	    'email' => 'bail|required|email|unique:users,email',
+	    'password' => 'nullable|confirmed|min:8'
+	]);
+
+        if ($request->input('_close', null)) {
+	    return redirect()->route('admin.users.index');
 	}
 
-	return $rows;
+        return var_dump($request->all());
+    }
+
+    public function store(Request $request)
+    {
+        $this->validate($request, [
+	    'name' => 'bail|required|between:5,25|regex:/^[\pL\s\-]+$/u',
+	    'email' => 'bail|required|email|unique:users,email',
+	    'password' => 'required|confirmed|min:8'
+	]);
+
+        if ($request->input('_close', null)) {
+	    return redirect()->route('admin.users.index');
+	}
+
+        return 'store';
+    }
+
+    public function destroy($id)
+    {
+	return redirect()->route('admin.users.index');
+        return 'destroy';
+    }
+
+    public function massDestroy(Request $request)
+    {
+	return redirect()->route('admin.users.index');
+    }
+
+    /*
+     * Sets row values specific to the User model.
+     */
+    private function setRowValues(&$rows, $columns, $users)
+    {
+        foreach ($users as $key => $user) {
+	    foreach ($columns as $column) {
+	        if ($column->id == 'role') {
+		    $roles = $user->getRoleNames();
+		    $rows[$key][$column->id] = $roles[0];
+		}
+	    }
+	}
+    }
+
+    /*
+     * Sets field values specific to the User model.
+     */
+    private function setFieldValues(&$fields, $user)
+    {
+	// Specific operations here...
     }
 }

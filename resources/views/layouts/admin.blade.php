@@ -203,7 +203,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 	      <p>Users</p>
 	    </a>
 	      <ul class="nav nav-treeview">
-		<x-menu-item href="{{ route('admin.users') }}" :sub=true :active=false>
+		<x-menu-item href="{{ route('admin.users.index') }}" :sub=true :active=false>
 		  Users
 		</x-menu-item>
 		<x-menu-item href="#" :sub=true :active=false>

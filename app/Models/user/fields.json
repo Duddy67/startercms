@@ -27,6 +27,13 @@
     "id": "password_confirmation"
   },
   {
+    "label": "Role",
+    "type": "select",
+    "name": "role",
+    "id": "role",
+    "options": [] 
+  },
+  {
     "label": "Created at",
     "type": "date",
     "name": "created_at",
