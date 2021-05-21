@@ -8,7 +8,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\UsersController;
-use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\RolesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,14 +44,11 @@ Route::prefix('admin')->group(function () {
     Route::middleware(['admin'])->group(function () {
 	Route::get('/', [AdminController::class, 'index'])->name('admin');
 	// Users
-	//Route::get('/users', [UsersController::class, 'index'])->name('admin.users');
 	Route::delete('/users', [UsersController::class, 'massDestroy'])->name('admin.users.massDestroy');
 	Route::resource('users', UsersController::class, ['as' => 'admin'])->except(['show']);
-	/*Route::get('/users/{id}', [UserController::class, 'edit'])->where('id', '^[1-9][1-9]{0,}')->name('admin.users.edit');
-	Route::post('/users/{id}', [UserController::class, 'update'])->where('id', '^[1-9][1-9]{0,}')->name('admin.users.update');
-	Route::delete('/users/{id}', [UserController::class, 'destroy'])->where('id', '^[1-9][1-9]{0,}')->name('admin.users.destroy');
-	Route::get('/users/create', [UserController::class, 'create'])->name('admin.users.create');
-	Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');*/
+	// Roles
+	Route::delete('/roles', [RolesController::class, 'massDestroy'])->name('admin.roles.massDestroy');
+	Route::resource('roles', RolesController::class, ['as' => 'admin'])->except(['show']);
     });
 });
 

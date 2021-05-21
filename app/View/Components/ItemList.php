@@ -9,17 +9,19 @@ class ItemList extends Component
     public $columns;
     public $items;
     public $rows;
+    public $route;
 
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct($columns, $rows, $items)
+    public function __construct($columns, $rows, $items, $route)
     {
         $this->columns = $columns;
         $this->items = $items;
         $this->rows = $rows;
+        $this->route = $route;
     }
 
     /**
