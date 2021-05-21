@@ -12,5 +12,5 @@
 @endsection
 
 @push ('scripts')
-    <script src="{{ asset('/js/admin/item-list.js') }}"></script>
+    <script src="{{ asset('/js/admin/list.js') }}"></script>
 @endpush

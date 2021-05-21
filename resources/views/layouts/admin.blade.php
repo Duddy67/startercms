@@ -207,14 +207,25 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		  Users
 		</x-menu-item>
 		<x-menu-item href="#" :sub=true :active=false>
-                  Roles
+                  Groups
+		</x-menu-item>
+	      </ul>
+	  </li>
+	  <li class="nav-item menu-open">
+	    <a href="#" class="nav-link">
+	      <i class="nav-icon fas fa-lock"></i>
+	      <p>Roles & Permissions</p>
+	    </a>
+	      <ul class="nav nav-treeview">
+		<x-menu-item href="#" :sub=true :active=false>
+		  Roles
 		</x-menu-item>
 		<x-menu-item href="#" :sub=true :active=false>
                   Permissions
 		</x-menu-item>
 	      </ul>
 	  </li>
-	  <li class="nav-item has-treeview">
+	  <li class="nav-item menu-open">
 	    <a href="#" class="nav-link">
 	      <i class="nav-icon fas fa-pencil-alt"></i>
 	      <p>Blog</p>
@@ -231,7 +242,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		</x-menu-item>
 	      </ul>
 	  </li>
-	  <li class="nav-item has-treeview">
+	  <li class="nav-item menu-open">
 	    <a href="#" class="nav-link">
 	      <i class="nav-icon fas fa-cogs"></i>
 	      <p>Settings</p>
