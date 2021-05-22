@@ -76,12 +76,12 @@ class Settings extends Model
     public static function getPermissionPatterns()
     {
         return [
-	    'create-',
-	    'update-',
-	    'delete-',
-	    'update-own-',
-	    'delete-own-',
-	    'settings-'
+	    'create-[0-9-a-z\-]+',
+	    'update-[0-9-a-z\-]+',
+	    'delete-[0-9-a-z\-]+',
+	    'update-own-[0-9-a-z\-]+',
+	    'delete-own-[0-9-a-z\-]+',
+	    'settings-[0-9-a-z\-]+'
 	];
     }
 }

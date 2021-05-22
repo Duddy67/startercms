@@ -220,7 +220,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		<x-menu-item href="{{ route('admin.roles.index') }}" :sub=true :active=false>
 		  Roles
 		</x-menu-item>
-		<x-menu-item href="#" :sub=true :active=false>
+		<x-menu-item href="{{ route('admin.permissions.index') }}" :sub=true :active=false>
                   Permissions
 		</x-menu-item>
 	      </ul>
@@ -289,7 +289,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Main content -->
     <div class="content">
       <div class="container-fluid">
-      @yield('main')
+      @include ('layouts.flash-message')
+      @yield ('main')
       </div><!-- /.container-fluid -->
     </div>
     <!-- /.content -->

@@ -72,7 +72,6 @@ trait ItemConfig
 	    }
 	}
 
-//file_put_contents('debog_file.txt', print_r($fields, true));
 	return $fields;
     }
 
@@ -85,13 +84,22 @@ trait ItemConfig
 	return $filters;
     }
 
-    public function getActions($section)
+    public function getActions($section, $except = [])
     {
 	$actions = $this->getData('actions');
 
 	if ($section != 'list' && $section != 'form') {
 	    return null;
 	}
+
+	if (!empty($except)) {
+	  foreach ($actions->{$section} as $key => $action) {
+	      if (in_array($action->id, $except)) {
+		  unset($actions->{$section}[$key]);
+	      }
+	  } 
+	}
+//file_put_contents('debog_file.txt', print_r($actions->{$section}, true));
 
 	return $actions->{$section};
     }

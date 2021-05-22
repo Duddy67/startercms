@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\RolesController;
+use App\Http\Controllers\Admin\PermissionsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +50,9 @@ Route::prefix('admin')->group(function () {
 	// Roles
 	Route::delete('/roles', [RolesController::class, 'massDestroy'])->name('admin.roles.massDestroy');
 	Route::resource('roles', RolesController::class, ['as' => 'admin'])->except(['show']);
+	// Permissions
+	Route::delete('/permissions', [PermissionsController::class, 'massDestroy'])->name('admin.permissions.massDestroy');
+	Route::resource('permissions', PermissionsController::class, ['as' => 'admin'])->except(['show']);
     });
 });
 
