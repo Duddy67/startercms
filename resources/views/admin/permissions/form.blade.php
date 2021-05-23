@@ -4,6 +4,11 @@
     @php $action = (isset($permission)) ? route('admin.permissions.update', $permission->id) : route('admin.permissions.store') @endphp
     <form method="post" action="{{ $action }}" id="itemForm">
         @csrf
+
+	@if (isset($permission))
+	    @method('put')
+	@endif
+
         @foreach ($fields as $attribs)
 	    @php if (isset($permission)) { 
 		     $value = old($attribs->name, $attribs->value);
@@ -16,8 +21,9 @@
 		     $value = old($attribs->name);
 		 }
 	    @endphp
-	    <x-input :attribs=$attribs :value=$value />
+	    <x-input :attribs="$attribs" :value="$value" />
         @endforeach
+
 	<input type="hidden" id="listUrl" value="{{ route('admin.permissions.index') }}">
 	<input type="hidden" id="close" name="_close" value="0">
     </form>

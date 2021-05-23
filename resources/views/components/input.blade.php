@@ -42,4 +42,24 @@
 	    <option value="{{ $option['value'] }}" {{ $selected }}>{{ $option['text'] }}</option>
         @endforeach
     </select> 
+@elseif ($attribs->type == 'checkbox')
+    <input type="checkbox" id="{{ $attribs->id }}" class="form-controller"
+
+    @if (isset($attribs->name))
+	name="{{ $attribs->name }}"
+    @endif
+
+    @if (isset($attribs->readonly) && $attribs->readonly)
+	readonly
+    @endif
+
+    @if ($value)
+	value="{{ $value }}"
+    @endif
+
+    @if ($attribs->checked)
+	checked
+    @endif
+
+    >
 @endif

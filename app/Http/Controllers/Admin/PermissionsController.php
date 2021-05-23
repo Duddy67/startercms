@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Traits\Admin\ItemConfig;
 use App\Models\Settings;
 use Spatie\Permission\Traits\HasRoles;
@@ -13,6 +14,8 @@ class PermissionsController extends Controller
 {
     use ItemConfig, HasRoles;
 
+    public $reservedPerms;
+    public $permPatterns;
 
     /**
      * Create a new controller instance.
@@ -23,6 +26,8 @@ class PermissionsController extends Controller
     {
         $this->middleware('auth');
 	$this->itemName = 'permission';
+	$this->reservedPerms = Settings::getReservedPermissions();
+	$this->permPatterns = Settings::getPermissionPatterns();
     }
 
     /**
@@ -67,35 +72,42 @@ class PermissionsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
-	    'name' => 'bail|required|between:5,25|regex:/^[\pL\s\-]+$/u',
-	    'email' => 'bail|required|email|unique:users,email',
-	    'password' => 'nullable|confirmed|min:8'
-	]);
-
-        if ($request->input('_close', null)) {
-	    return redirect()->route('admin.permissions.index');
-	}
-
-        return var_dump($request->all());
-    }
-
-    public function store(Request $request)
-    {
-        $reservedPerms = Settings::getReservedPermissions();
-        $permPatterns = Settings::getPermissionPatterns();
-//file_put_contents('debog_file.txt', print_r($reservedPerms, true));
+	$permission = Permission::findOrFail($id);
 
         $this->validate($request, [
 	    'name' => [
 		'required',
-		//'not_regex:/'.implode('|', $reservedPerms).'/i',
-		'regex:/^'.implode('|', $permPatterns).'$/',
+		//'not_regex:/'.implode('|', $this->reservedPerms).'/i',
+		'regex:/^'.implode('|', $this->permPatterns).'$/',
+		Rule::unique('permissions')->ignore($id)
+	    ],
+	]);
+
+	$permission->name = $request->input('name');
+	$permission->save();
+
+	$message = 'Permission successfully updated.';
+
+        if ($request->input('_close', null)) {
+	    return redirect()->route('admin.permissions.index')->with('success', $message);
+	}
+
+	return redirect()->route('admin.permissions.edit', $permission->id)->with('success', $message);
+    }
+
+    public function store(Request $request)
+    {
+        $this->validate($request, [
+	    'name' => [
+		'required',
+		//'not_regex:/'.implode('|', $this->reservedPerms).'/i',
+		'regex:/^'.implode('|', $this->permPatterns).'$/',
 		'unique:permissions'
 	    ],
 	]);
 
 	$permission = Permission::create(['name' => $request->input('name')]);
+
 	$message = 'Permission successfully added.';
 
         if ($request->input('_close', null)) {
@@ -107,13 +119,28 @@ class PermissionsController extends Controller
 
     public function destroy($id)
     {
-	return redirect()->route('admin.permissions.index');
-        return 'destroy';
+	$permission = Permission::findOrFail($id);
+
+	if (in_array($permission->name, $this->reservedPerms)) {
+	    return redirect()->route('admin.permissions.edit', $permission->id)->with('error', 'You cannot delete a reserved permission.');
+	}
+
+	$permission->delete();
+
+	return redirect()->route('admin.permissions.index')->with('success', 'Permission successfully deleted.');
     }
 
     public function massDestroy(Request $request)
     {
-	return redirect()->route('admin.permissions.index');
-    }
+        $permissions = Permission::whereIn('id', $request->input('ids'))->pluck('name')->toArray();
+	$result = array_intersect($permissions, $this->reservedPerms);
 
+	if (!empty($result)) {
+	    return redirect()->route('admin.permissions.index')->with('error', 'The following permissions are reserved: '.implode(',', $result));
+	}
+
+	Permission::destroy($request->input('ids'));
+
+	return redirect()->route('admin.permissions.index')->with('success', count($request->input('ids')).' Permission(s) successfully deleted.');
+    }
 }

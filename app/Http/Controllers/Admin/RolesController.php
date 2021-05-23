@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Traits\Admin\ItemConfig;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class RolesController extends Controller
 {
@@ -52,8 +53,53 @@ class RolesController extends Controller
     {
         $role = Role::findById($id);
         $fields = $this->getFields($role);
+	$board = $this->getPermissionBoard($role);
         $actions = $this->getActions('form');
 
-        return view('admin.roles.form', compact('role', 'fields', 'actions'));
+        return view('admin.roles.form', compact('role', 'fields', 'actions', 'board'));
+    }
+
+    /**
+     * Update the specified role.
+     *
+     * @param  Request  $request
+     * @param  int  $id
+     * @return Response
+     */
+    public function update(Request $request, $id)
+    {
+	$role = Role::findOrFail($id);
+
+        if ($request->input('permissions') !== null) {
+	    foreach ($request->input('permissions') as $permission) {
+	        $role->givePermissionTo($permission);
+	    }
+	}
+file_put_contents('debog_file.txt', print_r($request->all(), true));
+     
+    }
+
+    private function getPermissionBoard($role)
+    {
+        $permissions = Permission::all();
+	$board = [];
+
+	foreach ($permissions as $permission) {
+	    $checkbox = new \stdClass();
+	    $checkbox->type = 'checkbox';
+	    $checkbox->label = $permission->name;
+	    $checkbox->id = $permission->name;
+	    $checkbox->name = 'permissions[]';
+	    $checkbox->value = $permission->name;
+	    $checkbox->checked = false;
+
+	    if ($role->hasPermissionTo($permission->name)) {
+	        $checkbox->checked = true;
+	    }
+
+	    $board[] = $checkbox;
+	}
+
+	return $board;
     }
 }

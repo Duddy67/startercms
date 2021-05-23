@@ -4,6 +4,11 @@
     @php $action = (isset($role)) ? route('admin.roles.update', $role->id) : route('admin.roles.store') @endphp
     <form method="post" action="{{ $action }}" id="itemForm">
         @csrf
+
+	@if (isset($role))
+	    @method('put')
+	@endif
+
         @foreach ($fields as $attribs)
 	    @php if (isset($role)) { 
 		     $value = old($attribs->name, $attribs->value);
@@ -16,8 +21,19 @@
 		     $value = old($attribs->name);
 		 }
 	    @endphp
-	    <x-input :attribs=$attribs :value=$value />
+	    <x-input :attribs="$attribs" :value="$value" />
         @endforeach
+
+	<table class="table">
+	    <tbody>
+		@foreach ($board as $checkbox)
+		    <tr><td>
+			<x-input :attribs="$checkbox" :value="$checkbox->value" />
+		    </td></tr>
+		@endforeach
+	    </tbody>
+	</table>
+
 	<input type="hidden" id="listUrl" value="{{ route('admin.roles.index') }}">
 	<input type="hidden" id="close" name="_close" value="0">
     </form>
