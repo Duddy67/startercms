@@ -26,7 +26,7 @@
 
 	<table class="table">
 	    <tbody>
-		@foreach ($board as $checkbox)
+		@foreach ($list as $checkbox)
 		    <tr><td>
 			<x-input :attribs="$checkbox" :value="$checkbox->value" />
 		    </td></tr>

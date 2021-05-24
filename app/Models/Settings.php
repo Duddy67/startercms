@@ -13,7 +13,7 @@ class Settings extends Model
     public static function getReservedRoles()
     {
         return [
-	    'superadmin',
+	    'super-admin',
 	    'admin',
 	    'manager',
 	    'registered'

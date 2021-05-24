@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Traits\Admin\ItemConfig;
+use App\Models\Settings;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -13,6 +15,7 @@ class RolesController extends Controller
 {
     use ItemConfig, HasRoles;
 
+    public $reservedRoles;
 
     /**
      * Create a new controller instance.
@@ -23,6 +26,7 @@ class RolesController extends Controller
     {
         $this->middleware('auth');
 	$this->itemName = 'role';
+	$this->reservedRoles = Settings::getReservedRoles();
     }
 
     /**
@@ -45,18 +49,19 @@ class RolesController extends Controller
     {
         $fields = $this->getFields();
         $actions = $this->getActions('form');
+	$list = $this->getPermissionList();
 
-        return view('admin.roles.form', compact('fields', 'actions'));
+        return view('admin.roles.form', compact('fields', 'actions', 'list'));
     }
 
     public function edit($id)
     {
         $role = Role::findById($id);
         $fields = $this->getFields($role);
-	$board = $this->getPermissionBoard($role);
+	$list = $this->getPermissionList($role);
         $actions = $this->getActions('form');
 
-        return view('admin.roles.form', compact('role', 'fields', 'actions', 'board'));
+        return view('admin.roles.form', compact('role', 'fields', 'actions', 'list'));
     }
 
     /**
@@ -70,16 +75,82 @@ class RolesController extends Controller
     {
 	$role = Role::findOrFail($id);
 
+        $this->validate($request, [
+	    'name' => [
+		'required',
+		//'not_regex:/'.implode('|', $this->reservedRoles).'/i',
+		'regex:/^[a-z0-9-]{3,}$/',
+		Rule::unique('roles')->ignore($id)
+	    ],
+	]);
+
+	$role->name = $request->input('name');
+	$role->save();
+
+	// Set the permission list.
+	
         if ($request->input('permissions') !== null) {
+	    // Get the unselected permissions.
+	    $permissions = Permission::whereNotIn('name', $request->input('permissions'))->pluck('name')->toArray();
+
 	    foreach ($request->input('permissions') as $permission) {
-	        $role->givePermissionTo($permission);
+	        if (!$role->hasPermissionTo($permission)) {
+		    $role->givePermissionTo($permission);
+		}
 	    }
 	}
-file_put_contents('debog_file.txt', print_r($request->all(), true));
+	else {
+	    // Get all of the permissions.
+	    $permissions = Permission::all()->pluck('name')->toArray();
+	}
+
+	foreach ($permissions as $permission) {
+	    if ($role->hasPermissionTo($permission)) {
+		$role->revokePermissionTo($permission);
+	    }
+	}
+
+	$message = 'Permission successfully updated.';
+
+        if ($request->input('_close', null)) {
+	    return redirect()->route('admin.roles.index')->with('success', $message);
+	}
+
+	return redirect()->route('admin.roles.edit', $role->id)->with('success', $message);
      
     }
 
-    private function getPermissionBoard($role)
+    public function store(Request $request)
+    {
+        $this->validate($request, [
+	    'name' => [
+		'required',
+		//'not_regex:/'.implode('|', $this->reservedRoles).'/i',
+		'regex:/^[a-z0-9-]{3,}$/',
+		'unique:roles'
+	    ],
+	]);
+
+	$role = Role::create(['name' => $request->input('name')]);
+
+	// Set the permission list.
+	
+        if ($request->input('permissions') !== null) {
+	    foreach ($request->input('permissions') as $permission) {
+		$role->givePermissionTo($permission);
+	    }
+	}
+
+	$message = 'Role successfully added.';
+
+        if ($request->input('_close', null)) {
+	    return redirect()->route('admin.roles.index')->with('success', $message);
+	}
+
+	return redirect()->route('admin.roles.edit', $role->id)->with('success', $message);
+    }
+
+    private function getPermissionList($role = null)
     {
         $permissions = Permission::all();
 	$board = [];
@@ -93,7 +164,7 @@ file_put_contents('debog_file.txt', print_r($request->all(), true));
 	    $checkbox->value = $permission->name;
 	    $checkbox->checked = false;
 
-	    if ($role->hasPermissionTo($permission->name)) {
+	    if ($role && $role->hasPermissionTo($permission->name)) {
 	        $checkbox->checked = true;
 	    }
 

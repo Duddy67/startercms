@@ -4,6 +4,11 @@
     @php $action = (isset($user)) ? route('admin.users.update', $user->id) : route('admin.users.store') @endphp
     <form method="post" action="{{ $action }}" id="itemForm">
         @csrf
+
+	@if (isset($user))
+	    @method('put')
+	@endif
+
         @foreach ($fields as $attribs)
 	    @php if (isset($user)) { 
 		     $value = old($attribs->name, $attribs->value);
@@ -16,7 +21,7 @@
 		     $value = old($attribs->name);
 		 }
 	    @endphp
-	    <x-input :attribs=$attribs :value=$value />
+	    <x-input :attribs="$attribs" :value="$value" />
         @endforeach
 	<input type="hidden" id="listUrl" value="{{ route('admin.users.index') }}">
 	<input type="hidden" id="close" name="_close" value="0">

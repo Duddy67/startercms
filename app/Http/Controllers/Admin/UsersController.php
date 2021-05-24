@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use App\Traits\Admin\ItemConfig;
 
 class UsersController extends Controller
@@ -55,7 +57,8 @@ class UsersController extends Controller
         $user = User::findOrFail($id);
         $fields = $this->getFields($user, ['password', 'password_confirmation']);
         $actions = $this->getActions('form');
-
+	$roles = $user->getRoleType();
+var_dump($roles);
         return view('admin.users.form', compact('user', 'fields', 'actions'));
     }
 
@@ -68,32 +71,57 @@ class UsersController extends Controller
      */
     public function update(Request $request, $id)
     {
+	$user = User::findOrFail($id);
+
         $this->validate($request, [
 	    'name' => 'bail|required|between:5,25|regex:/^[\pL\s\-]+$/u',
-	    'email' => 'bail|required|email|unique:users,email',
+	    'email' => ['bail', 'required', 'email',
+			Rule::unique('users')->ignore($id)
+	    ],
 	    'password' => 'nullable|confirmed|min:8'
 	]);
 
-        if ($request->input('_close', null)) {
-	    return redirect()->route('admin.users.index');
+	$user->name = $request->input('name');
+	$user->email = $request->input('email');
+
+	if ($request->input('password') !== null) {
+	    $user->password = Hash::make($request->input('password'));
 	}
 
-        return var_dump($request->all());
+	$user->syncRoles($request->input('role'));
+
+	$user->save();
+
+	$message = 'Permission successfully updated.';
+
+        if ($request->input('_close', null)) {
+	    return redirect()->route('admin.users.index')->with('success', $message);
+	}
+
+	return redirect()->route('admin.users.edit', $user->id)->with('success', $message);
     }
 
     public function store(Request $request)
     {
         $this->validate($request, [
 	    'name' => 'bail|required|between:5,25|regex:/^[\pL\s\-]+$/u',
-	    'email' => 'bail|required|email|unique:users,email',
+	    'email' => 'bail|required|email|unique:users',
 	    'password' => 'required|confirmed|min:8'
 	]);
 
+	$user = User::create([
+	    'name' => $request->input('name'),
+	    'email' => $request->input('email'),
+	    'password' => Hash::make($request->input('name')),
+	]);
+
+	$message = 'User successfully added.';
+
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.users.index');
+	    return redirect()->route('admin.users.index')->with('success', $message);
 	}
 
-        return 'store';
+	return redirect()->route('admin.users.edit', $user->id)->with('success', $message);
     }
 
     public function destroy($id)
