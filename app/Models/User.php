@@ -43,7 +43,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public $roleTypes = [
+    public static $roleTypes = [
         'super-admin',
         'admin',
         'manager',
@@ -55,18 +55,27 @@ class User extends Authenticatable
         return User::all();
     }
 
-    public function getRoleOptions()
+    public static function getRoleOptions($user = null)
     {
-        $roleType = $this->getRoleType();
+        $roleType = self::getRoleType();
 
 	if ($roleType == 'registered') {
+	  $roles = Role::whereDoesntHave('permissions', function ($query) {
+	      $query->whereNotIn('name', ['create-user', 'create-permission', 'create-role']);
+	  })->get();
 	}
 	elseif ($roleType == 'manager') {
+	  $roles = Role::whereDoesntHave('permissions', function ($query) {
+	      $query->where('name', 'create-user')->whereNotIn('name', ['create-permission', 'create-role']);
+	  })->get();
 	}
 	elseif ($roleType == 'admin') {
+	  $roles = Role::whereDoesntHave('permissions', function ($query) {
+	      $query->whereIn('name', ['create-permission', 'create-role']);
+	  })->get();
 	}
 	// The super-admin is editing their own user account.
-	elseif ($this->getRoleNames()->toArray()[0] == 'super-admin') {
+	elseif ($user && $user->getRoleNames()->toArray()[0] == 'super-admin') {
 	    $roles = Role::where('name', 'super-admin')->get();
 	} 
 	// super-admin
@@ -83,15 +92,14 @@ class User extends Authenticatable
 	return $options;
     }
 
-    public function getRoleType()
+    public static function getRoleType($user = null)
     {
-        // Get the current user.
-        $user = auth()->user();
+        // Get the given or current user.
+        $user = ($user) ? $user : auth()->user();
 
         $roleName = $user->getRoleNames()->toArray()[0];
-//file_put_contents('debog_file.txt', print_r($roles, true));
 
-	if (in_array($roleName, $this->roleTypes)) {
+	if (in_array($roleName, User::$roleTypes)) {
 	    return $roleName;
 	}
 
@@ -108,9 +116,24 @@ class User extends Authenticatable
 	}
     }
 
+    /*
+     * Used to get the option role value.
+     */
     public function getRoleValue()
     {
-        $roles = $this->getRoleNames();
-	return $roles[0];
+        return $this->getRoleName();
+    }
+
+    /*
+     * Returns the user's role name.
+     */
+    public function getRoleName()
+    {
+        return $this->getRoleNames()->toArray()[0];
+    }
+
+    public function isAllowedTo($permission)
+    {
+	return $this->hasPermissionTo($permission) || $this->hasRole('super-admin');
     }
 }

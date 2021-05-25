@@ -28,7 +28,7 @@ class Settings extends Model
     public static function getPrivatePermissions()
     {
         return [
-	    'global-settings', 
+	    'update-settings', 
 	    'create-role',
 	    'update-role',
 	    'delete-role',

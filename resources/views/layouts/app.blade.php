@@ -67,7 +67,7 @@
                                     </form>
                                 </div>
                             </li>
-                            @hasanyrole ('admin|manager')
+                            @hasanyrole ('super-admin|admin|manager')
 				<li class="nav-item">
 				    <a class="nav-link" href="{{ route('admin') }}">{{ __('Admin') }}</a>
 				</li>

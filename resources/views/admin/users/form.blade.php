@@ -1,6 +1,7 @@
 @extends ('layouts.admin')
 
 @section ('main')
+@php var_dump(auth()->user()->isAllowedTo('create-role')); @endphp
     @php $action = (isset($user)) ? route('admin.users.update', $user->id) : route('admin.users.store') @endphp
     <form method="post" action="{{ $action }}" id="itemForm">
         @csrf

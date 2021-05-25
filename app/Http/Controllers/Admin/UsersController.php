@@ -15,7 +15,6 @@ class UsersController extends Controller
 
     protected $model;
 
-
     /**
      * Create a new controller instance.
      *
@@ -24,8 +23,11 @@ class UsersController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('admin.auth');
 	$this->model = new User;
+	//
 	$this->itemName = 'user';
+	$this->itemModel = '\App\Models\User';
     }
 
     /**
@@ -57,8 +59,8 @@ class UsersController extends Controller
         $user = User::findOrFail($id);
         $fields = $this->getFields($user, ['password', 'password_confirmation']);
         $actions = $this->getActions('form');
-	$roles = $user->getRoleType();
-var_dump($roles);
+	//$roles = $user->getRoleType();
+//var_dump($roles);
         return view('admin.users.form', compact('user', 'fields', 'actions'));
     }
 
@@ -88,11 +90,13 @@ var_dump($roles);
 	    $user->password = Hash::make($request->input('password'));
 	}
 
-	$user->syncRoles($request->input('role'));
+	if (!$user->hasRole('super-admin')) {
+	    $user->syncRoles($request->input('role'));
+	}
 
 	$user->save();
 
-	$message = 'Permission successfully updated.';
+	$message = 'User successfully updated.';
 
         if ($request->input('_close', null)) {
 	    return redirect()->route('admin.users.index')->with('success', $message);
@@ -106,7 +110,8 @@ var_dump($roles);
         $this->validate($request, [
 	    'name' => 'bail|required|between:5,25|regex:/^[\pL\s\-]+$/u',
 	    'email' => 'bail|required|email|unique:users',
-	    'password' => 'required|confirmed|min:8'
+	    'password' => 'required|confirmed|min:8',
+	    'role' => 'required'
 	]);
 
 	$user = User::create([
@@ -114,6 +119,8 @@ var_dump($roles);
 	    'email' => $request->input('email'),
 	    'password' => Hash::make($request->input('name')),
 	]);
+
+	$user->assignRole($request->input('role'));
 
 	$message = 'User successfully added.';
 

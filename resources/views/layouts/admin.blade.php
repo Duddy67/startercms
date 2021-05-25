@@ -197,68 +197,83 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-	  <li class="nav-item menu-open">
-	    <a href="#" class="nav-link active">
-	      <i class="nav-icon fas fa-users"></i>
-	      <p>Users</p>
-	    </a>
-	      <ul class="nav nav-treeview">
-		<x-menu-item href="{{ route('admin.users.index') }}" :sub=true :active=false>
-		  Users
-		</x-menu-item>
-		<x-menu-item href="#" :sub=true :active=false>
-                  Groups
-		</x-menu-item>
-	      </ul>
-	  </li>
-	  <li class="nav-item menu-open">
-	    <a href="#" class="nav-link">
-	      <i class="nav-icon fas fa-lock"></i>
-	      <p>Roles & Permissions</p>
-	    </a>
-	      <ul class="nav nav-treeview">
-		<x-menu-item href="{{ route('admin.roles.index') }}" :sub=true :active=false>
-		  Roles
-		</x-menu-item>
-		<x-menu-item href="{{ route('admin.permissions.index') }}" :sub=true :active=false>
-                  Permissions
-		</x-menu-item>
-	      </ul>
-	  </li>
-	  <li class="nav-item menu-open">
-	    <a href="#" class="nav-link">
-	      <i class="nav-icon fas fa-pencil-alt"></i>
-	      <p>Blog</p>
-	    </a>
-	      <ul class="nav nav-treeview">
-		<x-menu-item href="#" :sub=true :active=false>
-		  Posts
-		</x-menu-item>
-		<x-menu-item href="#" :sub=true :active=false>
-                  Categories
-		</x-menu-item>
-		<x-menu-item href="#" :sub=true :active=false>
-                  Settings
-		</x-menu-item>
-	      </ul>
-	  </li>
-	  <li class="nav-item menu-open">
-	    <a href="#" class="nav-link">
-	      <i class="nav-icon fas fa-cogs"></i>
-	      <p>Settings</p>
-	    </a>
-	      <ul class="nav nav-treeview">
-		<x-menu-item href="#" :sub=true :active=false>
-		  Security
-		</x-menu-item>
-		<x-menu-item href="#" :sub=true :active=false>
-                  Email
-		</x-menu-item>
-		<x-menu-item href="#" :sub=true :active=false>
-                  Global
-		</x-menu-item>
-	      </ul>
-	  </li>
+	  @allowto ('create-user')
+	      <li class="nav-item menu-open">
+		<a href="#" class="nav-link active">
+		  <i class="nav-icon fas fa-users"></i>
+		  <p>Users</p>
+		</a>
+		  <ul class="nav nav-treeview">
+		    <x-menu-item href="{{ route('admin.users.index') }}" :sub=true :active=false>
+		      Users
+		    </x-menu-item>
+		    <x-menu-item href="#" :sub=true :active=false>
+		      Groups
+		    </x-menu-item>
+		  </ul>
+	      </li>
+	  @endallowto
+
+	  @if (auth()->user()->isAllowedTo('create-permission') || auth()->user()->isAllowedTo('create-role'))
+	      <li class="nav-item menu-open">
+		<a href="#" class="nav-link">
+		  <i class="nav-icon fas fa-lock"></i>
+		  <p>Roles & Permissions</p>
+		</a>
+		  <ul class="nav nav-treeview">
+		    @allowto ('create-role')
+			<x-menu-item href="{{ route('admin.roles.index') }}" :sub=true :active=false>
+			  Roles
+			</x-menu-item>
+		    @endallowto
+		    @allowto ('create-permission')
+			<x-menu-item href="{{ route('admin.permissions.index') }}" :sub=true :active=false>
+			  Permissions
+			</x-menu-item>
+		    @endallowto
+		  </ul>
+	      </li>
+	  @endif
+
+	  @allowto ('create-post')
+	      <li class="nav-item menu-open">
+		<a href="#" class="nav-link">
+		  <i class="nav-icon fas fa-pencil-alt"></i>
+		  <p>Blog</p>
+		</a>
+		  <ul class="nav nav-treeview">
+		    <x-menu-item href="#" :sub=true :active=false>
+		      Posts
+		    </x-menu-item>
+		    <x-menu-item href="#" :sub=true :active=false>
+		      Categories
+		    </x-menu-item>
+		    <x-menu-item href="#" :sub=true :active=false>
+		      Settings
+		    </x-menu-item>
+		  </ul>
+	      </li>
+	  @endallowto
+
+	  @allowto ('update-settings')
+	      <li class="nav-item menu-open">
+		<a href="#" class="nav-link">
+		  <i class="nav-icon fas fa-cogs"></i>
+		  <p>Settings</p>
+		</a>
+		  <ul class="nav nav-treeview">
+		    <x-menu-item href="#" :sub=true :active=false>
+		      Security
+		    </x-menu-item>
+		    <x-menu-item href="#" :sub=true :active=false>
+		      Email
+		    </x-menu-item>
+		    <x-menu-item href="#" :sub=true :active=false>
+		      Global
+		    </x-menu-item>
+		  </ul>
+	      </li>
+	  @endallowto
         </ul>
       </nav>
       <!-- /.sidebar-menu -->

@@ -6,6 +6,7 @@ namespace App\Traits\Admin;
 trait ItemConfig
 {
     public $itemName;
+    public $itemModel;
 
 
     public function getColumns()
@@ -49,18 +50,31 @@ trait ItemConfig
     {
 	$fields = $this->getData('fields');
 
+	// Set the select field types.
+	foreach ($fields as $key => $field) {
+	    if ($field->type == 'select') {
+	        // Build the function name.
+		$function = 'get'.ucfirst($field->name).'Options';
+		$options = $this->itemModel::$function($item);
+		$fields[$key]->options = $options;
+
+		if ($item) {
+		    $function = 'get'.ucfirst($field->name).'Value';
+		    $fields[$key]->value = $item->$function();
+		}
+	    }
+	}
+
 	if ($item) {
 	    foreach ($fields as $key => $field) {
 		if (isset($field->name) && !in_array($field->type, $except)) {
+		    // Skip the fields which are already set.
+		    if ($field->type == 'select') {
+		        continue;
+		    }
+
 		    if ($field->type == 'date') {
 			$fields[$key]->value = $item->{$field->name}->toDateString();
-		    }
-		    elseif ($field->type == 'select') {
-		        $getOptions = 'get'.ucfirst($field->name).'Options';
-			$options = $item->$getOptions();
-			$fields[$key]->options = $options;
-		        $getValue = 'get'.ucfirst($field->name).'Value';
-			$fields[$key]->value = $item->$getValue();
 		    }
 		    else {
 			$fields[$key]->value = $item->{$field->name};
