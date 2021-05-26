@@ -23,7 +23,7 @@ class UsersController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('admin.auth');
+        $this->middleware('admin.users');
 	$this->model = new User;
 	//
 	$this->itemName = 'user';
@@ -74,6 +74,10 @@ class UsersController extends Controller
     public function update(Request $request, $id)
     {
 	$user = User::findOrFail($id);
+
+	if (!User::canUpdate($user)) {
+	    return redirect()->route('admin.users.index')->with('error', 'You are not allowed to update this user.');
+	}
 
         $this->validate($request, [
 	    'name' => 'bail|required|between:5,25|regex:/^[\pL\s\-]+$/u',
@@ -131,14 +135,31 @@ class UsersController extends Controller
 	return redirect()->route('admin.users.edit', $user->id)->with('success', $message);
     }
 
-    public function destroy($id)
+    public function destroy($id, $redirect = true)
     {
-	return redirect()->route('admin.users.index');
-        return 'destroy';
+	$user = User::findOrFail($id);
+//file_put_contents('debog_file.txt', print_r($id, true), FILE_APPEND);
+
+	if (!User::canDelete($user)) {
+	    return ($redirect) ? redirect()->route('admin.users.index')->with('error', 'You are not allowed to delete this user.') : false;
+	}
+
+	return ($redirect) ? redirect()->route('admin.users.index')->with('success', 'The user has been successfully deleted.') : true;
     }
 
     public function massDestroy(Request $request)
     {
+        if ($request->input('ids') !== null) {
+	    foreach ($request->input('ids') as $id) {
+	      if (!$this->destroy($id, false)) {
+		  return redirect()->route('admin.users.index')->with('error', 'You are not allowed to delete this user');
+	      }
+	    }
+	}
+
+	$request->session()->flash('warning', 'Testing a warning message');
+	$request->session()->flash('success', 'Success is in the eye of the beer holder');
+	//return redirect()->route('admin.users.index')->with('success', count($request->input('ids')).' user(s) has been successfully deleted.');
 	return redirect()->route('admin.users.index');
     }
 

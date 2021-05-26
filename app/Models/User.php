@@ -50,6 +50,14 @@ class User extends Authenticatable
         'registered'
     ];
 
+    public static $roleValues = [
+	'registered' => 1, 
+	'manager' => 2, 
+	'admin' => 3, 
+	'super-admin' => 5
+    ];
+
+
     public function getItems()
     {
         return User::all();
@@ -114,6 +122,37 @@ class User extends Authenticatable
 	else {
 	    return 'registered';
 	}
+    }
+
+    public static function canUpdate($user)
+    {
+        if (is_int($user)) {
+	    $user = User::findOrFail($user);
+	}
+
+	if (User::$roleValues[self::getRoleType()] > User::$roleValues[self::getRoleType($user)]) {
+	    return true;
+	}
+
+	return false;
+    }
+
+    public static function canDelete($user)
+    {
+        if (is_int($user)) {
+	    $user = User::findOrFail($user);
+	}
+
+	// Users cannot delete their own account.
+        if (auth()->user()->id == $user->id) {
+	    return false;
+	}
+
+	if (User::$roleValues[self::getRoleType()] > User::$roleValues[self::getRoleType($user)]) {
+	    return true;
+	}
+
+	return false;
     }
 
     /*
