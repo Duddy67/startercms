@@ -15,6 +15,7 @@ class PermissionsController extends Controller
     use ItemConfig, HasRoles;
 
     public $reservedPerms;
+    public $reservedPermIds;
     public $permPatterns;
 
     /**
@@ -25,8 +26,10 @@ class PermissionsController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('admin.roles');
 	$this->itemName = 'permission';
 	$this->reservedPerms = Settings::getReservedPermissions();
+	$this->reservedPermIds = Settings::getReservedPermissionIds();
 	$this->permPatterns = Settings::getPermissionPatterns();
     }
 
@@ -57,6 +60,11 @@ class PermissionsController extends Controller
     public function edit($id)
     {
         $permission = Permission::findById($id);
+
+	if (in_array($permission->name, $this->reservedPerms)) {
+	    return redirect()->route('admin.permissions.index')->with('error', 'The permission "'.$permission->name.'" is reserved.');
+	}
+
         $fields = $this->getFields($permission);
         $actions = $this->getActions('form');
 
@@ -77,10 +85,17 @@ class PermissionsController extends Controller
         $this->validate($request, [
 	    'name' => [
 		'required',
-		//'not_regex:/'.implode('|', $this->reservedPerms).'/i',
+		'not_regex:/'.implode('|', $this->reservedPerms).'/i',
 		'regex:/^'.implode('|', $this->permPatterns).'$/',
 		Rule::unique('permissions')->ignore($id)
 	    ],
+	],
+	// Custom messages.
+	[
+	    'name.required' => 'This field is required.',
+	    'name.not_regex' => 'This permission is reserved.',
+	    'name.regex' => 'The permission name is invalid.',
+	    'name.unique' => 'The permission is already taken.',
 	]);
 
 	$permission->name = $request->input('name');
@@ -100,10 +115,17 @@ class PermissionsController extends Controller
         $this->validate($request, [
 	    'name' => [
 		'required',
-		//'not_regex:/'.implode('|', $this->reservedPerms).'/i',
+		'not_regex:/'.implode('|', $this->reservedPerms).'/i',
 		'regex:/^'.implode('|', $this->permPatterns).'$/',
 		'unique:permissions'
 	    ],
+	],
+	// Custom messages.
+	[
+	    'name.required' => 'This field is required.',
+	    'name.not_regex' => 'This permission is reserved.',
+	    'name.regex' => 'The permission name is invalid.',
+	    'name.unique' => 'The permission is already taken.',
 	]);
 
 	$permission = Permission::create(['name' => $request->input('name')]);
@@ -121,8 +143,8 @@ class PermissionsController extends Controller
     {
 	$permission = Permission::findOrFail($id);
 
-	if (in_array($permission->name, $this->reservedPerms)) {
-	    return redirect()->route('admin.permissions.edit', $permission->id)->with('error', 'You cannot delete a reserved permission.');
+	if (in_array($permission->id, $this->reservedPermIds)) {
+	    return redirect()->route('admin.permissions.edit', $permission->id)->with('error', 'This permission is reserved.');
 	}
 
 	$permission->delete();

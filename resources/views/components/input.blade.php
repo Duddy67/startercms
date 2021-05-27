@@ -49,8 +49,8 @@
 	name="{{ $attribs->name }}"
     @endif
 
-    @if (isset($attribs->readonly) && $attribs->readonly)
-	readonly
+    @if (isset($attribs->disabled) && $attribs->disabled)
+	disabled="disabled"
     @endif
 
     @if ($value)

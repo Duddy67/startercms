@@ -67,25 +67,27 @@ class User extends Authenticatable
     {
         $roleType = self::getRoleType();
 
-	if ($roleType == 'registered') {
+	// Check first if the user is editing their own user account.
+	if ($user && auth()->user()->id == $user->id) {
+	    // Only display the user role.
+	    $roles = Role::where('name', $user->getRoleNames()->toArray()[0])->get();
+	}
+	// Move on to the role types.
+	elseif ($roleType == 'registered') {
 	  $roles = Role::whereDoesntHave('permissions', function ($query) {
 	      $query->whereNotIn('name', ['create-user', 'create-permission', 'create-role']);
-	  })->get();
+	  })->where('name', '!=', 'super-admin')->get();
 	}
 	elseif ($roleType == 'manager') {
 	  $roles = Role::whereDoesntHave('permissions', function ($query) {
 	      $query->where('name', 'create-user')->whereNotIn('name', ['create-permission', 'create-role']);
-	  })->get();
+	  })->where('name', '!=', 'super-admin')->get();
 	}
 	elseif ($roleType == 'admin') {
 	  $roles = Role::whereDoesntHave('permissions', function ($query) {
 	      $query->whereIn('name', ['create-permission', 'create-role']);
-	  })->get();
+	  })->where('name', '!=', 'super-admin')->get();
 	}
-	// The super-admin is editing their own user account.
-	elseif ($user && $user->getRoleNames()->toArray()[0] == 'super-admin') {
-	    $roles = Role::where('name', 'super-admin')->get();
-	} 
 	// super-admin
 	else {
 	    $roles = Role::whereNotIn('name', ['super-admin'])->get();

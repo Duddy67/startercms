@@ -255,7 +255,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 	      </li>
 	  @endallowto
 
-	  @allowto ('update-settings')
+	  @allowto ('global-settings')
 	      <li class="nav-item menu-open">
 		<a href="#" class="nav-link">
 		  <i class="nav-icon fas fa-cogs"></i>

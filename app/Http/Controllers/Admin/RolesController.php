@@ -17,6 +17,8 @@ class RolesController extends Controller
 
     public $reservedRoles;
 
+    public $reservedRoleIds;
+
     /**
      * Create a new controller instance.
      *
@@ -25,8 +27,10 @@ class RolesController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('admin.roles');
 	$this->itemName = 'role';
 	$this->reservedRoles = Settings::getReservedRoles();
+	$this->reservedRoleIds = Settings::getReservedRoleIds();
     }
 
     /**
@@ -75,10 +79,14 @@ class RolesController extends Controller
     {
 	$role = Role::findOrFail($id);
 
+	if (in_array($role->id, $this->reservedRoleIds)) {
+	    return redirect()->route('admin.roles.edit', $role->id)->with('error', 'This role is reserved.');
+	}
+
         $this->validate($request, [
 	    'name' => [
 		'required',
-		//'not_regex:/'.implode('|', $this->reservedRoles).'/i',
+		'not_regex:/^\s*('.implode('|', $this->reservedRoles).')\s*$/i',
 		'regex:/^[a-z0-9-]{3,}$/',
 		Rule::unique('roles')->ignore($id)
 	    ],
@@ -125,7 +133,7 @@ class RolesController extends Controller
         $this->validate($request, [
 	    'name' => [
 		'required',
-		//'not_regex:/'.implode('|', $this->reservedRoles).'/i',
+		'not_regex:/^\s*('.implode('|', $this->reservedRoles).')\s*$/i',
 		'regex:/^[a-z0-9-]{3,}$/',
 		'unique:roles'
 	    ],
@@ -150,6 +158,33 @@ class RolesController extends Controller
 	return redirect()->route('admin.roles.edit', $role->id)->with('success', $message);
     }
 
+    public function destroy($id)
+    {
+	$role = Role::findOrFail($id);
+
+	if (in_array($role->name, $this->reservedRoles)) {
+	    return redirect()->route('admin.roles.edit', $role->id)->with('error', 'This role is reserved.');
+	}
+
+	//$role->delete();
+
+	return redirect()->route('admin.roles.index')->with('success', 'Role successfully deleted.');
+    }
+
+    public function massDestroy(Request $request)
+    {
+        $roles = Role::whereIn('id', $request->input('ids'))->pluck('name')->toArray();
+	$result = array_intersect($roles, $this->reservedRoles);
+
+	if (!empty($result)) {
+	    return redirect()->route('admin.roles.index')->with('error', 'The following roles are reserved: '.implode(',', $result));
+	}
+
+	//Role::destroy($request->input('ids'));
+
+	return redirect()->route('admin.roles.index')->with('success', count($request->input('ids')).' Role(s) successfully deleted.');
+    }
+
     private function getPermissionList($role = null)
     {
         $permissions = Permission::all();
@@ -166,6 +201,10 @@ class RolesController extends Controller
 
 	    if ($role && $role->hasPermissionTo($permission->name)) {
 	        $checkbox->checked = true;
+	    }
+
+	    if ($role && in_array($role->name, $this->reservedRoles)) {
+		$checkbox->disabled = true;
 	    }
 
 	    $board[] = $checkbox;

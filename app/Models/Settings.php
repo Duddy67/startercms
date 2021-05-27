@@ -10,6 +10,9 @@ class Settings extends Model
     use HasFactory;
 
 
+    /*
+     * Roles that cannot be deleted nor updated.
+     */
     public static function getReservedRoles()
     {
         return [
@@ -20,6 +23,11 @@ class Settings extends Model
 	];
     }
 
+    public static function getReservedRoleIds()
+    {
+        return [1,2,3,4];
+    }
+
     /*
      * Permissions that can be given to an admin user type by the superadmin.
      * However, an admin user type cannot give these permissions to another user (ie: to a manager user type).
@@ -28,7 +36,6 @@ class Settings extends Model
     public static function getPrivatePermissions()
     {
         return [
-	    'update-settings', 
 	    'create-role',
 	    'update-role',
 	    'delete-role',
@@ -36,7 +43,9 @@ class Settings extends Model
 	    'update-permission',
 	    'delete-permission',
 	    'update-user',
-	    'delete-user'
+	    'delete-user',
+	    'global-settings', 
+	    'blog-settings', 
 	];
     }
 
@@ -51,6 +60,8 @@ class Settings extends Model
 	    'create-user',
 	    'update-own-user',
 	    'delete-own-user',
+	    'update-post',
+	    'delete-post',
 	];
     }
 
@@ -61,16 +72,22 @@ class Settings extends Model
     {
         return [
 	    'create-post',
-	    'update-post',
-	    'delete-post',
 	    'update-own-post',
 	    'delete-own-post',
 	];
     }
 
+    /*
+     * Permissions that cannot be deleted nor updated.
+     */
     public static function getReservedPermissions()
     {
 	return array_merge(self::getPrivatePermissions(), self::getProtectedPermissions(), self::getPublicPermissions()); 
+    }
+
+    public static function getReservedPermissionIds()
+    {
+        return [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18];
     }
 
     public static function getPermissionPatterns()
@@ -81,7 +98,7 @@ class Settings extends Model
 	    'delete-[0-9-a-z\-]+',
 	    'update-own-[0-9-a-z\-]+',
 	    'delete-own-[0-9-a-z\-]+',
-	    'settings-[0-9-a-z\-]+'
+	    '[0-9-a-z\-]+-settings'
 	];
     }
 }

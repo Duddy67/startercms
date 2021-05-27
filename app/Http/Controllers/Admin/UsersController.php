@@ -57,10 +57,14 @@ class UsersController extends Controller
     public function edit($id)
     {
         $user = User::findOrFail($id);
+
+	if (!User::canUpdate($user) && auth()->user()->id != $user->id) {
+	    return redirect()->route('admin.users.index')->with('error', 'You are not allowed to edit this user.');
+	}
+
         $fields = $this->getFields($user, ['password', 'password_confirmation']);
         $actions = $this->getActions('form');
-	//$roles = $user->getRoleType();
-//var_dump($roles);
+
         return view('admin.users.form', compact('user', 'fields', 'actions'));
     }
 
@@ -75,8 +79,8 @@ class UsersController extends Controller
     {
 	$user = User::findOrFail($id);
 
-	if (!User::canUpdate($user)) {
-	    return redirect()->route('admin.users.index')->with('error', 'You are not allowed to update this user.');
+	if (!User::canUpdate($user) && auth()->user()->id != $user->id) {
+	    return redirect()->route('admin.users.edit', $user->id)->with('error', 'You are not allowed to update this user.');
 	}
 
         $this->validate($request, [
@@ -135,32 +139,40 @@ class UsersController extends Controller
 	return redirect()->route('admin.users.edit', $user->id)->with('success', $message);
     }
 
-    public function destroy($id, $redirect = true)
+    public function destroy($id)
     {
 	$user = User::findOrFail($id);
-//file_put_contents('debog_file.txt', print_r($id, true), FILE_APPEND);
 
 	if (!User::canDelete($user)) {
-	    return ($redirect) ? redirect()->route('admin.users.index')->with('error', 'You are not allowed to delete this user.') : false;
+	    return redirect()->route('admin.users.edit', $user->id)->with('error', 'You are not allowed to delete this user.');
 	}
 
-	return ($redirect) ? redirect()->route('admin.users.index')->with('success', 'The user has been successfully deleted.') : true;
+	//$user->delete();
+
+	return redirect()->route('admin.users.index')->with('success', 'The user has been successfully deleted.');
     }
 
     public function massDestroy(Request $request)
     {
         if ($request->input('ids') !== null) {
-	    foreach ($request->input('ids') as $id) {
-	      if (!$this->destroy($id, false)) {
-		  return redirect()->route('admin.users.index')->with('error', 'You are not allowed to delete this user');
-	      }
+
+	    foreach ($request->input('ids') as $key => $id) {
+		$user = User::findOrFail($id);
+
+		if (!User::canDelete($user)) {
+		    // Informs about the users previously deleted.
+		    if ($key > 0) {
+			$request->session()->flash('success', $key.' user(s) has been successfully deleted.');
+		    }
+
+		    return redirect()->route('admin.users.index')->with('error', 'You are not allowed to delete this user: '.$user->name);
+		}
+
+		//$user->delete();
 	    }
 	}
 
-	$request->session()->flash('warning', 'Testing a warning message');
-	$request->session()->flash('success', 'Success is in the eye of the beer holder');
-	//return redirect()->route('admin.users.index')->with('success', count($request->input('ids')).' user(s) has been successfully deleted.');
-	return redirect()->route('admin.users.index');
+	return redirect()->route('admin.users.index')->with('success', count($request->input('ids')).' user(s) has been successfully deleted.');
     }
 
     /*
