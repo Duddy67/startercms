@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Traits\Admin\ItemConfig;
 use App\Models\Settings;
+use App\Models\User;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -16,8 +17,9 @@ class RolesController extends Controller
     use ItemConfig, HasRoles;
 
     public $reservedRoles;
-
     public $reservedRoleIds;
+    public $privatePerms;
+    public $protectedPerms;
 
     /**
      * Create a new controller instance.
@@ -31,6 +33,8 @@ class RolesController extends Controller
 	$this->itemName = 'role';
 	$this->reservedRoles = Settings::getReservedRoles();
 	$this->reservedRoleIds = Settings::getReservedRoleIds();
+	$this->privatePerms = Settings::getPrivatePermissions();
+	$this->protectedPerms = Settings::getProtectedPermissions();
     }
 
     /**
@@ -98,6 +102,14 @@ class RolesController extends Controller
 	// Set the permission list.
 	
         if ($request->input('permissions') !== null) {
+
+	    // Ensure an admin doesn't use any private permissions. 
+	    $count = array_intersect($request->input('permissions'), $this->privatePerms);
+
+	    if (User::getRoleType() == 'admin' && $count) {
+		return redirect()->route('admin.roles.edit', $role->id)->with('error', 'One or more selected permissions are not authorised.');
+	    }
+
 	    // Get the unselected permissions.
 	    $permissions = Permission::whereNotIn('name', $request->input('permissions'))->pluck('name')->toArray();
 
@@ -144,6 +156,14 @@ class RolesController extends Controller
 	// Set the permission list.
 	
         if ($request->input('permissions') !== null) {
+
+	    // Ensure an admin doesn't use any private permissions. 
+	    $count = array_intersect($request->input('permissions'), $this->privatePerms);
+
+	    if (User::getRoleType() == 'admin' && $count) {
+		return redirect()->route('admin.roles.edit', $role->id)->with('error', 'One or more selected permissions are not authorised.');
+	    }
+
 	    foreach ($request->input('permissions') as $permission) {
 		$role->givePermissionTo($permission);
 	    }
@@ -187,8 +207,18 @@ class RolesController extends Controller
 
     private function getPermissionList($role = null)
     {
-        $permissions = Permission::all();
-	$board = [];
+        $userRoleType = User::getRoleType();
+
+	if (($role === null || !in_array($role->name, $this->reservedRoles)) && $userRoleType == 'admin') {
+	    // Restrict permissions for admins.
+	    $permissions = Permission::whereNotIn('name', $this->privatePerms)->get();
+	}
+	// super-admin
+	else {
+	    $permissions = Permission::all();
+	}
+
+	$list = [];
 
 	foreach ($permissions as $permission) {
 	    $checkbox = new \stdClass();
@@ -199,17 +229,35 @@ class RolesController extends Controller
 	    $checkbox->value = $permission->name;
 	    $checkbox->checked = false;
 
-	    if ($role && $role->hasPermissionTo($permission->name)) {
-	        $checkbox->checked = true;
+	    if ($role) {
+		if ($role->hasPermissionTo($permission->name)) {
+		    $checkbox->checked = true;
+		}
+
+		// Disable permissions according to the edited default role type.
+
+		if ($role->name == 'super-admin') {
+		    $checkbox->checked = true;
+		    $checkbox->disabled = true;
+		}
+
+		if ($role->name == 'admin' && (in_array($permission->name, $this->privatePerms) || $permission->name == 'create-user')) {
+		    $checkbox->disabled = true;
+		}
+
+		if ($role->name == 'manager' && (in_array($permission->name, $this->privatePerms) || in_array($permission->name, $this->protectedPerms) || $permission->name == 'create-post')) {
+		    $checkbox->disabled = true;
+		}
+
+		if ($role->name == 'assistant' &&
+		    (in_array($permission->name, $this->privatePerms) || in_array($permission->name, ['access-admin', 'create-user', 'update-own-user', 'delete-own-user']))) {
+		    $checkbox->disabled = true;
+		}
 	    }
 
-	    if ($role && in_array($role->name, $this->reservedRoles)) {
-		$checkbox->disabled = true;
-	    }
-
-	    $board[] = $checkbox;
+	    $list[] = $checkbox;
 	}
 
-	return $board;
+	return $list;
     }
 }

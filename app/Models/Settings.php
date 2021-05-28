@@ -19,19 +19,20 @@ class Settings extends Model
 	    'super-admin',
 	    'admin',
 	    'manager',
+	    'assistant',
 	    'registered'
 	];
     }
 
     public static function getReservedRoleIds()
     {
-        return [1,2,3,4];
+        return [1,2,3,4,5];
     }
 
     /*
      * Permissions that can be given to an admin user type by the superadmin.
-     * However, an admin user type cannot give these permissions to another user (ie: to a manager user type).
-     * Therefore, an admin user type cannot create another admin user type.
+     * However, an admin user type cannot give these permissions to another user.
+     * (ie: An admin user type cannot create another admin user type.)
      */
     public static function getPrivatePermissions()
     {
@@ -51,8 +52,8 @@ class Settings extends Model
 
     /*
      * Permissions that can be given to a manager user type by an admin user type.
-     * However, a manager user type cannot give these permissions to another user (ie: to a registered user type).
-     * Therefore, a manager user type cannot create another manager user type.
+     * However, a manager user type cannot give these permissions to another user.
+     * (ie: A manager user type cannot create another manager user type.)
      */
     public static function getProtectedPermissions()
     {
@@ -62,6 +63,7 @@ class Settings extends Model
 	    'delete-own-user',
 	    'update-post',
 	    'delete-post',
+	    'access-admin',
 	];
     }
 

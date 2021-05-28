@@ -98,7 +98,8 @@ class UsersController extends Controller
 	    $user->password = Hash::make($request->input('password'));
 	}
 
-	if (!$user->hasRole('super-admin')) {
+	// Users cannot modify roles in their own account.
+	if (auth()->user()->id != $user->id) {
 	    $user->syncRoles($request->input('role'));
 	}
 

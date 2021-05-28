@@ -52,8 +52,9 @@ class User extends Authenticatable
 
     public static $roleValues = [
 	'registered' => 1, 
-	'manager' => 2, 
-	'admin' => 3, 
+	'assistant' => 2, 
+	'manager' => 3, 
+	'admin' => 4, 
 	'super-admin' => 5
     ];
 
@@ -120,6 +121,9 @@ class User extends Authenticatable
 	}
 	elseif ($role->hasPermissionTo('create-user')) {
 	    return 'manager';
+	}
+	elseif ($role->hasPermissionTo('access-admin')) {
+	    return 'assistant';
 	}
 	else {
 	    return 'registered';
