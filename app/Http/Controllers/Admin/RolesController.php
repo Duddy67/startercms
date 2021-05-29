@@ -186,7 +186,11 @@ class RolesController extends Controller
 	    return redirect()->route('admin.roles.edit', $role->id)->with('error', 'This role is reserved.');
 	}
 
-	//$role->delete();
+	if ($role->users->count()) {
+	    return redirect()->route('admin.roles.edit', $role->id)->with('error', 'One or more users are assigned to this role.');
+	}
+
+	$role->delete();
 
 	return redirect()->route('admin.roles.index')->with('success', 'Role successfully deleted.');
     }
@@ -200,7 +204,15 @@ class RolesController extends Controller
 	    return redirect()->route('admin.roles.index')->with('error', 'The following roles are reserved: '.implode(',', $result));
 	}
 
-	//Role::destroy($request->input('ids'));
+	foreach ($request->input('ids') as $id) {
+	    $role = Role::findOrFail($id);
+
+	    if ($role->users->count()) {
+		return redirect()->route('admin.roles.index')->with('error', 'One or more users are assigned to this role: '.$role->name);
+	    }
+	}
+
+	Role::destroy($request->input('ids'));
 
 	return redirect()->route('admin.roles.index')->with('success', count($request->input('ids')).' Role(s) successfully deleted.');
     }

@@ -37,12 +37,12 @@ class Settings extends Model
     public static function getPrivatePermissions()
     {
         return [
-	    'create-role',
-	    'update-role',
-	    'delete-role',
 	    'create-permission',
 	    'update-permission',
 	    'delete-permission',
+	    'create-role',
+	    'update-role',
+	    'delete-role',
 	    'update-user',
 	    'delete-user',
 	    'global-settings', 
@@ -63,6 +63,11 @@ class Settings extends Model
 	    'delete-own-user',
 	    'update-post',
 	    'delete-post',
+	    'create-blog-category',
+	    'update-blog-category',
+	    'delete-blog-category',
+	    'update-own-blog-category',
+	    'delete-own-blog-category',
 	    'access-admin',
 	];
     }

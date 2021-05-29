@@ -29,14 +29,11 @@
     @endif
 
     >
-
-    @if (isset($attribs->name))
-	@error($attribs->name)
-	    <div class="text-danger">{{ $message }}</div>
-	@enderror
-    @endif
 @elseif ($attribs->type == 'select')
     <select id="{{ $attribs->id }}" class="form-control" name="{{ $attribs->name }}">
+	@if (isset($attribs->blank))
+	    <option value="">{{ $attribs->blank }}</option>
+	@endif
         @foreach ($attribs->options as $option)
 	    @php $selected = ($option['value'] == $value) ? 'selected="selected"' : ''; @endphp
 	    <option value="{{ $option['value'] }}" {{ $selected }}>{{ $option['text'] }}</option>
@@ -62,4 +59,10 @@
     @endif
 
     >
+@endif
+
+@if (isset($attribs->name))
+    @error($attribs->name)
+	<div class="text-danger">{{ $message }}</div>
+    @enderror
 @endif

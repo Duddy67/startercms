@@ -31,6 +31,7 @@
     "type": "select",
     "name": "role",
     "id": "role",
+    "blank": "- Select -",
     "options": [] 
   },
   {

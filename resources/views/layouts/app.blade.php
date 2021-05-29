@@ -67,11 +67,11 @@
                                     </form>
                                 </div>
                             </li>
-                            @hasanyrole ('super-admin|admin|manager')
+                            @accessadmin ()
 				<li class="nav-item">
 				    <a class="nav-link" href="{{ route('admin') }}">{{ __('Admin') }}</a>
 				</li>
-			    @endhasanyrole
+			    @endaccessadmin
                         @endguest
                     </ul>
                 </div>

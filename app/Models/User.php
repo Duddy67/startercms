@@ -105,7 +105,7 @@ class User extends Authenticatable
 
     public static function getRoleType($user = null)
     {
-        // Get the given or current user.
+        // Get the given user or the current user.
         $user = ($user) ? $user : auth()->user();
 
         $roleName = $user->getRoleNames()->toArray()[0];
@@ -177,8 +177,19 @@ class User extends Authenticatable
         return $this->getRoleNames()->toArray()[0];
     }
 
+    /*
+     * Blade directive
+     */
     public function isAllowedTo($permission)
     {
 	return $this->hasPermissionTo($permission) || $this->hasRole('super-admin');
+    }
+
+    /*
+     * Blade directive
+     */
+    public function canAccessAdmin()
+    {
+        return in_array(self::getRoleType(), ['super-admin', 'admin', 'manager', 'assistant']);
     }
 }
