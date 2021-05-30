@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Models\Role;
+use App\Models\UserGroup;
 
 class User extends Authenticatable
 {
@@ -58,6 +59,14 @@ class User extends Authenticatable
 	'super-admin' => 5
     ];
 
+
+    /**
+     * The groups that belong to the user.
+     */
+    public function groups()
+    {
+        return $this->belongsToMany(UserGroup::class);
+    }
 
     public function getItems()
     {
