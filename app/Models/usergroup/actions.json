@@ -1,0 +1,36 @@
+{
+  "list": [
+      {
+	"id": "create",
+	"label": "New",
+	"type": "button"
+      },
+      {
+	"id": "massDestroy",
+	"label": "Delete",
+	"type": "button"
+      }
+  ],
+  "form": [
+      {
+	"id": "saveClose",
+	"label": "Save & close",
+	"type": "button"
+      },
+      {
+	"id": "save",
+	"label": "Save",
+	"type": "button"
+      },
+      {
+	"id": "cancel",
+	"label": "Cancel",
+	"type": "button"
+      },
+      {
+	"id": "destroy",
+	"label": "Delete",
+	"type": "button"
+      }
+  ]
+}

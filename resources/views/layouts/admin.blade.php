@@ -207,7 +207,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		    <x-menu-item href="{{ route('admin.users.index') }}" :sub=true :active=false>
 		      Users
 		    </x-menu-item>
-		    <x-menu-item href="#" :sub=true :active=false>
+		    <x-menu-item href="{{ route('admin.usergroups.index') }}" :sub=true :active=false>
 		      Groups
 		    </x-menu-item>
 		  </ul>

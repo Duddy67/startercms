@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\PermissionsController;
+use App\Http\Controllers\Admin\UserGroupsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,6 +54,9 @@ Route::prefix('admin')->group(function () {
 	// Permissions
 	Route::delete('/permissions', [PermissionsController::class, 'massDestroy'])->name('admin.permissions.massDestroy');
 	Route::resource('permissions', PermissionsController::class, ['as' => 'admin'])->except(['show']);
+	// UserGroups
+	Route::delete('/usergroups', [UserGroupsController::class, 'massDestroy'])->name('admin.usergroups.massDestroy');
+	Route::resource('usergroups', UserGroupsController::class, ['as' => 'admin'])->except(['show']);
     });
 });
 
