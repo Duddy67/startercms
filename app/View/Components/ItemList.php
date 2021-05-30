@@ -7,7 +7,6 @@ use Illuminate\View\Component;
 class ItemList extends Component
 {
     public $columns;
-    public $items;
     public $rows;
     public $route;
 
@@ -16,10 +15,9 @@ class ItemList extends Component
      *
      * @return void
      */
-    public function __construct($columns, $rows, $items, $route)
+    public function __construct($columns, $rows, $route)
     {
         $this->columns = $columns;
-        $this->items = $items;
         $this->rows = $rows;
         $this->route = $route;
     }

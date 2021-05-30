@@ -44,9 +44,8 @@ class PermissionsController extends Controller
         $actions = $this->getActions('list');
         $permissions = Permission::all();
 	$rows = $this->getRows($columns, $permissions);
-	//$this->setRowValues($rows, $columns, $permissions);
 
-        return view('admin.permissions.list', compact('permissions', 'columns', 'rows', 'actions'));
+        return view('admin.permissions.list', compact('columns', 'rows', 'actions'));
     }
 
     public function create()

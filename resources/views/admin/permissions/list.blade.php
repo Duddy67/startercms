@@ -2,7 +2,15 @@
 
 @section ('main')
     <x-toolbar :items=$actions />
-    <x-item-list :columns="$columns" :rows="$rows" :items="$permissions" route="admin.permissions.edit" />
+
+    @if (!empty($rows)) 
+	<x-item-list :columns="$columns" :rows="$rows" route="admin.permissions.edit" />
+    @else
+        <div class="alert alert-info" role="alert">
+	    No item has been found.
+	</div>
+    @endif
+
     <input type="hidden" id="listUrl" value="{{ route('admin.permissions.index') }}">
 
     <form id="selectedItems" action="{{ route('admin.permissions.index') }}" method="post">

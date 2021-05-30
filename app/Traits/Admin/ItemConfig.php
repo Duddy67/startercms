@@ -113,7 +113,6 @@ trait ItemConfig
 	      }
 	  } 
 	}
-//file_put_contents('debog_file.txt', print_r($actions->{$section}, true));
 
 	return $actions->{$section};
     }

@@ -48,9 +48,8 @@ class RolesController extends Controller
         $actions = $this->getActions('list');
         $roles = Role::all();
 	$rows = $this->getRows($columns, $roles);
-	//$this->setRowValues($rows, $columns, $roles);
 
-        return view('admin.roles.list', compact('roles', 'columns', 'rows', 'actions'));
+        return view('admin.roles.list', compact('columns', 'rows', 'actions'));
     }
 
     public function create()

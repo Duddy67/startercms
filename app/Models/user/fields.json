@@ -35,6 +35,14 @@
     "options": [] 
   },
   {
+    "label": "Groups",
+    "type": "select",
+    "name": "groups",
+    "id": "groups",
+    "blank": "- Select -",
+    "options": [] 
+  },
+  {
     "label": "Created at",
     "type": "date",
     "name": "created_at",

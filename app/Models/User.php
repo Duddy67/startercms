@@ -112,6 +112,18 @@ class User extends Authenticatable
 	return $options;
     }
 
+    public static function getGroupsOptions($user = null)
+    {
+        $groups = UserGroup::all();
+	$options = [];
+
+	foreach ($groups as $group) {
+	    $options[] = ['value' => $group->id, 'text' => $group->name];
+	}
+
+	return $options;
+    }
+
     public static function getRoleType($user = null)
     {
         // Get the given user or the current user.
@@ -176,6 +188,14 @@ class User extends Authenticatable
     public function getRoleValue()
     {
         return $this->getRoleName();
+    }
+
+    /*
+     * Used to get the option group value.
+     */
+    public function getGroupsValue()
+    {
+        return 0;
     }
 
     /*
