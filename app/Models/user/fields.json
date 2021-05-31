@@ -38,6 +38,7 @@
     "label": "Groups",
     "type": "select",
     "name": "groups",
+    "extra": ["multiple"],
     "id": "groups",
     "blank": "- Select -",
     "options": [] 

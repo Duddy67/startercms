@@ -112,6 +112,14 @@ class User extends Authenticatable
 	return $options;
     }
 
+    /*
+     * Used to get the option role value.
+     */
+    public function getRoleValue()
+    {
+        return $this->getRoleName();
+    }
+
     public static function getGroupsOptions($user = null)
     {
         $groups = UserGroup::all();
@@ -122,6 +130,14 @@ class User extends Authenticatable
 	}
 
 	return $options;
+    }
+
+    /*
+     * Used to get the option groups value.
+     */
+    public function getGroupsValue()
+    {
+        return $this->groups->pluck('id')->toArray();
     }
 
     public static function getRoleType($user = null)
@@ -183,22 +199,6 @@ class User extends Authenticatable
     }
 
     /*
-     * Used to get the option role value.
-     */
-    public function getRoleValue()
-    {
-        return $this->getRoleName();
-    }
-
-    /*
-     * Used to get the option group value.
-     */
-    public function getGroupsValue()
-    {
-        return 0;
-    }
-
-    /*
      * Returns the user's role name.
      */
     public function getRoleName()
@@ -220,5 +220,107 @@ class User extends Authenticatable
     public function canAccessAdmin()
     {
         return in_array(self::getRoleType(), ['super-admin', 'admin', 'manager', 'assistant']);
+    }
+
+    /*
+     * Roles that cannot be deleted nor updated.
+     */
+    public static function getReservedRoles()
+    {
+        return [
+	    'super-admin',
+	    'admin',
+	    'manager',
+	    'assistant',
+	    'registered'
+	];
+    }
+
+    public static function getReservedRoleIds()
+    {
+        return [1,2,3,4,5];
+    }
+
+    /*
+     * Permissions that can be given to an admin user type by the superadmin.
+     * However, an admin user type cannot give these permissions to another user.
+     * (ie: An admin user type cannot create another admin user type.)
+     */
+    public static function getPrivatePermissions()
+    {
+        return [
+	    'create-permission',
+	    'update-permission',
+	    'delete-permission',
+	    'create-role',
+	    'update-role',
+	    'delete-role',
+	    'update-user',
+	    'delete-user',
+	    'global-settings', 
+	    'blog-settings', 
+	];
+    }
+
+    /*
+     * Permissions that can be given to a manager user type by an admin user type.
+     * However, a manager user type cannot give these permissions to another user.
+     * (ie: A manager user type cannot create another manager user type.)
+     */
+    public static function getProtectedPermissions()
+    {
+        return [
+	    'create-user',
+	    'update-own-user',
+	    'delete-own-user',
+	    'create-user-group',
+	    'update-user-group',
+	    'delete-user-group',
+	    'update-post',
+	    'delete-post',
+	    'create-blog-category',
+	    'update-blog-category',
+	    'delete-blog-category',
+	    'update-own-blog-category',
+	    'delete-own-blog-category',
+	    'access-admin',
+	];
+    }
+
+    /*
+     * Permissions that can be given to a registered user type by an manager user type.
+     */
+    public static function getPublicPermissions()
+    {
+        return [
+	    'create-post',
+	    'update-own-post',
+	    'delete-own-post',
+	];
+    }
+
+    /*
+     * Permissions that cannot be deleted nor updated.
+     */
+    public static function getReservedPermissions()
+    {
+	return array_merge(self::getPrivatePermissions(), self::getProtectedPermissions(), self::getPublicPermissions()); 
+    }
+
+    public static function getReservedPermissionIds()
+    {
+        return [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18];
+    }
+
+    public static function getPermissionPatterns()
+    {
+        return [
+	    'create-[0-9-a-z\-]+',
+	    'update-[0-9-a-z\-]+',
+	    'delete-[0-9-a-z\-]+',
+	    'update-own-[0-9-a-z\-]+',
+	    'delete-own-[0-9-a-z\-]+',
+	    '[0-9-a-z\-]+-settings'
+	];
     }
 }

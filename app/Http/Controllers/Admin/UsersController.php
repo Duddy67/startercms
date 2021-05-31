@@ -103,6 +103,14 @@ class UsersController extends Controller
 	    $user->syncRoles($request->input('role'));
 	}
 
+	if ($request->input('groups') !== null) {
+	    $user->groups()->sync($request->input('groups'));
+	}
+	else {
+	    // Remove all groups for this user.
+	    $user->groups()->sync([]);
+	}
+
 	$user->save();
 
 	$message = 'User successfully updated.';
@@ -131,6 +139,10 @@ class UsersController extends Controller
 
 	$user->assignRole($request->input('role'));
 
+	if ($request->input('groups') !== null) {
+	    $user->groups()->attach($request->input('groups'));
+	}
+
 	$message = 'User successfully added.';
 
         if ($request->input('_close', null)) {
@@ -148,6 +160,7 @@ class UsersController extends Controller
 	    return redirect()->route('admin.users.edit', $user->id)->with('error', 'You are not allowed to delete this user.');
 	}
 
+	$user->groups()->detach();
 	//$user->delete();
 
 	return redirect()->route('admin.users.index')->with('success', 'The user has been successfully deleted.');
@@ -169,6 +182,7 @@ class UsersController extends Controller
 		    return redirect()->route('admin.users.index')->with('error', 'You are not allowed to delete this user: '.$user->name);
 		}
 
+		$user->groups()->detach();
 		//$user->delete();
 	    }
 	}

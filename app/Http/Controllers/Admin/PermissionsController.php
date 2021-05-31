@@ -84,7 +84,7 @@ class PermissionsController extends Controller
         $this->validate($request, [
 	    'name' => [
 		'required',
-		'not_regex:/'.implode('|', $this->reservedPerms).'/i',
+		'not_regex:/^('.implode('|', $this->reservedPerms).')$/i',
 		'regex:/^'.implode('|', $this->permPatterns).'$/',
 		Rule::unique('permissions')->ignore($id)
 	    ],
@@ -114,7 +114,7 @@ class PermissionsController extends Controller
         $this->validate($request, [
 	    'name' => [
 		'required',
-		'not_regex:/'.implode('|', $this->reservedPerms).'/i',
+		'not_regex:/^('.implode('|', $this->reservedPerms).')$/i',
 		'regex:/^'.implode('|', $this->permPatterns).'$/',
 		'unique:permissions'
 	    ],

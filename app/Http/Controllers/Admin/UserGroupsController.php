@@ -20,6 +20,7 @@ class UserGroupsController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('admin.usergroups');
 	$this->itemName = 'usergroup';
     }
 
@@ -108,17 +109,24 @@ class UserGroupsController extends Controller
 	return redirect()->route('admin.usergroups.edit', $group->id)->with('success', $message);
     }
 
-    public function destroy($id)
+    public function destroy($id, $redirect = true)
     {
 	$group = UserGroup::findOrFail($id);
-	$group->delete();
+	$group->users()->detach();
+	//$group->delete();
+
+	if (!$redirect) {
+	    return;
+	}
 
 	return redirect()->route('admin.usergroups.index')->with('success', 'User group successfully deleted.');
     }
 
     public function massDestroy(Request $request)
     {
-	Permission::destroy($request->input('ids'));
+        foreach ($request->input('ids') as $id) {
+	    $this->destroy($id, false);
+	}
 
 	return redirect()->route('admin.usergroups.index')->with('success', count($request->input('ids')).' User group(s) successfully deleted.');
     }

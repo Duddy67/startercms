@@ -32,5 +32,9 @@
 	});*/
   }
 
+  if (jQuery.fn.select2) {
+      $('.select2').select2();
+  }
+
 })(jQuery);
 

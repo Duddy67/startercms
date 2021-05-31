@@ -207,20 +207,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		    <x-menu-item href="{{ route('admin.users.index') }}" :sub=true :active=false>
 		      Users
 		    </x-menu-item>
-		    <x-menu-item href="{{ route('admin.usergroups.index') }}" :sub=true :active=false>
-		      Groups
-		    </x-menu-item>
-		  </ul>
-	      </li>
-	  @endallowto
-
-	  @if (auth()->user()->isAllowedTo('create-permission') || auth()->user()->isAllowedTo('create-role'))
-	      <li class="nav-item menu-open">
-		<a href="#" class="nav-link">
-		  <i class="nav-icon fas fa-lock"></i>
-		  <p>Roles & Permissions</p>
-		</a>
-		  <ul class="nav nav-treeview">
+		    @allowto ('create-user-group')
+			<x-menu-item href="{{ route('admin.usergroups.index') }}" :sub=true :active=false>
+			  Groups
+			</x-menu-item>
+		    @endallowto
 		    @allowto ('create-role')
 			<x-menu-item href="{{ route('admin.roles.index') }}" :sub=true :active=false>
 			  Roles
@@ -233,7 +224,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		    @endallowto
 		  </ul>
 	      </li>
-	  @endif
+	  @endallowto
 
 	  @allowto ('create-post')
 	      <li class="nav-item menu-open">
@@ -342,6 +333,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script src="{{ url('/') }}/vendor/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- AdminLTE App -->
 <script src="{{ url('/') }}/vendor/adminlte/js/adminlte.min.js"></script>
+<!-- Select2 Plugin -->
+<script type="text/javascript" src="{{ url('/') }}/vendor/adminlte/plugins/select2/js/select2.min.js"></script>
+<link rel="stylesheet" href="{{ url('/') }}/vendor/adminlte/plugins/select2/css/select2.min.css"></script>
 <!-- Additional js scripts -->
 @stack ('scripts')
 </body>

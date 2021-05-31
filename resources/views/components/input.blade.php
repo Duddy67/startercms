@@ -30,12 +30,21 @@
 
     >
 @elseif ($attribs->type == 'select')
-    <select id="{{ $attribs->id }}" class="form-control" name="{{ $attribs->name }}">
+    @php $multiple = (isset($attribs->extra) && in_array('multiple', $attribs->extra)) ? 'multiple' : '' @endphp
+    @php $multi = ($multiple) ? '[]' : '' @endphp
+
+    <select id="{{ $attribs->id }}" class="form-control select2" {{ $multiple }} name="{{ $attribs->name.$multi }}">
 	@if (isset($attribs->blank))
 	    <option value="">{{ $attribs->blank }}</option>
 	@endif
+
         @foreach ($attribs->options as $option)
-	    @php $selected = ($option['value'] == $value) ? 'selected="selected"' : ''; @endphp
+	    @if ($multiple)
+		@php $selected = ($value !== null && in_array($option['value'], $value)) ? 'selected="selected"' : '' @endphp
+	    @else
+		@php $selected = ($option['value'] == $value) ? 'selected="selected"' : '' @endphp
+	    @endif
+
 	    <option value="{{ $option['value'] }}" {{ $selected }}>{{ $option['text'] }}</option>
         @endforeach
     </select> 
