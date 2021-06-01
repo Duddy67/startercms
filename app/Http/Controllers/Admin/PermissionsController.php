@@ -6,17 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Traits\Admin\ItemConfig;
-use App\Models\Settings;
+use App\Traits\Admin\RolesPermissions;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Models\Permission;
 
 class PermissionsController extends Controller
 {
-    use ItemConfig, HasRoles;
-
-    public $reservedPerms;
-    public $reservedPermIds;
-    public $permPatterns;
+    use ItemConfig, RolesPermissions, HasRoles;
 
     /**
      * Create a new controller instance.
@@ -28,9 +24,6 @@ class PermissionsController extends Controller
         $this->middleware('auth');
         $this->middleware('admin.roles');
 	$this->itemName = 'permission';
-	$this->reservedPerms = Settings::getReservedPermissions();
-	$this->reservedPermIds = Settings::getReservedPermissionIds();
-	$this->permPatterns = Settings::getPermissionPatterns();
     }
 
     /**
@@ -60,7 +53,7 @@ class PermissionsController extends Controller
     {
         $permission = Permission::findById($id);
 
-	if (in_array($permission->name, $this->reservedPerms)) {
+	if (in_array($permission->name, $this->getReservedPermissions())) {
 	    return redirect()->route('admin.permissions.index')->with('error', 'The permission "'.$permission->name.'" is reserved.');
 	}
 
@@ -84,8 +77,8 @@ class PermissionsController extends Controller
         $this->validate($request, [
 	    'name' => [
 		'required',
-		'not_regex:/^('.implode('|', $this->reservedPerms).')$/i',
-		'regex:/^'.implode('|', $this->permPatterns).'$/',
+		'not_regex:/^('.implode('|', $this->getReservedPermissions()).')$/i',
+		'regex:/^'.implode('|', $this->getPermissionPatterns()).'$/',
 		Rule::unique('permissions')->ignore($id)
 	    ],
 	],
@@ -114,8 +107,8 @@ class PermissionsController extends Controller
         $this->validate($request, [
 	    'name' => [
 		'required',
-		'not_regex:/^('.implode('|', $this->reservedPerms).')$/i',
-		'regex:/^'.implode('|', $this->permPatterns).'$/',
+		'not_regex:/^('.implode('|', $this->getReservedPermissions()).')$/i',
+		'regex:/^'.implode('|', $this->getPermissionPatterns()).'$/',
 		'unique:permissions'
 	    ],
 	],
@@ -142,7 +135,7 @@ class PermissionsController extends Controller
     {
 	$permission = Permission::findOrFail($id);
 
-	if (in_array($permission->id, $this->reservedPermIds)) {
+	if (in_array($permission->id, $this->getReservedPermissionIds())) {
 	    return redirect()->route('admin.permissions.edit', $permission->id)->with('error', 'This permission is reserved.');
 	}
 
@@ -154,7 +147,7 @@ class PermissionsController extends Controller
     public function massDestroy(Request $request)
     {
         $permissions = Permission::whereIn('id', $request->input('ids'))->pluck('name')->toArray();
-	$result = array_intersect($permissions, $this->reservedPerms);
+	$result = array_intersect($permissions, $this->getReservedPermissions());
 
 	if (!empty($result)) {
 	    return redirect()->route('admin.permissions.index')->with('error', 'The following permissions are reserved: '.implode(',', $result));

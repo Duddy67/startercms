@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Traits\Admin\ItemConfig;
-use App\Models\Settings;
+use App\Traits\Admin\RolesPermissions;
 use App\Models\User;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Models\Role;
@@ -14,12 +14,7 @@ use Spatie\Permission\Models\Permission;
 
 class RolesController extends Controller
 {
-    use ItemConfig, HasRoles;
-
-    public $reservedRoles;
-    public $reservedRoleIds;
-    public $privatePerms;
-    public $protectedPerms;
+    use ItemConfig, RolesPermissions, HasRoles;
 
     /**
      * Create a new controller instance.
@@ -31,10 +26,6 @@ class RolesController extends Controller
         $this->middleware('auth');
         $this->middleware('admin.roles');
 	$this->itemName = 'role';
-	$this->reservedRoles = Settings::getReservedRoles();
-	$this->reservedRoleIds = Settings::getReservedRoleIds();
-	$this->privatePerms = Settings::getPrivatePermissions();
-	$this->protectedPerms = Settings::getProtectedPermissions();
     }
 
     /**
@@ -82,14 +73,14 @@ class RolesController extends Controller
     {
 	$role = Role::findOrFail($id);
 
-	if (in_array($role->id, $this->reservedRoleIds)) {
+	if (in_array($role->id, $this->getReservedRoleIds())) {
 	    return redirect()->route('admin.roles.edit', $role->id)->with('error', 'This role is reserved.');
 	}
 
         $this->validate($request, [
 	    'name' => [
 		'required',
-		'not_regex:/^\s*('.implode('|', $this->reservedRoles).')\s*$/i',
+		'not_regex:/^('.implode('|', $this->getReservedRoles()).')$/i',
 		'regex:/^[a-z0-9-]{3,}$/',
 		Rule::unique('roles')->ignore($id)
 	    ],
@@ -103,7 +94,7 @@ class RolesController extends Controller
         if ($request->input('permissions') !== null) {
 
 	    // Ensure an admin doesn't use any private permissions. 
-	    $count = array_intersect($request->input('permissions'), $this->privatePerms);
+	    $count = array_intersect($request->input('permissions'), $this->getPrivatePermissions());
 
 	    if (User::getRoleType() == 'admin' && $count) {
 		return redirect()->route('admin.roles.edit', $role->id)->with('error', 'One or more selected permissions are not authorised.');
@@ -144,7 +135,7 @@ class RolesController extends Controller
         $this->validate($request, [
 	    'name' => [
 		'required',
-		'not_regex:/^\s*('.implode('|', $this->reservedRoles).')\s*$/i',
+		'not_regex:/^('.implode('|', $this->getReservedRoles()).')$/i',
 		'regex:/^[a-z0-9-]{3,}$/',
 		'unique:roles'
 	    ],
@@ -157,7 +148,7 @@ class RolesController extends Controller
         if ($request->input('permissions') !== null) {
 
 	    // Ensure an admin doesn't use any private permissions. 
-	    $count = array_intersect($request->input('permissions'), $this->privatePerms);
+	    $count = array_intersect($request->input('permissions'), $this->getPrivatePermissions());
 
 	    if (User::getRoleType() == 'admin' && $count) {
 		return redirect()->route('admin.roles.edit', $role->id)->with('error', 'One or more selected permissions are not authorised.');
@@ -181,7 +172,7 @@ class RolesController extends Controller
     {
 	$role = Role::findOrFail($id);
 
-	if (in_array($role->name, $this->reservedRoles)) {
+	if (in_array($role->name, $this->getReservedRoles())) {
 	    return redirect()->route('admin.roles.edit', $role->id)->with('error', 'This role is reserved.');
 	}
 
@@ -197,7 +188,7 @@ class RolesController extends Controller
     public function massDestroy(Request $request)
     {
         $roles = Role::whereIn('id', $request->input('ids'))->pluck('name')->toArray();
-	$result = array_intersect($roles, $this->reservedRoles);
+	$result = array_intersect($roles, $this->getReservedRoles());
 
 	if (!empty($result)) {
 	    return redirect()->route('admin.roles.index')->with('error', 'The following roles are reserved: '.implode(',', $result));
@@ -220,9 +211,9 @@ class RolesController extends Controller
     {
         $userRoleType = User::getRoleType();
 
-	if (($role === null || !in_array($role->name, $this->reservedRoles)) && $userRoleType == 'admin') {
+	if (($role === null || !in_array($role->name, $this->getReservedRoles())) && $userRoleType == 'admin') {
 	    // Restrict permissions for admins.
-	    $permissions = Permission::whereNotIn('name', $this->privatePerms)->get();
+	    $permissions = Permission::whereNotIn('name', $this->getPrivatePermissions())->get();
 	}
 	// super-admin
 	else {
@@ -252,18 +243,22 @@ class RolesController extends Controller
 		    $checkbox->disabled = true;
 		}
 
-		if ($role->name == 'admin' && (in_array($permission->name, $this->privatePerms) || $permission->name == 'create-user')) {
+		if (in_array($role->name, $this->getReservedRoles())) {
 		    $checkbox->disabled = true;
 		}
 
-		if ($role->name == 'manager' && (in_array($permission->name, $this->privatePerms) || in_array($permission->name, $this->protectedPerms) || $permission->name == 'create-post')) {
+		/*if ($role->name == 'admin' && (in_array($permission->name, $this->getPrivatePermissions()) || $permission->name == 'create-user')) {
+		    $checkbox->disabled = true;
+		}
+
+		if ($role->name == 'manager' && (in_array($permission->name, $this->getPrivatePermissions()) || in_array($permission->name, $this->getProtectedPermissions()) || $permission->name == 'create-post')) {
 		    $checkbox->disabled = true;
 		}
 
 		if ($role->name == 'assistant' &&
-		    (in_array($permission->name, $this->privatePerms) || in_array($permission->name, ['access-admin', 'create-user', 'update-own-user', 'delete-own-user']))) {
+		    (in_array($permission->name, $this->getPrivatePermissions()) || in_array($permission->name, ['access-admin', 'create-user', 'update-own-user', 'delete-own-user']))) {
 		    $checkbox->disabled = true;
-		}
+		}*/
 	    }
 
 	    $list[] = $checkbox;
