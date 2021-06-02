@@ -17,7 +17,7 @@ class Admin
      */
     public function handle(Request $request, Closure $next)
     {
-        if (in_array(User::getRoleType(), ['super-admin', 'admin', 'manager', 'assistant'])) {
+        if (in_array(User::getUserRoleType(), ['super-admin', 'admin', 'manager', 'assistant'])) {
 	    return $next($request);
 	}
 

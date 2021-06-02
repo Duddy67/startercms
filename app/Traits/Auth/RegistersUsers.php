@@ -5,6 +5,7 @@ namespace App\Traits\Auth;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
 
 trait RegistersUsers
 {
@@ -57,6 +58,10 @@ trait RegistersUsers
      */
     protected function registered(Request $request, $user)
     {
-        //
+        // The very first registered user is the super-admin.
+        if ($user->id === 1) {
+	    Role::create(['name' => 'super-admin']);
+	    $user->assignRole('super-admin');
+	}
     }
 }

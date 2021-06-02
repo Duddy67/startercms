@@ -24,15 +24,18 @@
 	    <x-input :attribs="$attribs" :value="$value" />
         @endforeach
 
-	<table class="table">
-	    <tbody>
-		@foreach ($list as $checkbox)
-		    <tr><td>
-			<x-input :attribs="$checkbox" :value="$checkbox->value" />
-		    </td></tr>
-		@endforeach
-	    </tbody>
-	</table>
+	@foreach ($list as $section => $checkboxes)
+	    <h5>{{ $section }}</h5>
+	    <table class="table">
+		<tbody>
+		    @foreach ($checkboxes as $checkbox)
+			<tr><td>
+			    <x-input :attribs="$checkbox" :value="$checkbox->value" />
+			</td></tr>
+		    @endforeach
+		</tbody>
+	    </table>
+	@endforeach
 
 	<input type="hidden" id="listUrl" value="{{ route('admin.roles.index') }}">
 	<input type="hidden" id="close" name="_close" value="0">

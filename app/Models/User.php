@@ -44,20 +44,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public static $roleTypes = [
-        'super-admin',
-        'admin',
-        'manager',
-        'registered'
-    ];
-
-    public static $roleValues = [
-	'registered' => 1, 
-	'assistant' => 2, 
-	'manager' => 3, 
-	'admin' => 4, 
-	'super-admin' => 5
-    ];
 
 
     /**
@@ -75,7 +61,7 @@ class User extends Authenticatable
 
     public static function getRoleOptions($user = null)
     {
-        $roleType = self::getRoleType();
+        $roleType = self::getUserRoleType();
 
 	// Check first if the user is editing their own user account.
 	if ($user && auth()->user()->id == $user->id) {
@@ -146,22 +132,17 @@ class User extends Authenticatable
         $user = ($user) ? $user : auth()->user();
         $roleName = $user->getRoleNames()->toArray()[0];
 
-	//return self::getRoleType($roleName);
+	if ($roleName == 'super-admin') {
+	    return 'super-admin';
+	}
+
+	return self::getRoleType($roleName);
 
     }
 
-    public static function getRoleType($user = null)
+    public static function getRoleType($role)
     {
-        // Get the given user or the current user.
-        $user = ($user) ? $user : auth()->user();
-
-        $roleName = $user->getRoleNames()->toArray()[0];
-
-	if (in_array($roleName, User::$roleTypes)) {
-	    return $roleName;
-	}
-
-	$role = Role::findByName($roleName);
+	$role = (is_string($role)) ? Role::findByName($role) : $role;
 
 	if ($role->hasPermissionTo('create-role')) {
 	    return 'admin';
@@ -177,13 +158,26 @@ class User extends Authenticatable
 	}
     }
 
+    public static function getRoleHierarchy()
+    {
+	return [
+	    'registered' => 1, 
+	    'assistant' => 2, 
+	    'manager' => 3, 
+	    'admin' => 4, 
+	    'super-admin' => 5
+	];
+    }
+
     public static function canUpdate($user)
     {
         if (is_int($user)) {
 	    $user = User::findOrFail($user);
 	}
 
-	if (User::$roleValues[self::getRoleType()] > User::$roleValues[self::getRoleType($user)]) {
+	$hierarchy = self::getRoleHierarchy();
+
+	if ($hierarchy[self::getUserRoleType()] > $hierarchy[self::getUserRoleType($user)]) {
 	    return true;
 	}
 
@@ -201,7 +195,9 @@ class User extends Authenticatable
 	    return false;
 	}
 
-	if (User::$roleValues[self::getRoleType()] > User::$roleValues[self::getRoleType($user)]) {
+	$hierarchy = self::getRoleHierarchy();
+
+	if ($hierarchy[self::getUserRoleType()] > $hierarchy[self::getUserRoleType($user)]) {
 	    return true;
 	}
 
@@ -221,7 +217,7 @@ class User extends Authenticatable
      */
     public function isAllowedTo($permission)
     {
-	return $this->hasPermissionTo($permission) || $this->hasRole('super-admin');
+	return $this->hasRole('super-admin') || $this->hasPermissionTo($permission);
     }
 
     /*
@@ -229,6 +225,6 @@ class User extends Authenticatable
      */
     public function canAccessAdmin()
     {
-        return in_array(self::getRoleType(), ['super-admin', 'admin', 'manager', 'assistant']);
+        return in_array(self::getUserRoleType(), ['super-admin', 'admin', 'manager', 'assistant']);
     }
 }

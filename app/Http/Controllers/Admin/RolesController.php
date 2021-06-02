@@ -8,6 +8,7 @@ use Illuminate\Validation\Rule;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\RolesPermissions;
 use App\Models\User;
+use App\Models\Settings;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -72,6 +73,7 @@ class RolesController extends Controller
     public function update(Request $request, $id)
     {
 	$role = Role::findOrFail($id);
+//file_put_contents('debog_file.txt', print_r($arr, true));
 
 	if (in_array($role->id, $this->getReservedRoleIds())) {
 	    return redirect()->route('admin.roles.edit', $role->id)->with('error', 'This role is reserved.');
@@ -93,10 +95,11 @@ class RolesController extends Controller
 	
         if ($request->input('permissions') !== null) {
 
-	    // Ensure an admin doesn't use any private permissions. 
-	    $count = array_intersect($request->input('permissions'), $this->getPrivatePermissions());
+	    // Ensure an admin doesn't use any level1 permissions. 
+	    $level1Perms = Settings::getPermissionArray(['level2', 'level3']);
+	    $count = array_intersect($request->input('permissions'), $level1Perms);
 
-	    if (User::getRoleType() == 'admin' && $count) {
+	    if (User::getUserRoleType() == 'admin' && $count) {
 		return redirect()->route('admin.roles.edit', $role->id)->with('error', 'One or more selected permissions are not authorised.');
 	    }
 
@@ -147,10 +150,11 @@ class RolesController extends Controller
 	
         if ($request->input('permissions') !== null) {
 
-	    // Ensure an admin doesn't use any private permissions. 
-	    $count = array_intersect($request->input('permissions'), $this->getPrivatePermissions());
+	    // Ensure an admin doesn't use any level1 permissions. 
+	    $level1Perms = Settings::getPermissionArray(['level2', 'level3']);
+	    $count = array_intersect($request->input('permissions'), $level1Perms);
 
-	    if (User::getRoleType() == 'admin' && $count) {
+	    if (User::getUserRoleType() == 'admin' && $count) {
 		return redirect()->route('admin.roles.edit', $role->id)->with('error', 'One or more selected permissions are not authorised.');
 	    }
 
@@ -209,59 +213,56 @@ class RolesController extends Controller
 
     private function getPermissionList($role = null)
     {
-        $userRoleType = User::getRoleType();
+        // N.B: Only super-admin and users type admin are allowed to manage roles.
 
-	if (($role === null || !in_array($role->name, $this->getReservedRoles())) && $userRoleType == 'admin') {
-	    // Restrict permissions for admins.
-	    $permissions = Permission::whereNotIn('name', $this->getPrivatePermissions())->get();
+        $userRoleType = User::getUserRoleType();
+	$hierarchy = User::getRoleHierarchy();
+
+	if ($userRoleType == 'admin') {
+	    // Restrict permissions for users type admin.
+	    $permList = Settings::getPermissionList(['level1']);
 	}
 	// super-admin
 	else {
-	    $permissions = Permission::all();
+	    $permList = Settings::getPermissionList();
 	}
 
 	$list = [];
 
-	foreach ($permissions as $permission) {
-	    $checkbox = new \stdClass();
-	    $checkbox->type = 'checkbox';
-	    $checkbox->label = $permission->name;
-	    $checkbox->id = $permission->name;
-	    $checkbox->name = 'permissions[]';
-	    $checkbox->value = $permission->name;
-	    $checkbox->checked = false;
+	foreach ($permList as $section => $permissions) {
+	    $list[$section] = [];
 
-	    if ($role) {
-		if ($role->hasPermissionTo($permission->name)) {
-		    $checkbox->checked = true;
+	    foreach ($permissions as $permission) {
+		$checkbox = new \stdClass();
+		$checkbox->type = 'checkbox';
+		$checkbox->label = $permission->name;
+		$checkbox->id = $permission->name;
+		$checkbox->name = 'permissions[]';
+		$checkbox->value = $permission->name;
+		$checkbox->checked = false;
+
+		if ($role) {
+		    if ($role->hasPermissionTo($permission->name)) {
+			$checkbox->checked = true;
+		    }
+
+		    // Disable permissions according to the edited role type.
+
+                    $roleType = User::getRoleType($role);
+
+		    if ($role->name == 'super-admin') {
+		        // super-admin has all permissions.
+			$checkbox->checked = true;
+			$roleType = 'super-admin';
+		    }
+
+		    if ($hierarchy[$roleType] >= $hierarchy[$userRoleType]) {
+			$checkbox->disabled = true;
+		    }
 		}
 
-		// Disable permissions according to the edited default role type.
-
-		if ($role->name == 'super-admin') {
-		    $checkbox->checked = true;
-		    $checkbox->disabled = true;
-		}
-
-		if (in_array($role->name, $this->getReservedRoles())) {
-		    $checkbox->disabled = true;
-		}
-
-		/*if ($role->name == 'admin' && (in_array($permission->name, $this->getPrivatePermissions()) || $permission->name == 'create-user')) {
-		    $checkbox->disabled = true;
-		}
-
-		if ($role->name == 'manager' && (in_array($permission->name, $this->getPrivatePermissions()) || in_array($permission->name, $this->getProtectedPermissions()) || $permission->name == 'create-post')) {
-		    $checkbox->disabled = true;
-		}
-
-		if ($role->name == 'assistant' &&
-		    (in_array($permission->name, $this->getPrivatePermissions()) || in_array($permission->name, ['access-admin', 'create-user', 'update-own-user', 'delete-own-user']))) {
-		    $checkbox->disabled = true;
-		}*/
+		$list[$section][] = $checkbox;
 	    }
-
-	    $list[] = $checkbox;
 	}
 
 	return $list;
