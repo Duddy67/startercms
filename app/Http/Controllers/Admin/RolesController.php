@@ -242,8 +242,17 @@ class RolesController extends Controller
 		$checkbox->checked = false;
 
 		if ($role) {
-		    if ($role->hasPermissionTo($permission->name)) {
-			$checkbox->checked = true;
+		    try {
+			if ($role->hasPermissionTo($permission->name)) {
+			    $checkbox->checked = true;
+			}
+		    }
+		    catch (\Exception $e) {
+			$checkbox->label = $permission->name.' (missing !)';
+			$checkbox->disabled = true;
+			$list[$section][] = $checkbox;
+
+		        continue;
 		    }
 
 		    // Disable permissions according to the edited role type.

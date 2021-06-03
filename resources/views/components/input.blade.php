@@ -32,8 +32,9 @@
 @elseif ($attribs->type == 'select')
     @php $multiple = (isset($attribs->extra) && in_array('multiple', $attribs->extra)) ? 'multiple' : '' @endphp
     @php $multi = ($multiple) ? '[]' : '' @endphp
+    @php $disabled = (isset($attribs->extra) && in_array('disabled', $attribs->extra)) ? 'disabled' : '' @endphp
 
-    <select id="{{ $attribs->id }}" class="form-control select2" {{ $multiple }} name="{{ $attribs->name.$multi }}">
+    <select id="{{ $attribs->id }}" class="form-control select2" {{ $multiple }} {{ $disabled }} name="{{ $attribs->name.$multi }}">
 	@if (isset($attribs->blank))
 	    <option value="">{{ $attribs->blank }}</option>
 	@endif

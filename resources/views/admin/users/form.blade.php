@@ -13,6 +13,10 @@
         @foreach ($fields as $attribs)
 	    @php if (isset($user)) { 
 		     $value = old($attribs->name, $attribs->value);
+                     // Users cannot change their role.
+                     if ($attribs->name == 'role' && auth()->user()->id == $user->id) {
+                         $attribs->extra = ['disabled'];
+                     }
 		 }
 		 else {
                      if ($attribs->name == 'created_at' || $attribs->name == 'updated_at') {

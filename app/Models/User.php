@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use App\Models\Settings;
 use App\Models\UserGroup;
 
 class User extends Authenticatable
@@ -44,7 +46,64 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public $permissionPatterns = [
+	'create-[0-9-a-z\-]+',
+	'update-[0-9-a-z\-]+',
+	'delete-[0-9-a-z\-]+',
+	'update-own-[0-9-a-z\-]+',
+	'delete-own-[0-9-a-z\-]+',
+	'[0-9-a-z\-]+-settings',
+	'access-admin'
+    ];
 
+
+    public function updatePermissions($request)
+    {
+        if (!$this->isAllowedTo('update-permissions')) {
+	    $request->session()->flash('error', 'You are not allowed to update permissions.');
+
+	    return;
+	}
+
+	$permissions = Settings::getPermissionArray();
+	$invalidNames = [];
+	$count = 0;
+//file_put_contents('debog_file.txt', print_r($permissions, true), FILE_APPEND);
+
+	foreach ($permissions as $permission) {
+	  if (Permission::where('name', $permission)->first() === null) {
+	      if (!preg_match('#^'.implode('|', $this->permissionPatterns).'$#', $permission)) {
+		  $invalidNames[] = $permission;
+		  continue;
+	      }
+
+	      //Permission::create(['name' => $permission]);
+	      $count++;
+	  }
+	}
+
+	if (!empty($invalidNames)) {
+	    $request->session()->flash('error', 'The permission names: "'.implode(', ', $invalidNames).'" are invalid.');
+	}
+
+	if ($count) {
+	    $request->session()->flash('success', $count.' permission(s) successfully updated.');
+	}
+	else {
+	    $request->session()->flash('info', 'No new permissions added.');
+	}
+    }
+
+    public function resetPermissions($request)
+    {
+        if (!$this->isAllowedTo('update-permissions')) {
+	    $request->session()->flash('error', 'You are not allowed to update permissions.');
+
+	    return;
+	}
+
+	$this->updatePermissions($request);
+    }
 
     /**
      * The groups that belong to the user.
@@ -176,7 +235,7 @@ class User extends Authenticatable
 	}
 
 	$hierarchy = self::getRoleHierarchy();
-
+        // Users can only update users lower in the hierarchy.
 	if ($hierarchy[self::getUserRoleType()] > $hierarchy[self::getUserRoleType($user)]) {
 	    return true;
 	}
@@ -196,7 +255,7 @@ class User extends Authenticatable
 	}
 
 	$hierarchy = self::getRoleHierarchy();
-
+        // Users can only delete users lower in the hierarchy.
 	if ($hierarchy[self::getUserRoleType()] > $hierarchy[self::getUserRoleType($user)]) {
 	    return true;
 	}

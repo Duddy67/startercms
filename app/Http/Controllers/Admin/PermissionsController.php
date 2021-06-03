@@ -9,6 +9,7 @@ use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\RolesPermissions;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Models\Permission;
+use App\Models\Settings;
 
 class PermissionsController extends Controller
 {
@@ -36,9 +37,21 @@ class PermissionsController extends Controller
         $columns = $this->getColumns();
         $actions = $this->getActions('list');
         $permissions = Permission::all();
-	$rows = $this->getRows($columns, $permissions);
+        $list = $this->getPermissionList();
 
-        return view('admin.permissions.list', compact('columns', 'rows', 'actions'));
+        return view('admin.permissions.list', compact('columns', 'list', 'actions'));
+    }
+
+    public function refresh(Request $request)
+    {
+	auth()->user()->updatePermissions($request);
+//file_put_contents('debog_file.txt', print_r('refresh', true));
+	return redirect()->route('admin.permissions.index');
+    }
+
+    public function reset(Request $request)
+    {
+	return redirect()->route('admin.permissions.index')->with('success', 'Permissions successfully reset.');
     }
 
     public function create()
@@ -156,5 +169,27 @@ class PermissionsController extends Controller
 	Permission::destroy($request->input('ids'));
 
 	return redirect()->route('admin.permissions.index')->with('success', count($request->input('ids')).' Permission(s) successfully deleted.');
+    }
+
+    private function getPermissionList()
+    {
+	$permList = Settings::getPermissionList();
+
+	$list = [];
+
+	foreach ($permList as $section => $permissions) {
+	    $list[$section] = [];
+
+	    foreach ($permissions as $permission) {
+	        $missing = '';
+		if (Permission::where('name', $permission->name)->first() === null) {
+		    $missing = ' (missing !)';
+		}
+
+		$list[$section][] = $permission->name.$missing;
+	    }
+	}
+
+	return $list;
     }
 }

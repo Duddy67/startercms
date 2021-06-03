@@ -5,7 +5,7 @@
 @endif
 
 @php $icon = (array_key_exists($button->id, $btnIcons)) ? 'fa '.$btnIcons[$button->id] : '' @endphp
-@php $icon = (isset($button->icon)) ? $button->id : $icon @endphp
+@php $icon = (isset($button->icon)) ? $button->icon : $icon @endphp
 
 @if (!empty($icon))
     @php $icon = '<i class="'.$icon.'"></i>' @endphp

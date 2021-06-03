@@ -63,7 +63,9 @@ class UsersController extends Controller
 	}
 
         $fields = $this->getFields($user, ['password', 'password_confirmation']);
-        $actions = $this->getActions('form');
+	// Users cannot delete their own account.
+	$except = (auth()->user()->id == $user->id) ? ['destroy'] : [];
+        $actions = $this->getActions('form', $except);
 
         return view('admin.users.form', compact('user', 'fields', 'actions'));
     }
@@ -98,7 +100,7 @@ class UsersController extends Controller
 	    $user->password = Hash::make($request->input('password'));
 	}
 
-	// Users cannot modify roles in their own account.
+	// Users cannot modify the role attribute in their own account.
 	if (auth()->user()->id != $user->id) {
 	    $user->syncRoles($request->input('role'));
 	}

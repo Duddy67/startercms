@@ -1,14 +1,18 @@
 {
   "list": [
       {
-	"id": "create",
-	"label": "New",
-	"type": "button"
+	"id": "refresh",
+	"label": "Refresh",
+	"type": "button",
+	"class": "btn-primary",
+	"icon": "fa fa-sync"
       },
       {
-	"id": "massDestroy",
-	"label": "Delete",
-	"type": "button"
+	"id": "reset",
+	"label": "Reset",
+	"type": "button",
+	"class": "btn-danger",
+	"icon": "fa fa-undo"
       }
   ],
   "form": [
