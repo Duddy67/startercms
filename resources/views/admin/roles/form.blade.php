@@ -24,7 +24,7 @@
 	    <x-input :attribs="$attribs" :value="$value" />
         @endforeach
 
-	@foreach ($list as $section => $checkboxes)
+	@foreach ($board as $section => $checkboxes)
 	    <h5>{{ $section }}</h5>
 	    <table class="table">
 		<tbody>

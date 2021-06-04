@@ -53,8 +53,8 @@ Route::prefix('admin')->group(function () {
 	Route::resource('roles', RolesController::class, ['as' => 'admin'])->except(['show']);
 	// Permissions
 	Route::get('/permissions', [PermissionsController::class, 'index'])->name('admin.permissions.index');
-	Route::patch('/permissions', [PermissionsController::class, 'refresh'])->name('admin.permissions.refresh');
-	Route::put('/permissions', [PermissionsController::class, 'reset'])->name('admin.permissions.reset');
+	Route::patch('/permissions', [PermissionsController::class, 'build'])->name('admin.permissions.build');
+	Route::put('/permissions', [PermissionsController::class, 'rebuild'])->name('admin.permissions.rebuild');
 	// UserGroups
 	Route::delete('/usergroups', [UserGroupsController::class, 'massDestroy'])->name('admin.usergroups.massDestroy');
 	Route::resource('usergroups', UserGroupsController::class, ['as' => 'admin'])->except(['show']);

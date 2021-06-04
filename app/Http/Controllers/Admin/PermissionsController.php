@@ -7,13 +7,12 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\RolesPermissions;
-use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Models\Permission;
 use App\Models\Settings;
 
 class PermissionsController extends Controller
 {
-    use ItemConfig, RolesPermissions, HasRoles;
+    use ItemConfig, RolesPermissions;
 
     /**
      * Create a new controller instance.
@@ -37,143 +36,28 @@ class PermissionsController extends Controller
         $columns = $this->getColumns();
         $actions = $this->getActions('list');
         $permissions = Permission::all();
-        $list = $this->getPermissionList();
+        $list = $this->getPermissionBoard();
 
         return view('admin.permissions.list', compact('columns', 'list', 'actions'));
     }
 
-    public function refresh(Request $request)
+    public function build(Request $request)
     {
-	auth()->user()->updatePermissions($request);
+	$this->buildPermissions($request);
 //file_put_contents('debog_file.txt', print_r('refresh', true));
 	return redirect()->route('admin.permissions.index');
     }
 
-    public function reset(Request $request)
+    public function rebuild(Request $request)
     {
-	return redirect()->route('admin.permissions.index')->with('success', 'Permissions successfully reset.');
+	$this->buildPermissions($request);
+
+	return redirect()->route('admin.permissions.index');
     }
 
-    public function create()
+    private function getPermissionBoard()
     {
-        $fields = $this->getFields();
-        $actions = $this->getActions('form', ['destroy']);
-
-        return view('admin.permissions.form', compact('fields', 'actions'));
-    }
-
-    public function edit($id)
-    {
-        $permission = Permission::findById($id);
-
-	if (in_array($permission->name, $this->getReservedPermissions())) {
-	    return redirect()->route('admin.permissions.index')->with('error', 'The permission "'.$permission->name.'" is reserved.');
-	}
-
-        $fields = $this->getFields($permission);
-        $actions = $this->getActions('form');
-
-        return view('admin.permissions.form', compact('permission', 'fields', 'actions'));
-    }
-
-    /**
-     * Update the specified permission.
-     *
-     * @param  Request  $request
-     * @param  int  $id
-     * @return Response
-     */
-    public function update(Request $request, $id)
-    {
-	$permission = Permission::findOrFail($id);
-
-        $this->validate($request, [
-	    'name' => [
-		'required',
-		'not_regex:/^('.implode('|', $this->getReservedPermissions()).')$/i',
-		'regex:/^'.implode('|', $this->getPermissionPatterns()).'$/',
-		Rule::unique('permissions')->ignore($id)
-	    ],
-	],
-	// Custom messages.
-	[
-	    'name.required' => 'This field is required.',
-	    'name.not_regex' => 'This permission is reserved.',
-	    'name.regex' => 'The permission name is invalid.',
-	    'name.unique' => 'The permission is already taken.',
-	]);
-
-	$permission->name = $request->input('name');
-	$permission->save();
-
-	$message = 'Permission successfully updated.';
-
-        if ($request->input('_close', null)) {
-	    return redirect()->route('admin.permissions.index')->with('success', $message);
-	}
-
-	return redirect()->route('admin.permissions.edit', $permission->id)->with('success', $message);
-    }
-
-    public function store(Request $request)
-    {
-        $this->validate($request, [
-	    'name' => [
-		'required',
-		'not_regex:/^('.implode('|', $this->getReservedPermissions()).')$/i',
-		'regex:/^'.implode('|', $this->getPermissionPatterns()).'$/',
-		'unique:permissions'
-	    ],
-	],
-	// Custom messages.
-	[
-	    'name.required' => 'This field is required.',
-	    'name.not_regex' => 'This permission is reserved.',
-	    'name.regex' => 'The permission name is invalid.',
-	    'name.unique' => 'The permission is already taken.',
-	]);
-
-	$permission = Permission::create(['name' => $request->input('name')]);
-
-	$message = 'Permission successfully added.';
-
-        if ($request->input('_close', null)) {
-	    return redirect()->route('admin.permissions.index')->with('success', $message);
-	}
-
-	return redirect()->route('admin.permissions.edit', $permission->id)->with('success', $message);
-    }
-
-    public function destroy($id)
-    {
-	$permission = Permission::findOrFail($id);
-
-	if (in_array($permission->id, $this->getReservedPermissionIds())) {
-	    return redirect()->route('admin.permissions.edit', $permission->id)->with('error', 'This permission is reserved.');
-	}
-
-	$permission->delete();
-
-	return redirect()->route('admin.permissions.index')->with('success', 'Permission successfully deleted.');
-    }
-
-    public function massDestroy(Request $request)
-    {
-        $permissions = Permission::whereIn('id', $request->input('ids'))->pluck('name')->toArray();
-	$result = array_intersect($permissions, $this->getReservedPermissions());
-
-	if (!empty($result)) {
-	    return redirect()->route('admin.permissions.index')->with('error', 'The following permissions are reserved: '.implode(',', $result));
-	}
-
-	Permission::destroy($request->input('ids'));
-
-	return redirect()->route('admin.permissions.index')->with('success', count($request->input('ids')).' Permission(s) successfully deleted.');
-    }
-
-    private function getPermissionList()
-    {
-	$permList = Settings::getPermissionList();
+	$permList = $this->getPermissionList();
 
 	$list = [];
 

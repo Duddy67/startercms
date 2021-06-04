@@ -58,7 +58,7 @@ class UsersController extends Controller
     {
         $user = User::findOrFail($id);
 
-	if (!User::canUpdate($user) && auth()->user()->id != $user->id) {
+	if (!auth()->user()->canUpdate($user) && auth()->user()->id != $user->id) {
 	    return redirect()->route('admin.users.index')->with('error', 'You are not allowed to edit this user.');
 	}
 
@@ -81,7 +81,7 @@ class UsersController extends Controller
     {
 	$user = User::findOrFail($id);
 
-	if (!User::canUpdate($user) && auth()->user()->id != $user->id) {
+	if (!auth()->user()->canUpdate($user) && auth()->user()->id != $user->id) {
 	    return redirect()->route('admin.users.edit', $user->id)->with('error', 'You are not allowed to update this user.');
 	}
 
@@ -158,7 +158,7 @@ class UsersController extends Controller
     {
 	$user = User::findOrFail($id);
 
-	if (!User::canDelete($user)) {
+	if (!auth()->user()->canDelete($user)) {
 	    return redirect()->route('admin.users.edit', $user->id)->with('error', 'You are not allowed to delete this user.');
 	}
 
@@ -175,7 +175,7 @@ class UsersController extends Controller
 	    foreach ($request->input('ids') as $key => $id) {
 		$user = User::findOrFail($id);
 
-		if (!User::canDelete($user)) {
+		if (!auth()->user()->canDelete($user)) {
 		    // Informs about the users previously deleted.
 		    if ($key > 0) {
 			$request->session()->flash('success', $key.' user(s) has been successfully deleted.');

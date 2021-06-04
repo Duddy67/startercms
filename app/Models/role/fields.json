@@ -7,6 +7,14 @@
     "placeholder": "Name"
   },
   {
+    "label": "Type",
+    "type": "text",
+    "name": "_role_type",
+    "id": "_role_type",
+    "extra": ["disabled"],
+    "placeholder": "Unknown"
+  },
+  {
     "label": "Created at",
     "type": "date",
     "name": "created_at",

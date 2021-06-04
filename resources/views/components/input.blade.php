@@ -3,8 +3,10 @@
     <label for="{{ $attribs->id }}">{{ $attribs->label }}</label>
 @endif
 
+@php $disabled = (isset($attribs->extra) && in_array('disabled', $attribs->extra)) ? 'disabled' : '' @endphp
+
 @if ($attribs->type == 'text' || $attribs->type == 'password' || $attribs->type == 'date')
-    <input  id="{{ $attribs->id }}" 
+    <input  id="{{ $attribs->id }}" {{ $disabled }} 
 
     @if ($attribs->type == 'date')
 	type="text" class="form-control date"
@@ -20,7 +22,7 @@
 	placeholder="{{ $attribs->placeholder }}"
     @endif
 
-    @if (isset($attribs->readonly) && $attribs->readonly)
+    @if ($disabled)
 	readonly
     @endif
 
@@ -32,7 +34,6 @@
 @elseif ($attribs->type == 'select')
     @php $multiple = (isset($attribs->extra) && in_array('multiple', $attribs->extra)) ? 'multiple' : '' @endphp
     @php $multi = ($multiple) ? '[]' : '' @endphp
-    @php $disabled = (isset($attribs->extra) && in_array('disabled', $attribs->extra)) ? 'disabled' : '' @endphp
 
     <select id="{{ $attribs->id }}" class="form-control select2" {{ $multiple }} {{ $disabled }} name="{{ $attribs->name.$multi }}">
 	@if (isset($attribs->blank))

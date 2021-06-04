@@ -4,10 +4,12 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Traits\Admin\RolesPermissions;
 
 class Admin
 {
+    use RolesPermissions;
+
     /**
      * Handle an incoming request.
      *
@@ -17,7 +19,7 @@ class Admin
      */
     public function handle(Request $request, Closure $next)
     {
-        if (in_array(User::getUserRoleType(), ['super-admin', 'admin', 'manager', 'assistant'])) {
+        if (in_array($this->getUserRoleType(), ['super-admin', 'admin', 'manager', 'assistant'])) {
 	    return $next($request);
 	}
 

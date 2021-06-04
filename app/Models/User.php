@@ -7,14 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
-use App\Models\Settings;
+use App\Traits\Admin\RolesPermissions;
 use App\Models\UserGroup;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, RolesPermissions;
 
     /**
      * The attributes that are mass assignable.
@@ -46,64 +44,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public $permissionPatterns = [
-	'create-[0-9-a-z\-]+',
-	'update-[0-9-a-z\-]+',
-	'delete-[0-9-a-z\-]+',
-	'update-own-[0-9-a-z\-]+',
-	'delete-own-[0-9-a-z\-]+',
-	'[0-9-a-z\-]+-settings',
-	'access-admin'
-    ];
-
-
-    public function updatePermissions($request)
-    {
-        if (!$this->isAllowedTo('update-permissions')) {
-	    $request->session()->flash('error', 'You are not allowed to update permissions.');
-
-	    return;
-	}
-
-	$permissions = Settings::getPermissionArray();
-	$invalidNames = [];
-	$count = 0;
-//file_put_contents('debog_file.txt', print_r($permissions, true), FILE_APPEND);
-
-	foreach ($permissions as $permission) {
-	  if (Permission::where('name', $permission)->first() === null) {
-	      if (!preg_match('#^'.implode('|', $this->permissionPatterns).'$#', $permission)) {
-		  $invalidNames[] = $permission;
-		  continue;
-	      }
-
-	      //Permission::create(['name' => $permission]);
-	      $count++;
-	  }
-	}
-
-	if (!empty($invalidNames)) {
-	    $request->session()->flash('error', 'The permission names: "'.implode(', ', $invalidNames).'" are invalid.');
-	}
-
-	if ($count) {
-	    $request->session()->flash('success', $count.' permission(s) successfully updated.');
-	}
-	else {
-	    $request->session()->flash('info', 'No new permissions added.');
-	}
-    }
-
-    public function resetPermissions($request)
-    {
-        if (!$this->isAllowedTo('update-permissions')) {
-	    $request->session()->flash('error', 'You are not allowed to update permissions.');
-
-	    return;
-	}
-
-	$this->updatePermissions($request);
-    }
 
     /**
      * The groups that belong to the user.
@@ -120,34 +60,7 @@ class User extends Authenticatable
 
     public static function getRoleOptions($user = null)
     {
-        $roleType = self::getUserRoleType();
-
-	// Check first if the user is editing their own user account.
-	if ($user && auth()->user()->id == $user->id) {
-	    // Only display the user role.
-	    $roles = Role::where('name', $user->getRoleNames()->toArray()[0])->get();
-	}
-	// Move on to the role types.
-	elseif ($roleType == 'registered') {
-	  $roles = Role::whereDoesntHave('permissions', function ($query) {
-	      $query->whereNotIn('name', ['create-user', 'create-permission', 'create-role']);
-	  })->where('name', '!=', 'super-admin')->get();
-	}
-	elseif ($roleType == 'manager') {
-	  $roles = Role::whereDoesntHave('permissions', function ($query) {
-	      $query->where('name', 'create-user')->whereNotIn('name', ['create-permission', 'create-role']);
-	  })->where('name', '!=', 'super-admin')->get();
-	}
-	elseif ($roleType == 'admin') {
-	  $roles = Role::whereDoesntHave('permissions', function ($query) {
-	      $query->whereIn('name', ['create-permission', 'create-role']);
-	  })->where('name', '!=', 'super-admin')->get();
-	}
-	// super-admin
-	else {
-	    $roles = Role::whereNotIn('name', ['super-admin'])->get();
-	}
-
+	$roles = auth()->user()->getAssignableRoles($user);
 	$options = [];
 
 	foreach ($roles as $role) {
@@ -185,78 +98,35 @@ class User extends Authenticatable
         return $this->groups->pluck('id')->toArray();
     }
 
-    public static function getUserRoleType($user = null)
-    {
-        // Get the given user or the current user.
-        $user = ($user) ? $user : auth()->user();
-        $roleName = $user->getRoleNames()->toArray()[0];
-
-	if ($roleName == 'super-admin') {
-	    return 'super-admin';
-	}
-
-	return self::getRoleType($roleName);
-
-    }
-
-    public static function getRoleType($role)
-    {
-	$role = (is_string($role)) ? Role::findByName($role) : $role;
-
-	if ($role->hasPermissionTo('create-role')) {
-	    return 'admin';
-	}
-	elseif ($role->hasPermissionTo('create-user')) {
-	    return 'manager';
-	}
-	elseif ($role->hasPermissionTo('access-admin')) {
-	    return 'assistant';
-	}
-	else {
-	    return 'registered';
-	}
-    }
-
-    public static function getRoleHierarchy()
-    {
-	return [
-	    'registered' => 1, 
-	    'assistant' => 2, 
-	    'manager' => 3, 
-	    'admin' => 4, 
-	    'super-admin' => 5
-	];
-    }
-
-    public static function canUpdate($user)
+    public function canUpdate($user)
     {
         if (is_int($user)) {
 	    $user = User::findOrFail($user);
 	}
 
-	$hierarchy = self::getRoleHierarchy();
+	$hierarchy = $this->getRoleHierarchy();
         // Users can only update users lower in the hierarchy.
-	if ($hierarchy[self::getUserRoleType()] > $hierarchy[self::getUserRoleType($user)]) {
+	if ($hierarchy[$this->getUserRoleType()] > $hierarchy[$this->getUserRoleType($user)]) {
 	    return true;
 	}
 
 	return false;
     }
 
-    public static function canDelete($user)
+    public function canDelete($user)
     {
         if (is_int($user)) {
 	    $user = User::findOrFail($user);
 	}
 
 	// Users cannot delete their own account.
-        if (auth()->user()->id == $user->id) {
+        if ($this->id == $user->id) {
 	    return false;
 	}
 
-	$hierarchy = self::getRoleHierarchy();
+	$hierarchy = $this->getRoleHierarchy();
         // Users can only delete users lower in the hierarchy.
-	if ($hierarchy[self::getUserRoleType()] > $hierarchy[self::getUserRoleType($user)]) {
+	if ($hierarchy[$this->getUserRoleType()] > $hierarchy[$this->getUserRoleType($user)]) {
 	    return true;
 	}
 
@@ -284,6 +154,6 @@ class User extends Authenticatable
      */
     public function canAccessAdmin()
     {
-        return in_array(self::getUserRoleType(), ['super-admin', 'admin', 'manager', 'assistant']);
+        return in_array($this->getUserRoleType(), ['super-admin', 'admin', 'manager', 'assistant']);
     }
 }

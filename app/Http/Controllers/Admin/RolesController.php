@@ -7,15 +7,12 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\RolesPermissions;
-use App\Models\User;
-use App\Models\Settings;
-use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
 class RolesController extends Controller
 {
-    use ItemConfig, RolesPermissions, HasRoles;
+    use ItemConfig, RolesPermissions;
 
     /**
      * Create a new controller instance.
@@ -48,19 +45,20 @@ class RolesController extends Controller
     {
         $fields = $this->getFields();
         $actions = $this->getActions('form');
-	$list = $this->getPermissionList();
+	$board = $this->getPermissionBoard();
 
-        return view('admin.roles.form', compact('fields', 'actions', 'list'));
+        return view('admin.roles.form', compact('fields', 'actions', 'board'));
     }
 
     public function edit($id)
     {
         $role = Role::findById($id);
         $fields = $this->getFields($role);
-	$list = $this->getPermissionList($role);
+	$this->setFieldValues($fields, $role);
+	$board = $this->getPermissionBoard($role);
         $actions = $this->getActions('form');
 
-        return view('admin.roles.form', compact('role', 'fields', 'actions', 'list'));
+        return view('admin.roles.form', compact('role', 'fields', 'actions', 'board'));
     }
 
     /**
@@ -75,14 +73,14 @@ class RolesController extends Controller
 	$role = Role::findOrFail($id);
 //file_put_contents('debog_file.txt', print_r($arr, true));
 
-	if (in_array($role->id, $this->getReservedRoleIds())) {
-	    return redirect()->route('admin.roles.edit', $role->id)->with('error', 'This role is reserved.');
+	if (in_array($role->id, $this->getDefaultRoleIds())) {
+	    //return redirect()->route('admin.roles.edit', $role->id)->with('error', 'This role is reserved.');
 	}
 
         $this->validate($request, [
 	    'name' => [
 		'required',
-		'not_regex:/^('.implode('|', $this->getReservedRoles()).')$/i',
+		'not_regex:/^('.implode('|', $this->getDefaultRoles()).')$/i',
 		'regex:/^[a-z0-9-]{3,}$/',
 		Rule::unique('roles')->ignore($id)
 	    ],
@@ -96,10 +94,10 @@ class RolesController extends Controller
         if ($request->input('permissions') !== null) {
 
 	    // Ensure an admin doesn't use any level1 permissions. 
-	    $level1Perms = Settings::getPermissionArray(['level2', 'level3']);
+	    $level1Perms = $this->getPermissionArray(['level2', 'level3']);
 	    $count = array_intersect($request->input('permissions'), $level1Perms);
 
-	    if (User::getUserRoleType() == 'admin' && $count) {
+	    if ($this->getUserRoleType() == 'admin' && $count) {
 		return redirect()->route('admin.roles.edit', $role->id)->with('error', 'One or more selected permissions are not authorised.');
 	    }
 
@@ -138,7 +136,7 @@ class RolesController extends Controller
         $this->validate($request, [
 	    'name' => [
 		'required',
-		'not_regex:/^('.implode('|', $this->getReservedRoles()).')$/i',
+		'not_regex:/^('.implode('|', $this->getDefaultRoles()).')$/i',
 		'regex:/^[a-z0-9-]{3,}$/',
 		'unique:roles'
 	    ],
@@ -151,10 +149,10 @@ class RolesController extends Controller
         if ($request->input('permissions') !== null) {
 
 	    // Ensure an admin doesn't use any level1 permissions. 
-	    $level1Perms = Settings::getPermissionArray(['level2', 'level3']);
+	    $level1Perms = $this->getPermissionArray(['level2', 'level3']);
 	    $count = array_intersect($request->input('permissions'), $level1Perms);
 
-	    if (User::getUserRoleType() == 'admin' && $count) {
+	    if ($this->getUserRoleType() == 'admin' && $count) {
 		return redirect()->route('admin.roles.edit', $role->id)->with('error', 'One or more selected permissions are not authorised.');
 	    }
 
@@ -176,7 +174,7 @@ class RolesController extends Controller
     {
 	$role = Role::findOrFail($id);
 
-	if (in_array($role->name, $this->getReservedRoles())) {
+	if (in_array($role->name, $this->getDefaultRoles())) {
 	    return redirect()->route('admin.roles.edit', $role->id)->with('error', 'This role is reserved.');
 	}
 
@@ -192,7 +190,7 @@ class RolesController extends Controller
     public function massDestroy(Request $request)
     {
         $roles = Role::whereIn('id', $request->input('ids'))->pluck('name')->toArray();
-	$result = array_intersect($roles, $this->getReservedRoles());
+	$result = array_intersect($roles, $this->getDefaultRoles());
 
 	if (!empty($result)) {
 	    return redirect()->route('admin.roles.index')->with('error', 'The following roles are reserved: '.implode(',', $result));
@@ -211,20 +209,20 @@ class RolesController extends Controller
 	return redirect()->route('admin.roles.index')->with('success', count($request->input('ids')).' Role(s) successfully deleted.');
     }
 
-    private function getPermissionList($role = null)
+    private function getPermissionBoard($role = null)
     {
         // N.B: Only super-admin and users type admin are allowed to manage roles.
 
-        $userRoleType = User::getUserRoleType();
-	$hierarchy = User::getRoleHierarchy();
+        $userRoleType = $this->getUserRoleType();
+	$hierarchy = $this->getRoleHierarchy();
 
 	if ($userRoleType == 'admin') {
 	    // Restrict permissions for users type admin.
-	    $permList = Settings::getPermissionList(['level1']);
+	    $permList = $this->getPermissionList(['level1']);
 	}
 	// super-admin
 	else {
-	    $permList = Settings::getPermissionList();
+	    $permList = $this->getPermissionList();
 	}
 
 	$list = [];
@@ -257,7 +255,7 @@ class RolesController extends Controller
 
 		    // Disable permissions according to the edited role type.
 
-                    $roleType = User::getRoleType($role);
+                    $roleType = $this->getRoleType($role);
 
 		    if ($role->name == 'super-admin') {
 		        // super-admin has all permissions.
@@ -275,5 +273,18 @@ class RolesController extends Controller
 	}
 
 	return $list;
+    }
+
+    /*
+     * Sets field values specific to the Role model.
+     */
+    private function setFieldValues(&$fields, $role)
+    {
+        foreach ($fields as $field) {
+	    if ($field->name == '_role_type') {
+	        $value = ($role->name == 'super-admin') ? 'super-admin' : $this->getRoleType($role);
+	        $field->value = $value;
+	    }
+	}
     }
 }
