@@ -4,6 +4,10 @@ namespace App\Traits\Admin;
 
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Artisan;
 
 trait RolesPermissions
 {
@@ -37,20 +41,6 @@ trait RolesPermissions
 	];
     }
 
-    /*
-     * Permissions that cannot be deleted nor updated.
-     */
-    public function getReservedPermissions()
-    {
-	//return array_merge(self::getPrivatePermissions(), self::getProtectedPermissions(), self::getPublicPermissions()); 
-	return [];
-    }
-
-    public function getReservedPermissionIds()
-    {
-        return [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18];
-    }
-
     public function getPermissionPatterns()
     {
         return [
@@ -59,13 +49,14 @@ trait RolesPermissions
 	    'delete-[0-9-a-z\-]+',
 	    'update-own-[0-9-a-z\-]+',
 	    'delete-own-[0-9-a-z\-]+',
-	    '[0-9-a-z\-]+-settings'
+	    '[0-9-a-z\-]+-settings',
+	    'access-admin'
 	];
     }
 
     public function getPermissionList($except = [])
     {
-	$json = file_get_contents(app_path().'/Models/user/permissions.json', true);
+	$json = file_get_contents(app_path().'/Models/permission/permissions.json', true);
 
         if ($json === false) {
 	   throw new Exception('Load Failed');    
@@ -170,12 +161,16 @@ trait RolesPermissions
 	return $roles;
     }
 
-    public function buildPermissions($request)
+    public function buildPermissions($request, $rebuild = false)
     {
         if (!auth()->user()->isAllowedTo('update-permissions')) {
 	    $request->session()->flash('error', 'You are not allowed to update permissions.');
 
 	    return;
+	}
+
+	if ($rebuild) {
+	    $this->truncatePermissions();
 	}
 
 	$permissions = $this->getPermissionArray();
@@ -205,18 +200,53 @@ trait RolesPermissions
 	else {
 	    $request->session()->flash('info', 'No new permissions added.');
 	}
+
+	if ($rebuild && empty($invalidNames)) {
+	    $this->setPermissions();
+	    $request->session()->flash('success', 'Permissions have been successfully rebuilt.');
+	}
     }
 
-    public function rebuildPermissions($request)
+    public function setPermissions()
     {
-        if (!auth()->user()->isAllowedTo('update-permissions')) {
-	    $request->session()->flash('error', 'You are not allowed to update permissions.');
+	$permList = $this->getPermissionList();
 
-	    return;
+	foreach ($permList as $permissions) {
+	    foreach ($permissions as $permission) {
+	        $roles = explode('|', $permission->default);
+
+		foreach ($roles as $role) {
+		    if (!empty($role)) {
+			$role = Role::findByName($role);
+			$role->givePermissionTo($permission->name);
+		    }
+		}
+	    }
 	}
+    }
 
-	// delete all permissions...
+    public function truncatePermissions()
+    {
+	Schema::disableForeignKeyConstraints();
+	DB::table('permissions')->truncate();
+	DB::table('role_has_permissions')->truncate();
+	Schema::enableForeignKeyConstraints();
 
-	$this->buildPermissions($request);
+	Artisan::call('cache:clear');
+    }
+
+    public function createRoles()
+    {
+        if (Role::whereIn('name', $this->getDefaultRoles())->doesntExist()) {
+	    $date = Carbon::now();
+
+	    Role::insert([
+		['name' => 'super-admin', 'guard_name' => 'web', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
+		['name' => 'admin', 'guard_name' => 'web', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
+		['name' => 'manager', 'guard_name' => 'web', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
+		['name' => 'assistant', 'guard_name' => 'web', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
+		['name' => 'registered', 'guard_name' => 'web', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()]
+	    ]);
+	}
     }
 }

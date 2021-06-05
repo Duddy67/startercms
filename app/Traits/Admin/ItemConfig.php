@@ -50,8 +50,14 @@ trait ItemConfig
     {
 	$fields = $this->getData('fields');
 
-	// Set the select field types.
 	foreach ($fields as $key => $field) {
+	    // Remove unwanted fields if any.
+	    if (in_array($field->name, $except)) {
+	        unset($fields[$key]);
+		continue;
+	    }
+
+	    // Set the select field types.
 	    if ($field->type == 'select') {
 	        // Build the function name.
 		$function = 'get'.ucfirst($field->name).'Options';
@@ -67,7 +73,7 @@ trait ItemConfig
 
 	if ($item) {
 	    foreach ($fields as $key => $field) {
-		if (isset($field->name) && !in_array($field->type, $except)) {
+		if (isset($field->name)) {
 		    // Skip the fields which are already set.
 		    if ($field->type == 'select') {
 		        continue;

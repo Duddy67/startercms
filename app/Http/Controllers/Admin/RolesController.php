@@ -53,7 +53,8 @@ class RolesController extends Controller
     public function edit($id)
     {
         $role = Role::findById($id);
-        $fields = $this->getFields($role);
+	$except = (in_array($role->name, $this->getDefaultRoles())) ? ['_role_type'] : [];
+        $fields = $this->getFields($role, $except);
 	$this->setFieldValues($fields, $role);
 	$board = $this->getPermissionBoard($role);
         $actions = $this->getActions('form');
@@ -71,10 +72,9 @@ class RolesController extends Controller
     public function update(Request $request, $id)
     {
 	$role = Role::findOrFail($id);
-//file_put_contents('debog_file.txt', print_r($arr, true));
 
 	if (in_array($role->id, $this->getDefaultRoleIds())) {
-	    //return redirect()->route('admin.roles.edit', $role->id)->with('error', 'This role is reserved.');
+	    return redirect()->route('admin.roles.edit', $role->id)->with('error', 'You cannot modify the default roles.');
 	}
 
         $this->validate($request, [
@@ -104,6 +104,7 @@ class RolesController extends Controller
 	    // Get the unselected permissions.
 	    $permissions = Permission::whereNotIn('name', $request->input('permissions'))->pluck('name')->toArray();
 
+	    // Give the selected permissions.
 	    foreach ($request->input('permissions') as $permission) {
 	        if (!$role->hasPermissionTo($permission)) {
 		    $role->givePermissionTo($permission);
@@ -115,6 +116,7 @@ class RolesController extends Controller
 	    $permissions = Permission::all()->pluck('name')->toArray();
 	}
 
+	// Revoke the unselected permissions.
 	foreach ($permissions as $permission) {
 	    if ($role->hasPermissionTo($permission)) {
 		$role->revokePermissionTo($permission);
@@ -175,7 +177,7 @@ class RolesController extends Controller
 	$role = Role::findOrFail($id);
 
 	if (in_array($role->name, $this->getDefaultRoles())) {
-	    return redirect()->route('admin.roles.edit', $role->id)->with('error', 'This role is reserved.');
+	    return redirect()->route('admin.roles.edit', $role->id)->with('error', 'You cannot delete the default roles.');
 	}
 
 	if ($role->users->count()) {
@@ -193,7 +195,7 @@ class RolesController extends Controller
 	$result = array_intersect($roles, $this->getDefaultRoles());
 
 	if (!empty($result)) {
-	    return redirect()->route('admin.roles.index')->with('error', 'The following roles are reserved: '.implode(',', $result));
+	    return redirect()->route('admin.roles.index')->with('error', 'The following roles cannot be deleted: '.implode(',', $result));
 	}
 
 	foreach ($request->input('ids') as $id) {
@@ -263,7 +265,7 @@ class RolesController extends Controller
 			$roleType = 'super-admin';
 		    }
 
-		    if ($hierarchy[$roleType] >= $hierarchy[$userRoleType]) {
+		    if ($hierarchy[$roleType] >= $hierarchy[$userRoleType] || in_array($role->name, $this->getDefaultRoles())) {
 			$checkbox->disabled = true;
 		    }
 		}
@@ -280,7 +282,14 @@ class RolesController extends Controller
      */
     private function setFieldValues(&$fields, $role)
     {
+        $defaultRole = (in_array($role->name, $this->getDefaultRoles())) ? true : false;
+
         foreach ($fields as $field) {
+	    if ($defaultRole) {
+	        // Disable all field.
+	        $field->extra = ['disabled'];
+	    }
+
 	    if ($field->name == '_role_type') {
 	        $value = ($role->name == 'super-admin') ? 'super-admin' : $this->getRoleType($role);
 	        $field->value = $value;

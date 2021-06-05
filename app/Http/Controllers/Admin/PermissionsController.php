@@ -44,14 +44,12 @@ class PermissionsController extends Controller
     public function build(Request $request)
     {
 	$this->buildPermissions($request);
-//file_put_contents('debog_file.txt', print_r('refresh', true));
 	return redirect()->route('admin.permissions.index');
     }
 
     public function rebuild(Request $request)
     {
-	$this->buildPermissions($request);
-
+	$this->buildPermissions($request, true);
 	return redirect()->route('admin.permissions.index');
     }
 

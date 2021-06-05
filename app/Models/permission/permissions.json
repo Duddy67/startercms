@@ -1,0 +1,118 @@
+{
+  "users": [
+      {
+	"name": "create-user",
+	"type": "level2",
+	"default": "admin|manager"
+      },
+      {
+	"name": "update-user",
+	"type": "level2",
+	"default": "admin|manager"
+      },
+      {
+	"name": "delete-user",
+	"type": "level2",
+	"default": "admin|manager"
+      },
+      {
+	"name": "update-own-user",
+	"type": "level2",
+	"default": ""
+      },
+      {
+	"name": "delete-own-user",
+	"type": "level2",
+	"default": ""
+      },
+      {
+	"name": "create-user-group",
+	"type": "level2",
+	"default": "admin|manager"
+      },
+      {
+	"name": "update-user-group",
+	"type": "level2",
+	"default": "admin|manager"
+      },
+      {
+	"name": "delete-user-group",
+	"type": "level2",
+	"default": "admin|manager"
+      },
+      {
+	"name": "create-role",
+	"type": "level1",
+	"default": "admin"
+      },
+      {
+	"name": "update-role",
+	"type": "level1",
+	"default": "admin"
+      },
+      {
+	"name": "delete-role",
+	"type": "level1",
+	"default": "admin"
+      },
+      {
+	"name": "update-permissions",
+	"type": "level1",
+	"default": ""
+      }
+  ],
+  "blog": [
+      {
+	"name": "create-post",
+	"type": "level3",
+	"default": "admin|manager|assistant|registered"
+      },
+      {
+	"name": "update-post",
+	"type": "level2",
+	"default": "admin|manager|assistant"
+      },
+      {
+	"name": "delete-post",
+	"type": "level2",
+	"default": "admin|manager|assistant"
+      },
+      {
+	"name": "update-own-post",
+	"type": "level3",
+	"default": "registered"
+      },
+      {
+	"name": "delete-own-post",
+	"type": "level3",
+	"default": "registered"
+      },
+      {
+	"name": "create-post-category",
+	"type": "level2",
+	"default": "admin|manager"
+      },
+      {
+	"name": "update-post-category",
+	"type": "level2",
+	"default": "admin|manager"
+      },
+      {
+	"name": "delete-post-category",
+	"type": "level2",
+	"default": "admin|manager"
+      }
+  ],
+  "access": [
+      {
+	"name": "global-settings",
+	"type": "level1",
+	"default": ""
+      },
+      {
+	"name": "access-admin",
+	"type": "level2",
+	"default": "assistant"
+      }
+  ]
+}
