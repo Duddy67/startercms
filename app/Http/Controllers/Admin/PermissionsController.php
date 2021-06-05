@@ -33,12 +33,10 @@ class PermissionsController extends Controller
      */
     public function index()
     {
-        $columns = $this->getColumns();
         $actions = $this->getActions('list');
-        $permissions = Permission::all();
-        $list = $this->getPermissionBoard();
+        $board = $this->getPermissionBoard();
 
-        return view('admin.permissions.list', compact('columns', 'list', 'actions'));
+        return view('admin.permissions.list', compact('board', 'actions'));
     }
 
     public function build(Request $request)

@@ -3,7 +3,7 @@
 @section ('main')
     <x-toolbar :items=$actions />
 
-    @foreach ($list as $section => $permissions)
+    @foreach ($board as $section => $permissions)
 	<h5>{{ $section }}</h5>
 	<table class="table">
 	    <tbody>
