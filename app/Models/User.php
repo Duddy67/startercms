@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use App\Traits\Admin\RolesPermissions;
 use App\Models\UserGroup;
+use Request;
 
 class User extends Authenticatable
 {
@@ -55,7 +56,8 @@ class User extends Authenticatable
 
     public function getItems()
     {
-        return User::all();
+        $input = Request::all();
+        return User::paginate(3);
     }
 
     public static function getRoleOptions($user = null)

@@ -43,7 +43,7 @@ class UsersController extends Controller
 	$rows = $this->getRows($columns, $users, ['roles']);
 	$this->setRowValues($rows, $columns, $users);
 
-        return view('admin.users.list', compact('columns', 'rows', 'actions'));
+        return view('admin.users.list', compact('users', 'columns', 'rows', 'actions'));
     }
 
     public function create()

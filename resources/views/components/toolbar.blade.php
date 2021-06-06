@@ -1,4 +1,4 @@
-<nav class="navbar navbar-light bg-light">
+<nav class="navbar">
     <div class="row" id="action-btn">
 	@foreach ($items as $item)
 	    <div class="mr-3">

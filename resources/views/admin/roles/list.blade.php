@@ -1,7 +1,15 @@
 @extends ('layouts.admin')
 
+@section ('header')
+    <p class="h3">Roles</p>
+@endsection
+
 @section ('main')
-    <x-toolbar :items=$actions />
+    <div class="card">
+	<div class="card-body">
+	    <x-toolbar :items=$actions />
+	</div>
+    </div>
 
     @if (!empty($rows)) 
 	<x-item-list :columns="$columns" :rows="$rows" route="admin.roles.edit" />

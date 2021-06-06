@@ -1,6 +1,8 @@
-<table id="item-list" class="table table-hover">
-    <thead>
-	<th scope="col">#</th>
+<table id="item-list" class="table table-hover table-striped">
+    <thead class="table-success">
+	<th scope="col">
+	    <input type="checkbox" id="toggle-select">
+        </th>
         @foreach ($columns as $key => $column)
 	    <th scope="col">{{ $column->label }}</th>
         @endforeach

@@ -21,17 +21,25 @@
 		     $value = old($attribs->name);
 		 }
 	    @endphp
-	    <x-input :attribs="$attribs" :value="$value" />
+
+	    <div class="form-group">
+		<x-input :attribs="$attribs" :value="$value" />
+            </div>
         @endforeach
 
+	<h4 class="pt-3">Permissions</h4>
 	@foreach ($board as $section => $checkboxes)
-	    <h5>{{ $section }}</h5>
-	    <table class="table">
+	    <h5 class="font-weight-bold">{{ $section }}</h5>
+	    <table class="table table-striped">
 		<tbody>
 		    @foreach ($checkboxes as $checkbox)
-			<tr><td>
-			    <x-input :attribs="$checkbox" :value="$checkbox->value" />
-			</td></tr>
+			<tr>
+			    <td>
+                                <div class="form-check">
+			        <x-input :attribs="$checkbox" :value="$checkbox->value" />
+                                </div>
+			    </td>
+                        </tr>
 		    @endforeach
 		</tbody>
 	    </table>
@@ -40,7 +48,10 @@
 	<input type="hidden" id="listUrl" value="{{ route('admin.roles.index') }}">
 	<input type="hidden" id="close" name="_close" value="0">
     </form>
-    <x-toolbar :items=$actions />
+
+    <div class="form-group">
+	<x-toolbar :items=$actions />
+    </div>
 
     @if (isset($role))
 	<form id="deleteItemForm" action="{{ url('/admin/roles', ['id' => $role->id]) }}" method="post">

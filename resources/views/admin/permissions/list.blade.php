@@ -1,11 +1,19 @@
 @extends ('layouts.admin')
 
+@section ('header')
+    <p class="h3">Permissions</p>
+@endsection
+
 @section ('main')
-    <x-toolbar :items=$actions />
+    <div class="card">
+	<div class="card-body">
+	    <x-toolbar :items=$actions />
+	</div>
+    </div>
 
     @foreach ($board as $section => $permissions)
-	<h5>{{ $section }}</h5>
-	<table class="table">
+	<h5 class="font-weight-bold">{{ $section }}</h5>
+	<table class="table table-striped">
 	    <tbody>
 		@foreach ($permissions as $permission)
 		    <tr><td>

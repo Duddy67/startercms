@@ -1,7 +1,15 @@
 @extends ('layouts.admin')
 
+@section ('header')
+    <p class="h3">Users</p>
+@endsection
+
 @section ('main')
-    <x-toolbar :items=$actions />
+    <div class="card">
+	<div class="card-body">
+	    <x-toolbar :items=$actions />
+	</div>
+    </div>
 
     @if (!empty($rows)) 
 	<x-item-list :columns="$columns" :rows="$rows" route="admin.users.edit" />
@@ -10,6 +18,12 @@
 	    No item has been found.
 	</div>
     @endif
+
+    {{ $users->links('pagination::bootstrap-4') }}
+    <div>Showing {{ $users->firstItem() }} to {{ $users->lastItem() }} of {{ $users->total() }} results.</div>
+    
+    
+    
 
     <input type="hidden" id="listUrl" value="{{ route('admin.users.index') }}">
 

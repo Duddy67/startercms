@@ -236,6 +236,7 @@ class RolesController extends Controller
 		$checkbox = new \stdClass();
 		$checkbox->type = 'checkbox';
 		$checkbox->label = $permission->name;
+		$checkbox->position = 'right';
 		$checkbox->id = $permission->name;
 		$checkbox->name = 'permissions[]';
 		$checkbox->value = $permission->name;

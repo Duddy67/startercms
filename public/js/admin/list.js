@@ -13,6 +13,13 @@
 		window.location = $(this).data('href');
 	    }
 	});
+
+	$('#toggle-select').click (function () {
+	     var checkedStatus = this.checked;
+	    $('#item-list tbody tr').find('td:first :checkbox').each(function () {
+		$(this).prop('checked', checkedStatus);
+	     });
+	});
     });
 
     $.fn.setSelectedItems = function() {

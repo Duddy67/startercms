@@ -1,17 +1,18 @@
 
-@if (isset($attribs->label))
+@if (isset($attribs->label) && $attribs->type != 'checkbox')
     <label for="{{ $attribs->id }}">{{ $attribs->label }}</label>
 @endif
 
 @php $disabled = (isset($attribs->extra) && in_array('disabled', $attribs->extra)) ? 'disabled' : '' @endphp
+@php $class = (isset($attribs->class)) ? $attribs->class : '' @endphp
 
 @if ($attribs->type == 'text' || $attribs->type == 'password' || $attribs->type == 'date')
     <input  id="{{ $attribs->id }}" {{ $disabled }} 
 
     @if ($attribs->type == 'date')
-	type="text" class="form-control date"
+	type="text" class="form-control date {{ $class }}"
     @else 
-	type="{{ $attribs->type }}" class="form-control" 
+	type="{{ $attribs->type }}" class="form-control {{ $class }}" 
     @endif
 
     @if (isset($attribs->name))
@@ -51,7 +52,11 @@
         @endforeach
     </select> 
 @elseif ($attribs->type == 'checkbox')
-    <input type="checkbox" id="{{ $attribs->id }}" class="form-controller"
+    @if (!isset($attribs->position) || $attribs->position == 'left')
+	<label class="form-check-label" for="{{ $attribs->id }}">{{ $attribs->label }}</label>
+    @endif
+
+    <input type="checkbox" id="{{ $attribs->id }}" class="form-check-input"
 
     @if (isset($attribs->name))
 	name="{{ $attribs->name }}"
@@ -70,6 +75,10 @@
     @endif
 
     >
+
+    @if (isset($attribs->position) && $attribs->position == 'right')
+	<label class="form-check-label" for="{{ $attribs->id }}">{{ $attribs->label }}</label>
+    @endif
 @endif
 
 @if (isset($attribs->name))

@@ -217,6 +217,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			  Roles
 			</x-menu-item>
 		    @endallowto
+		    @allowto ('create-permission')
+			<x-menu-item href="{{ route('admin.permissions.index') }}" :sub=true :active=false>
+			  Permissions
+			</x-menu-item>
+		    @endallowto
 		  </ul>
 	      </li>
 	  @endallowto
@@ -248,11 +253,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		  <p>Settings</p>
 		</a>
 		  <ul class="nav nav-treeview">
-		    @allowto ('create-permission')
-			<x-menu-item href="{{ route('admin.permissions.index') }}" :sub=true :active=false>
-			  Permissions
-			</x-menu-item>
-		    @endallowto
 		    <x-menu-item href="#" :sub=true :active=false>
 		      Security
 		    </x-menu-item>
@@ -279,13 +279,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">Starter Page</h1>
+	    @yield ('header')
+            <!--<h1 class="m-0">Starter Page</h1>-->
           </div><!-- /.col -->
           <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
+            <!--<ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
               <li class="breadcrumb-item active">Starter Page</li>
-            </ol>
+            </ol>-->
           </div><!-- /.col -->
         </div><!-- /.row -->
       </div><!-- /.container-fluid -->
