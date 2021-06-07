@@ -2,6 +2,9 @@
 
 namespace App\Traits\Admin;
 
+use App\Models\Settings;
+use Request;
+
 
 trait ItemConfig
 {
@@ -99,7 +102,16 @@ trait ItemConfig
     {
 	$filters = $this->getData('filters');
 
-	// Possible operations here...
+	foreach ($filters as $key => $filter) {
+	    // Build the function name.
+	    $function = 'get'.ucfirst($filter->name).'Options';
+	    $options = Settings::$function();
+	    $filters[$key]->options = $options;
+
+		//$function = 'get'.ucfirst($filter->name).'Value';
+		//$filters[$key]->value = $item->$function();
+		$filters[$key]->value = Request::input('per_page', 5);
+	}
 
 	return $filters;
     }

@@ -35,15 +35,16 @@ class UsersController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index(Request $request)
     {
         $columns = $this->getColumns();
         $actions = $this->getActions('list');
-        $users = $this->model->getItems();
-	$rows = $this->getRows($columns, $users, ['roles']);
-	$this->setRowValues($rows, $columns, $users);
-
-        return view('admin.users.list', compact('users', 'columns', 'rows', 'actions'));
+        $filters = $this->getFilters();
+        $items = $this->model->getItems();
+	$rows = $this->getRows($columns, $items, ['roles']);
+	$this->setRowValues($rows, $columns, $items);
+$query = $request->query();
+        return view('admin.users.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'query'));
     }
 
     public function create()

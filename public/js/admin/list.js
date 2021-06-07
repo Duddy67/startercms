@@ -20,6 +20,10 @@
 		$(this).prop('checked', checkedStatus);
 	     });
 	});
+
+	$('select[id^="filter-"]').change(function() {
+	    $('#item-filters').submit();
+	});
     });
 
     $.fn.setSelectedItems = function() {

@@ -12,6 +12,13 @@
     </div>
 
     @if (!empty($rows)) 
+	<form id="item-filters" action="{{ route('admin.users.index') }}" method="get">
+
+	    @foreach ($filters as $attribs)
+		<x-input :attribs="$attribs" :value="$attribs->value" />
+	    @endforeach
+	</form>
+
 	<x-item-list :columns="$columns" :rows="$rows" route="admin.users.edit" />
     @else
         <div class="alert alert-info" role="alert">
@@ -19,11 +26,7 @@
 	</div>
     @endif
 
-    {{ $users->links('pagination::bootstrap-4') }}
-    <div>Showing {{ $users->firstItem() }} to {{ $users->lastItem() }} of {{ $users->total() }} results.</div>
-    
-    
-    
+    <x-pagination :items=$items />
 
     <input type="hidden" id="listUrl" value="{{ route('admin.users.index') }}">
 

@@ -36,7 +36,11 @@
     @php $multiple = (isset($attribs->extra) && in_array('multiple', $attribs->extra)) ? 'multiple' : '' @endphp
     @php $multi = ($multiple) ? '[]' : '' @endphp
 
-    <select id="{{ $attribs->id }}" class="form-control select2" {{ $multiple }} {{ $disabled }} name="{{ $attribs->name.$multi }}">
+    <select id="{{ $attribs->id }}" class="form-control select2" {{ $multiple }} {{ $disabled }} name="{{ $attribs->name.$multi }}"
+    @if (isset($attribs->onchange))
+	onchange="{{ $attribs->onchange }}"
+    @endif
+    >
 	@if (isset($attribs->blank))
 	    <option value="">{{ $attribs->blank }}</option>
 	@endif

@@ -56,8 +56,8 @@ class User extends Authenticatable
 
     public function getItems()
     {
-        $input = Request::all();
-        return User::paginate(3);
+        $perPage = Request::input('per_page', 5);
+        return User::paginate($perPage);
     }
 
     public static function getRoleOptions($user = null)
