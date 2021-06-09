@@ -1,7 +1,7 @@
 @extends ('layouts.admin')
 
 @section ('main')
-    @php $action = (isset($userGroup)) ? route('admin.usergroups.update', $userGroup->id) : route('admin.usergroups.store') @endphp
+    @php $action = (isset($userGroup)) ? route('admin.usergroups.update', $queryWithId) : route('admin.usergroups.store', $query) @endphp
     <form method="post" action="{{ $action }}" id="itemForm">
         @csrf
 
@@ -24,13 +24,13 @@
 	    <x-input :attribs="$attribs" :value="$value" />
         @endforeach
 
-	<input type="hidden" id="listUrl" value="{{ route('admin.usergroups.index') }}">
+	<input type="hidden" id="itemList" value="{{ route('admin.usergroups.index', $query) }}">
 	<input type="hidden" id="close" name="_close" value="0">
     </form>
     <x-toolbar :items=$actions />
 
     @if (isset($userGroup))
-	<form id="deleteItemForm" action="{{ url('/admin/usergroups', ['id' => $userGroup->id]) }}" method="post">
+	<form id="deleteItem" action="{{ route('admin.usergroups.destroy', $queryWithId) }}" method="post">
 	    @method('delete')
 	    @csrf
 	</form>

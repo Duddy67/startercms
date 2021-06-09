@@ -19,7 +19,7 @@
 	    @endforeach
 	</form>
 
-	<x-item-list :columns="$columns" :rows="$rows" route="admin.users.edit" />
+	<x-item-list :columns="$columns" :rows="$rows" :route="$route" />
     @else
         <div class="alert alert-info" role="alert">
 	    No item has been found.
@@ -28,9 +28,9 @@
 
     <x-pagination :items=$items />
 
-    <input type="hidden" id="listUrl" value="{{ route('admin.users.index') }}">
+    <input type="hidden" id="createItem" value="{{ route('admin.users.create', $query) }}">
 
-    <form id="selectedItems" action="{{ route('admin.users.index') }}" method="post">
+    <form id="selectedItems" action="{{ route('admin.users.index', $query) }}" method="post">
 	@method('delete')
 	@csrf
     </form>

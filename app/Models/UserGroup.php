@@ -26,4 +26,11 @@ class UserGroup extends Model
     {
         return $this->belongsToMany(User::class);
     }
+
+    public function getItems($request)
+    {
+        $perPage = $request->input('per_page', 5);
+        return UserGroup::paginate($perPage);
+    }
+
 }

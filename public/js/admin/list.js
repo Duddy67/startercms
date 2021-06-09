@@ -49,7 +49,7 @@
     }
 
     $.fn.create = function() {
-	window.location.replace($('#listUrl').val()+'/create');
+	window.location.replace($('#createItem').val());
     }
 
     $.fn.massDestroy = function() {

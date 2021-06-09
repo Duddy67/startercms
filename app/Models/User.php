@@ -9,7 +9,6 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use App\Traits\Admin\RolesPermissions;
 use App\Models\UserGroup;
-use Request;
 
 class User extends Authenticatable
 {
@@ -54,9 +53,9 @@ class User extends Authenticatable
         return $this->belongsToMany(UserGroup::class);
     }
 
-    public function getItems()
+    public function getItems($request)
     {
-        $perPage = Request::input('per_page', 5);
+        $perPage = $request->input('per_page', 5);
         return User::paginate($perPage);
     }
 

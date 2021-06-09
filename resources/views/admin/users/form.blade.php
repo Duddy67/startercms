@@ -1,8 +1,8 @@
 @extends ('layouts.admin')
 
 @section ('main')
-@php var_dump(auth()->user()->isAllowedTo('create-role')); @endphp
-    @php $action = (isset($user)) ? route('admin.users.update', $user->id) : route('admin.users.store') @endphp
+
+    @php $action = (isset($user)) ? route('admin.users.update', $queryWithId) : route('admin.users.store', $query) @endphp
     <form method="post" action="{{ $action }}" id="itemForm">
         @csrf
 
@@ -31,7 +31,8 @@
 		<x-input :attribs="$attribs" :value="$value" />
 	    </div>
         @endforeach
-	<input type="hidden" id="listUrl" value="{{ route('admin.users.index') }}">
+
+	<input type="hidden" id="itemList" value="{{ route('admin.users.index', $query) }}">
 	<input type="hidden" id="close" name="_close" value="0">
     </form>
 
@@ -40,7 +41,7 @@
     </div>
 
     @if (isset($user))
-	<form id="deleteItemForm" action="{{ url('/admin/users', ['id' => $user->id]) }}" method="post">
+	<form id="deleteItem" action="{{ route('admin.users.destroy', $queryWithId) }}" method="post">
 	    @method('delete')
 	    @csrf
 	</form>

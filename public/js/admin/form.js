@@ -19,15 +19,16 @@
   }
 
   $.fn.cancel = function() {
-      window.location.replace($('#listUrl').val());
+      // Redirect to the item list.
+      window.location.replace($('#itemList').val());
   }
 
   $.fn.destroy = function() {
-      $('#deleteItemForm').submit();
-      /*alert($('#listUrl').val()+'/2');
+      $('#deleteItem').submit();
+      /*alert($('#itemListUrl').val()+'/2');
       $.ajax({
 	  type: 'DELETE',
-	  url: $('#listUrl').val()+'/2',
+	  url: $('#itemListUrl').val()+'/2',
 	  headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 	});*/
   }

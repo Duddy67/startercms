@@ -12,16 +12,18 @@
     </div>
 
     @if (!empty($rows)) 
-	<x-item-list :columns="$columns" :rows="$rows" route="admin.roles.edit" />
+	<x-item-list :columns="$columns" :rows="$rows" :route="$route" />
     @else
         <div class="alert alert-info" role="alert">
 	    No item has been found.
 	</div>
     @endif
 
-    <input type="hidden" id="listUrl" value="{{ route('admin.roles.index') }}">
+    <x-pagination :items=$items />
 
-    <form id="selectedItems" action="{{ route('admin.roles.index') }}" method="post">
+    <input type="hidden" id="createItem" value="{{ route('admin.roles.create', $query) }}">
+
+    <form id="selectedItems" action="{{ route('admin.roles.index', $query) }}" method="post">
 	@method('delete')
 	@csrf
     </form>

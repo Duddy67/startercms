@@ -82,6 +82,12 @@ trait RolesPermissions
 	return $list;
     }
 
+    public function getItems($request)
+    {
+        $perPage = $request->input('per_page', 5);
+        return Role::paginate($perPage);
+    }
+
     public function getPermissionArray($except = [])
     {
         $list = $this->getPermissionList($except);

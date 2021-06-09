@@ -1,7 +1,7 @@
 @extends ('layouts.admin')
 
 @section ('main')
-    @php $action = (isset($role)) ? route('admin.roles.update', $role->id) : route('admin.roles.store') @endphp
+    @php $action = (isset($role)) ? route('admin.roles.update', $queryWithId) : route('admin.roles.store', $query) @endphp
     <form method="post" action="{{ $action }}" id="itemForm">
         @csrf
 
@@ -36,7 +36,7 @@
 			<tr>
 			    <td>
                                 <div class="form-check">
-			        <x-input :attribs="$checkbox" :value="$checkbox->value" />
+				    <x-input :attribs="$checkbox" :value="$checkbox->value" />
                                 </div>
 			    </td>
                         </tr>
@@ -45,7 +45,7 @@
 	    </table>
 	@endforeach
 
-	<input type="hidden" id="listUrl" value="{{ route('admin.roles.index') }}">
+	<input type="hidden" id="itemList" value="{{ route('admin.roles.index', $query) }}">
 	<input type="hidden" id="close" name="_close" value="0">
     </form>
 
@@ -54,7 +54,7 @@
     </div>
 
     @if (isset($role))
-	<form id="deleteItemForm" action="{{ url('/admin/roles', ['id' => $role->id]) }}" method="post">
+	<form id="deleteItem" action="{{ route('admin.roles.destroy', $queryWithId) }}" method="post">
 	    @method('delete')
 	    @csrf
 	</form>

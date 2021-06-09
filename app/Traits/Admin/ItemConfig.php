@@ -3,7 +3,6 @@
 namespace App\Traits\Admin;
 
 use App\Models\Settings;
-use Request;
 
 
 trait ItemConfig
@@ -98,7 +97,7 @@ trait ItemConfig
 	return $fields;
     }
 
-    public function getFilters()
+    public function getFilters($request)
     {
 	$filters = $this->getData('filters');
 
@@ -110,7 +109,7 @@ trait ItemConfig
 
 		//$function = 'get'.ucfirst($filter->name).'Value';
 		//$filters[$key]->value = $item->$function();
-		$filters[$key]->value = Request::input('per_page', 5);
+		$filters[$key]->value = $request->input('per_page', 5);
 	}
 
 	return $filters;

@@ -9,7 +9,11 @@
     </thead>
     <tbody>
         @foreach ($rows as $i => $row)
-	    <tr class="clickable-row" data-href="{{ route($route, $row['item_id']) }}">
+	     @php 
+	         $query = $route['query'];
+                 $query[$route['item_name']] = $row['item_id'];
+            @endphp
+	    <tr class="clickable-row" data-href="{{ route($route['name'], $query) }}">
 		<td>
 		    <div class="form-check">
 			<input type="checkbox" class="form-check-input" data-item-id={{ $row['item_id'] }} data-index="{{ $i }}">

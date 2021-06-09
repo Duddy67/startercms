@@ -39,23 +39,26 @@ class UsersController extends Controller
     {
         $columns = $this->getColumns();
         $actions = $this->getActions('list');
-        $filters = $this->getFilters();
-        $items = $this->model->getItems();
+        $filters = $this->getFilters($request);
+        $items = $this->model->getItems($request);
 	$rows = $this->getRows($columns, $items, ['roles']);
 	$this->setRowValues($rows, $columns, $items);
-$query = $request->query();
-        return view('admin.users.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'query'));
+	$route = ['name' => 'admin.users.edit', 'item_name' => 'user', 'query' => $request->query()];
+	$query = $request->query();
+
+        return view('admin.users.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'route', 'query'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $fields = $this->getFields();
         $actions = $this->getActions('form');
+	$query = $request->query();
 
-        return view('admin.users.form', compact('fields', 'actions'));
+        return view('admin.users.form', compact('fields', 'actions', 'query'));
     }
 
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $user = User::findOrFail($id);
 
@@ -67,8 +70,10 @@ $query = $request->query();
 	// Users cannot delete their own account.
 	$except = (auth()->user()->id == $user->id) ? ['destroy'] : [];
         $actions = $this->getActions('form', $except);
+	$query = $queryWithId = $request->query();
+	$queryWithId['user'] = $id;
 
-        return view('admin.users.form', compact('user', 'fields', 'actions'));
+        return view('admin.users.form', compact('user', 'fields', 'actions', 'query', 'queryWithId'));
     }
 
     /**
@@ -117,12 +122,15 @@ $query = $request->query();
 	$user->save();
 
 	$message = 'User successfully updated.';
+	$query = $request->query();
 
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.users.index')->with('success', $message);
+	    return redirect()->route('admin.users.index', $query)->with('success', $message);
 	}
 
-	return redirect()->route('admin.users.edit', $user->id)->with('success', $message);
+	$query['user'] = $user->id;
+
+	return redirect()->route('admin.users.edit', $query)->with('success', $message);
     }
 
     public function store(Request $request)
@@ -147,15 +155,18 @@ $query = $request->query();
 	}
 
 	$message = 'User successfully added.';
+	$query = $request->query();
 
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.users.index')->with('success', $message);
+	    return redirect()->route('admin.users.index', $query)->with('success', $message);
 	}
 
-	return redirect()->route('admin.users.edit', $user->id)->with('success', $message);
+	$query['user'] = $user->id;
+
+	return redirect()->route('admin.users.edit', $query)->with('success', $message);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
 	$user = User::findOrFail($id);
 
@@ -166,7 +177,7 @@ $query = $request->query();
 	$user->groups()->detach();
 	//$user->delete();
 
-	return redirect()->route('admin.users.index')->with('success', 'The user has been successfully deleted.');
+	return redirect()->route('admin.users.index', $request->query())->with('success', 'The user has been successfully deleted.');
     }
 
     public function massDestroy(Request $request)
@@ -190,7 +201,7 @@ $query = $request->query();
 	    }
 	}
 
-	return redirect()->route('admin.users.index')->with('success', count($request->input('ids')).' user(s) has been successfully deleted.');
+	return redirect()->route('admin.users.index', $request->query())->with('success', count($request->input('ids')).' user(s) has been successfully deleted.');
     }
 
     /*
