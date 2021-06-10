@@ -10,7 +10,7 @@ class Settings extends Model
 {
     use HasFactory;
 
-    public static function getPer_pageOptions()
+    public static function getPerPageOptions()
     {
       return [
 	  ['value' => 2, 'text' => 2],
@@ -20,9 +20,5 @@ class Settings extends Model
 	  ['value' => 20, 'text' => 20],
 	  ['value' => 25, 'text' => 25],
       ];
-    }
-
-    public static function getPer_pageValue()
-    {
     }
 }

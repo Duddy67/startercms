@@ -204,21 +204,25 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		  <p>Users</p>
 		</a>
 		  <ul class="nav nav-treeview">
-		    <x-menu-item href="{{ route('admin.users.index') }}" :sub=true :active=false>
-		      Users
-		    </x-menu-item>
+			@php $active = (request()->is('admin/users*')) ? true : false @endphp
+			<x-menu-item href="{{ route('admin.users.index') }}" :sub=true :active="$active">
+			  Users
+			</x-menu-item>
 		    @allowto ('create-user-group')
-			<x-menu-item href="{{ route('admin.usergroups.index') }}" :sub=true :active=false>
+			@php $active = (request()->is('admin/usergroups*')) ? true : false @endphp
+			<x-menu-item href="{{ route('admin.usergroups.index') }}" :sub=true :active="$active">
 			  Groups
 			</x-menu-item>
 		    @endallowto
 		    @allowto ('create-role')
-			<x-menu-item href="{{ route('admin.roles.index') }}" :sub=true :active=false>
+			@php $active = (request()->is('admin/roles*')) ? true : false @endphp
+			<x-menu-item href="{{ route('admin.roles.index') }}" :sub=true :active="$active">
 			  Roles
 			</x-menu-item>
 		    @endallowto
 		    @allowto ('create-permission')
-			<x-menu-item href="{{ route('admin.permissions.index') }}" :sub=true :active=false>
+			@php $active = (request()->is('admin/permissions*')) ? true : false @endphp
+			<x-menu-item href="{{ route('admin.permissions.index') }}" :sub=true :active="$active">
 			  Permissions
 			</x-menu-item>
 		    @endallowto

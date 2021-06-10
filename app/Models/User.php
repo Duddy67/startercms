@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use App\Traits\Admin\RolesPermissions;
+use Spatie\Permission\Models\Role;
 use App\Models\UserGroup;
 
 class User extends Authenticatable
@@ -56,7 +57,20 @@ class User extends Authenticatable
     public function getItems($request)
     {
         $perPage = $request->input('per_page', 5);
-        return User::paginate($perPage);
+        $roles = $request->input('roles', []);
+        $search = $request->input('search', null);
+
+	$query = User::whereHas('roles', function($query) use($roles) {
+	    if (!empty($roles)) {
+	        $query->whereIn('name', $roles);
+	    }
+	});
+
+	if ($search !== null) {
+	    $query->where('name', 'like', '%'.$search.'%');
+	}
+
+        return $query->paginate($perPage);
     }
 
     public static function getRoleOptions($user = null)
@@ -97,6 +111,17 @@ class User extends Authenticatable
     public function getGroupsValue()
     {
         return $this->groups->pluck('id')->toArray();
+    }
+
+    public static function getRolesOptions()
+    {
+        $roles = Role::all()->pluck('name')->toArray();
+
+	foreach ($roles as $role) {
+	    $options[] = ['value' => $role, 'text' => $role];
+	}
+
+	return $options;
     }
 
     public function canUpdate($user)

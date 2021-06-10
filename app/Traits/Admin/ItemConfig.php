@@ -62,12 +62,12 @@ trait ItemConfig
 	    // Set the select field types.
 	    if ($field->type == 'select') {
 	        // Build the function name.
-		$function = 'get'.ucfirst($field->name).'Options';
+		$function = 'get'.str_replace('_', '', ucwords($field->name, '_')).'Options';
 		$options = $this->itemModel::$function($item);
 		$fields[$key]->options = $options;
 
 		if ($item) {
-		    $function = 'get'.ucfirst($field->name).'Value';
+		    $function = 'get'.str_replace('_', '', ucwords($field->name, '_')).'Value';
 		    $fields[$key]->value = $item->$function();
 		}
 	    }
@@ -102,14 +102,25 @@ trait ItemConfig
 	$filters = $this->getData('filters');
 
 	foreach ($filters as $key => $filter) {
-	    // Build the function name.
-	    $function = 'get'.ucfirst($filter->name).'Options';
-	    $options = Settings::$function();
-	    $filters[$key]->options = $options;
+	    if ($filter->type == 'button') {
+	        continue;
+	    }
 
-		//$function = 'get'.ucfirst($filter->name).'Value';
-		//$filters[$key]->value = $item->$function();
-		$filters[$key]->value = $request->input('per_page', 5);
+	    if ($filter->type == 'select') {
+		// Build the function name.
+		$function = 'get'.str_replace('_', '', ucwords($filter->name, '_')).'Options';
+
+		if ($filter->name == 'per_page') {
+		    $options = Settings::$function();
+		}
+		else {
+		    $options = $this->itemModel::$function();
+		}
+
+		$filters[$key]->options = $options;
+	    }
+
+	    $filters[$key]->value = $request->input($filter->name);
 	}
 
 	return $filters;

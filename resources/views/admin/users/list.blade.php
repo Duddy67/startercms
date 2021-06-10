@@ -11,14 +11,21 @@
 	</div>
     </div>
 
-    @if (!empty($rows)) 
-	<form id="item-filters" action="{{ route('admin.users.index') }}" method="get">
-
-	    @foreach ($filters as $attribs)
+    <form id="item-filters" action="{{ route('admin.users.index') }}" method="get">
+	@foreach ($filters as $attribs)
+	    @if ($attribs->type == 'button') 
+		<x-button :button="$attribs" />
+	    @else
 		<x-input :attribs="$attribs" :value="$attribs->value" />
-	    @endforeach
-	</form>
+	    @endif
+	@endforeach
 
+	@if (isset($query['page'])) 
+	    <input type="hidden" id="filters-pagination" name="page" value="{{ $query['page'] }}">
+	@endif
+    </form>
+
+    @if (!empty($rows)) 
 	<x-item-list :columns="$columns" :rows="$rows" :route="$route" />
     @else
         <div class="alert alert-info" role="alert">
@@ -26,7 +33,7 @@
 	</div>
     @endif
 
-    <x-pagination :items=$items />
+    <x-pagination :items="$items" />
 
     <input type="hidden" id="createItem" value="{{ route('admin.users.create', $query) }}">
 
@@ -37,5 +44,5 @@
 @endsection
 
 @push ('scripts')
-    <script src="{{ asset('/js/admin/list.js') }}"></script>
+    <script type="text/javascript" src="{{ url('/') }}/js/admin/list.js"></script>
 @endpush

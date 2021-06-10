@@ -1,10 +1,41 @@
 [
   {
+    "label": "Search",
+    "type": "text",
+    "name": "search",
+    "id": "search",
+    "placeholder": "Search by name"
+  },
+  {
+    "id": "search-button",
+    "label": "Search",
+    "type": "button"
+  },
+  {
+    "id": "clear-search-button",
+    "label": "Clear",
+    "type": "button"
+  },
+  {
     "label": "Per page",
     "type": "select",
     "name": "per_page",
-    "id": "filter-perPage",
+    "id": "filters-perPage",
+    "blank": "- Select -",
     "options": [] 
+  },
+  {
+    "label": "Roles",
+    "type": "select",
+    "name": "roles",
+    "extra": ["multiple"],
+    "id": "filters-roles",
+    "options": [] 
+  },
+  {
+    "id": "clear-all-button",
+    "label": "Clear all",
+    "type": "button"
   }
 ]
 
