@@ -21,4 +21,20 @@ class Settings extends Model
 	  ['value' => 25, 'text' => 25],
       ];
     }
+
+    public static function getSortedByOptions($itemName)
+    {
+	$json = file_get_contents(app_path().'/Models/'.$itemName.'/columns.json', true);
+	$columns = json_decode($json);
+	$options = [];
+
+	foreach ($columns as $column) {
+	    if (isset($column->extra) && in_array('sortable', $column->extra)) {
+	        $options[] = ['value' => $column->name.'_asc', 'text' => $column->name.' asc'];
+	        $options[] = ['value' => $column->name.'_desc', 'text' => $column->name.' desc'];
+	    }
+	}
+
+	return $options;
+    }
 }

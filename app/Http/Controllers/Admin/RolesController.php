@@ -35,12 +35,13 @@ class RolesController extends Controller
     {
         $columns = $this->getColumns();
         $actions = $this->getActions('list');
+        $filters = $this->getFilters($request);
 	$items = $this->getItems($request);
 	$rows = $this->getRows($columns, $items);
-	$route = ['name' => 'admin.roles.edit', 'item_name' => 'role', 'query' => $request->query()];
+	$url = ['route' => 'admin.roles', 'item_name' => 'role', 'query' => $request->query()];
 	$query = $request->query();
 
-        return view('admin.roles.list', compact('items', 'columns', 'rows', 'actions', 'route', 'query'));
+        return view('admin.roles.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
     }
 
     public function create(Request $request)

@@ -30,7 +30,15 @@ class UserGroup extends Model
     public function getItems($request)
     {
         $perPage = $request->input('per_page', 5);
-        return UserGroup::paginate($perPage);
+        $search = $request->input('search', null);
+
+	$query = UserGroup::query();
+
+	if ($search !== null) {
+	    $query->where('name', 'like', '%'.$search.'%');
+	}
+
+        return $query->paginate($perPage);
     }
 
 }

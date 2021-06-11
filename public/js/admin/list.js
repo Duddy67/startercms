@@ -28,20 +28,20 @@
 	    $('#item-filters').submit();
 	});
 
-	$('#search-button').click(function() {
+	$('#search-btn').click(function() {
 	    if ($('#search').val() !== '') {
 		$.fn.checkEmptyFilters();
 		$('#item-filters').submit();
 	    }
 	});
 
-	$('#clear-search-button').click(function() {
+	$('#clear-search-btn').click(function() {
 	    $('#search').val('');
 	    $.fn.checkEmptyFilters();
 	    $('#item-filters').submit();
 	});
 
-	$('#clear-all-button').click(function() {
+	$('#clear-all-btn').click(function() {
 	    $('select[id^="filters-"]').each(function(index) {
 		$(this).empty();
 	    });
@@ -62,6 +62,7 @@
 		$(this).prop('disabled', true);
 	    }
 
+	    // Reinitialize pagination on each request.
 	    if ($('#filters-pagination').length) {
 		$('#filters-pagination').prop('disabled', true);
 	    }

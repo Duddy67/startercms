@@ -6,16 +6,18 @@ use Illuminate\View\Component;
 
 class Filters extends Component
 {
-    public $items;
+    public $filters;
+    public $url;
 
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($filters, $url)
     {
-        $this->items = $items;
+        $this->filters = $filters;
+        $this->url = $url;
     }
 
     /**

@@ -11,8 +11,14 @@
 	</div>
     </div>
 
+    <div class="card">
+	<div class="card-body">
+	    <x-filters :filters="$filters" :url="$url" />
+	</div>
+    </div>
+
     @if (!empty($rows)) 
-	<x-item-list :columns="$columns" :rows="$rows" :route="$route" />
+	<x-item-list :columns="$columns" :rows="$rows" :url="$url" />
     @else
         <div class="alert alert-info" role="alert">
 	    No item has been found.

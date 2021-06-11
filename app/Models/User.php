@@ -57,6 +57,7 @@ class User extends Authenticatable
     public function getItems($request)
     {
         $perPage = $request->input('per_page', 5);
+        $sortedBy = $request->input('sorted_by', null);
         $roles = $request->input('roles', []);
         $search = $request->input('search', null);
 
@@ -68,6 +69,11 @@ class User extends Authenticatable
 
 	if ($search !== null) {
 	    $query->where('name', 'like', '%'.$search.'%');
+	}
+
+	if ($sortedBy !== null) {
+	    preg_match('#^([a-z0-9_]+)_(asc|desc)$#', $sortedBy, $matches);
+	    $query->orderBy($matches[1], $matches[2]);
 	}
 
         return $query->paginate($perPage);

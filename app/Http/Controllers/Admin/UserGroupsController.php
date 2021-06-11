@@ -38,12 +38,13 @@ class UserGroupsController extends Controller
     {
         $columns = $this->getColumns();
         $actions = $this->getActions('list');
+        $filters = $this->getFilters($request);
 	$items = $this->model->getItems($request);
 	$rows = $this->getRows($columns, $items);
-	$route = ['name' => 'admin.usergroups.edit', 'item_name' => 'usergroup', 'query' => $request->query()];
+	$url = ['route' => 'admin.usergroups', 'item_name' => 'usergroup', 'query' => $request->query()];
 	$query = $request->query();
 
-        return view('admin.usergroups.list', compact('items', 'columns', 'rows', 'actions', 'route', 'query'));
+        return view('admin.usergroups.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
     }
 
     public function create(Request $request)

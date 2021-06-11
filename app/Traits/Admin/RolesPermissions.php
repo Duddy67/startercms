@@ -85,7 +85,15 @@ trait RolesPermissions
     public function getItems($request)
     {
         $perPage = $request->input('per_page', 5);
-        return Role::paginate($perPage);
+        $search = $request->input('search', null);
+
+	$query = Role::query();
+
+	if ($search !== null) {
+	    $query->where('name', 'like', '%'.$search.'%');
+	}
+
+        return $query->paginate($perPage);
     }
 
     public function getPermissionArray($except = [])

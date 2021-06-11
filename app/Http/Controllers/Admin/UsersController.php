@@ -43,10 +43,10 @@ class UsersController extends Controller
         $items = $this->model->getItems($request);
 	$rows = $this->getRows($columns, $items, ['roles']);
 	$this->setRowValues($rows, $columns, $items);
-	$route = ['name' => 'admin.users.edit', 'item_name' => 'user', 'query' => $request->query()];
+	$url = ['route' => 'admin.users', 'item_name' => 'user', 'query' => $request->query()];
 	$query = $request->query();
 
-        return view('admin.users.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'route', 'query'));
+        return view('admin.users.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
     }
 
     public function create(Request $request)

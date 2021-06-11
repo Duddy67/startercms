@@ -8,18 +8,18 @@ class ItemList extends Component
 {
     public $columns;
     public $rows;
-    public $route;
+    public $url;
 
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct($columns, $rows, $route)
+    public function __construct($columns, $rows, $url)
     {
         $this->columns = $columns;
         $this->rows = $rows;
-        $this->route = $route;
+        $this->url = $url;
     }
 
     /**

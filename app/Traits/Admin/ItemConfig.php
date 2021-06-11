@@ -110,8 +110,13 @@ trait ItemConfig
 		// Build the function name.
 		$function = 'get'.str_replace('_', '', ucwords($filter->name, '_')).'Options';
 
+		// Global filter.
 		if ($filter->name == 'per_page') {
 		    $options = Settings::$function();
+		}
+		// Global filter.
+		elseif ($filter->name == 'sorted_by') {
+		    $options = Settings::$function($this->itemName);
 		}
 		else {
 		    $options = $this->itemModel::$function();
