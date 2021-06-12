@@ -54,11 +54,6 @@
 	"name": "delete-role",
 	"type": "level1",
 	"default": "admin"
-      },
-      {
-	"name": "update-permissions",
-	"type": "level1",
-	"default": ""
       }
   ],
   "blog": [

@@ -1,7 +1,7 @@
 (function($) {
     // Run a function when the page is fully loaded including graphics.
     $(window).on('load', function() {
-	let actions = ['refresh', 'reset'];
+	let actions = ['update', 'rebuild'];
 
 	actions.forEach(function (action) {
 	    $('#'+action).click( function() { $.fn[action](); });
@@ -15,11 +15,11 @@
 	});
     });
 
-    $.fn.refresh = function() {
+    $.fn.update = function() {
 	$('#updateItems').submit();
     }
 
-    $.fn.reset = function() {
+    $.fn.rebuild = function() {
 	$('input[name="_method"]').val('put');
 	$('#updateItems').submit();
     }

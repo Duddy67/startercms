@@ -10,6 +10,8 @@ use App\Traits\Admin\RolesPermissions;
 use Spatie\Permission\Models\Permission;
 use App\Models\Settings;
 
+use Spatie\Permission\Models\Role;
+
 class PermissionsController extends Controller
 {
     use ItemConfig, RolesPermissions;
@@ -35,6 +37,11 @@ class PermissionsController extends Controller
     {
         $actions = $this->getActions('list');
         $board = $this->getPermissionBoard();
+	try {
+$role = Role::findByName('admino');
+	}
+	catch (\Exception $e) {
+	}
 
         return view('admin.permissions.list', compact('board', 'actions'));
     }

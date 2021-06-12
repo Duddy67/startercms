@@ -177,7 +177,7 @@ trait RolesPermissions
 
     public function buildPermissions($request, $rebuild = false)
     {
-        if (!auth()->user()->isAllowedTo('update-permissions')) {
+        if (!auth()->user()->hasRole('super-admin')) {
 	    $request->session()->flash('error', 'You are not allowed to update permissions.');
 
 	    return;
@@ -193,6 +193,7 @@ trait RolesPermissions
 
 	foreach ($permissions as $permission) {
 	  if (Permission::where('name', $permission)->first() === null) {
+	      // Check for permission names.
 	      if (!preg_match('#^'.implode('|', $this->getPermissionPatterns()).'$#', $permission)) {
 		  $invalidNames[] = $permission;
 		  continue;
@@ -206,22 +207,26 @@ trait RolesPermissions
 
 	if (!empty($invalidNames)) {
 	    $request->session()->flash('error', 'The permission names: "'.implode(', ', $invalidNames).'" are invalid.');
+	    return;
+	}
+
+	if ($rebuild) {
+	    if ($this->setPermissions($request)) {
+		$request->session()->flash('success', $count.' permissions have been successfully rebuilt.');
+	    }
+
+	    return;
 	}
 
 	if ($count) {
 	    $request->session()->flash('success', $count.' permission(s) successfully updated.');
 	}
 	else {
-	    $request->session()->flash('info', 'No new permissions added.');
-	}
-
-	if ($rebuild && empty($invalidNames)) {
-	    $this->setPermissions();
-	    $request->session()->flash('success', 'Permissions have been successfully rebuilt.');
+	    $request->session()->flash('info', 'No new permissions have been added.');
 	}
     }
 
-    public function setPermissions()
+    private function setPermissions($request)
     {
 	$permList = $this->getPermissionList();
 
@@ -231,15 +236,23 @@ trait RolesPermissions
 
 		foreach ($roles as $role) {
 		    if (!empty($role)) {
-			$role = Role::findByName($role);
-			$role->givePermissionTo($permission->name);
+		        try {
+			    $role = Role::findByName($role);
+			    $role->givePermissionTo($permission->name);
+			}
+			catch (\Exception $e) {
+			    $request->session()->flash('error', '"'.$role.'" role doesn\'t exist.');
+			    return false;
+			}
 		    }
 		}
 	    }
 	}
+
+	return true;
     }
 
-    public function truncatePermissions()
+    private function truncatePermissions()
     {
 	Schema::disableForeignKeyConstraints();
 	DB::table('permissions')->truncate();

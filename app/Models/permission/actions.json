@@ -1,40 +1,18 @@
 {
   "list": [
       {
-	"id": "refresh",
-	"label": "Refresh",
+	"id": "update",
+	"label": "Update",
 	"type": "button",
 	"class": "btn-primary",
 	"icon": "fa fa-sync"
       },
       {
-	"id": "reset",
-	"label": "Reset",
+	"id": "rebuild",
+	"label": "Rebuild all",
 	"type": "button",
 	"class": "btn-danger",
 	"icon": "fa fa-undo"
-      }
-  ],
-  "form": [
-      {
-	"id": "saveClose",
-	"label": "Save & close",
-	"type": "button"
-      },
-      {
-	"id": "save",
-	"label": "Save",
-	"type": "button"
-      },
-      {
-	"id": "cancel",
-	"label": "Cancel",
-	"type": "button"
-      },
-      {
-	"id": "destroy",
-	"label": "Delete",
-	"type": "button"
       }
   ]
 }
