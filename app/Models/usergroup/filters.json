@@ -7,6 +7,14 @@
     "placeholder": "Search by name"
   },
   {
+    "label": "Sorted by",
+    "type": "select",
+    "name": "sorted_by",
+    "id": "filters-sortedBy",
+    "blank": "- Select -",
+    "options": [] 
+  },
+  {
     "label": "Per page",
     "type": "select",
     "name": "per_page",

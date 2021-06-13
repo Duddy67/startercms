@@ -9,11 +9,19 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Traits\Admin\ItemConfig;
 
-class UsersController extends Controller
+class UserController extends Controller
 {
     use ItemConfig;
 
+    /*
+     * Instance of the model.
+     */
     protected $model;
+
+    /*
+     * Name of the model.
+     */
+    protected $modelName = 'user';
 
     /**
      * Create a new controller instance.
@@ -25,9 +33,6 @@ class UsersController extends Controller
         $this->middleware('auth');
         $this->middleware('admin.users');
 	$this->model = new User;
-	//
-	$this->itemName = 'user';
-	$this->itemModel = '\App\Models\User';
     }
 
     /**

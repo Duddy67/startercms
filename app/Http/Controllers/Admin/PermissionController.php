@@ -12,9 +12,15 @@ use App\Models\Settings;
 
 use Spatie\Permission\Models\Role;
 
-class PermissionsController extends Controller
+class PermissionController extends Controller
 {
     use ItemConfig, RolesPermissions;
+
+    /*
+     * Name of the model.
+     */
+    protected $modelName = 'permission';
+
 
     /**
      * Create a new controller instance.
@@ -25,7 +31,6 @@ class PermissionsController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('admin.roles');
-	$this->itemName = 'permission';
     }
 
     /**
@@ -37,11 +42,6 @@ class PermissionsController extends Controller
     {
         $actions = $this->getActions('list');
         $board = $this->getPermissionBoard();
-	try {
-$role = Role::findByName('admino');
-	}
-	catch (\Exception $e) {
-	}
 
         return view('admin.permissions.list', compact('board', 'actions'));
     }

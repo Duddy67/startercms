@@ -8,11 +8,20 @@ use Illuminate\Validation\Rule;
 use App\Models\UserGroup;
 use App\Traits\Admin\ItemConfig;
 
-class UserGroupsController extends Controller
+class UserGroupController extends Controller
 {
     use ItemConfig;
 
+    /*
+     * Instance of the model.
+     */
     protected $model;
+
+    /*
+     * Name of the model.
+     */
+    protected $modelName = 'usergroup';
+
 
     /**
      * Create a new controller instance.
@@ -24,9 +33,6 @@ class UserGroupsController extends Controller
         $this->middleware('auth');
         $this->middleware('admin.usergroups');
 	$this->model = new UserGroup;
-
-	$this->itemName = 'usergroup';
-	$this->itemModel = '\App\Models\UserGroup';
     }
 
     /**

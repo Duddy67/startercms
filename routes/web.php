@@ -7,10 +7,10 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Admin\UsersController;
-use App\Http\Controllers\Admin\RolesController;
-use App\Http\Controllers\Admin\PermissionsController;
-use App\Http\Controllers\Admin\UserGroupsController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\UserGroupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,18 +46,18 @@ Route::prefix('admin')->group(function () {
     Route::middleware(['admin'])->group(function () {
 	Route::get('/', [AdminController::class, 'index'])->name('admin');
 	// Users
-	Route::delete('/users', [UsersController::class, 'massDestroy'])->name('admin.users.massDestroy');
-	Route::resource('users', UsersController::class, ['as' => 'admin'])->except(['show']);
+	Route::delete('/users', [UserController::class, 'massDestroy'])->name('admin.users.massDestroy');
+	Route::resource('users', UserController::class, ['as' => 'admin'])->except(['show']);
 	// Roles
-	Route::delete('/roles', [RolesController::class, 'massDestroy'])->name('admin.roles.massDestroy');
-	Route::resource('roles', RolesController::class, ['as' => 'admin'])->except(['show']);
+	Route::delete('/roles', [RoleController::class, 'massDestroy'])->name('admin.roles.massDestroy');
+	Route::resource('roles', RoleController::class, ['as' => 'admin'])->except(['show']);
 	// Permissions
-	Route::get('/permissions', [PermissionsController::class, 'index'])->name('admin.permissions.index');
-	Route::patch('/permissions', [PermissionsController::class, 'build'])->name('admin.permissions.build');
-	Route::put('/permissions', [PermissionsController::class, 'rebuild'])->name('admin.permissions.rebuild');
+	Route::get('/permissions', [PermissionController::class, 'index'])->name('admin.permissions.index');
+	Route::patch('/permissions', [PermissionController::class, 'build'])->name('admin.permissions.build');
+	Route::put('/permissions', [PermissionController::class, 'rebuild'])->name('admin.permissions.rebuild');
 	// UserGroups
-	Route::delete('/usergroups', [UserGroupsController::class, 'massDestroy'])->name('admin.usergroups.massDestroy');
-	Route::resource('usergroups', UserGroupsController::class, ['as' => 'admin'])->except(['show']);
+	Route::delete('/usergroups', [UserGroupController::class, 'massDestroy'])->name('admin.usergroups.massDestroy');
+	Route::resource('usergroups', UserGroupController::class, ['as' => 'admin'])->except(['show']);
     });
 });
 

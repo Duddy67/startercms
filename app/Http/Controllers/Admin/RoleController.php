@@ -10,9 +10,15 @@ use App\Traits\Admin\RolesPermissions;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
-class RolesController extends Controller
+class RoleController extends Controller
 {
     use ItemConfig, RolesPermissions;
+
+    /*
+     * Name of the model.
+     */
+    protected $modelName = 'role';
+
 
     /**
      * Create a new controller instance.
@@ -23,7 +29,6 @@ class RolesController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('admin.roles');
-	$this->itemName = 'role';
     }
 
     /**

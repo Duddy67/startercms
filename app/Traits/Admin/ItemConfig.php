@@ -7,9 +7,6 @@ use App\Models\Settings;
 
 trait ItemConfig
 {
-    public $itemName;
-    public $itemModel;
-
 
     public function getColumns()
     {
@@ -63,7 +60,7 @@ trait ItemConfig
 	    if ($field->type == 'select') {
 	        // Build the function name.
 		$function = 'get'.str_replace('_', '', ucwords($field->name, '_')).'Options';
-		$options = $this->itemModel::$function($item);
+		$options = $this->model->$function($item);
 		$fields[$key]->options = $options;
 
 		if ($item) {
@@ -116,10 +113,10 @@ trait ItemConfig
 		}
 		// Global filter.
 		elseif ($filter->name == 'sorted_by') {
-		    $options = Settings::$function($this->itemName);
+		    $options = Settings::$function($this->modelName);
 		}
 		else {
-		    $options = $this->itemModel::$function();
+		    $options = $this->model->$function();
 		}
 
 		$filters[$key]->options = $options;
@@ -152,7 +149,7 @@ trait ItemConfig
 
     private function getData($type)
     {
-	$json = file_get_contents(app_path().'/Models/'.$this->itemName.'/'.$type.'.json', true);
+	$json = file_get_contents(app_path().'/Models/'.$this->modelName.'/'.$type.'.json', true);
 
         if ($json === false) {
 	   throw new Exception('Load Failed');    

@@ -79,7 +79,7 @@ class User extends Authenticatable
         return $query->paginate($perPage);
     }
 
-    public static function getRoleOptions($user = null)
+    public function getRoleOptions($user = null)
     {
 	$roles = auth()->user()->getAssignableRoles($user);
 	$options = [];
@@ -99,7 +99,7 @@ class User extends Authenticatable
         return $this->getRoleName();
     }
 
-    public static function getGroupsOptions($user = null)
+    public function getGroupsOptions($user = null)
     {
         $groups = UserGroup::all();
 	$options = [];
@@ -119,7 +119,10 @@ class User extends Authenticatable
         return $this->groups->pluck('id')->toArray();
     }
 
-    public static function getRolesOptions()
+    /*
+     * Used with filters.
+     */
+    public function getRolesOptions()
     {
         $roles = Role::all()->pluck('name')->toArray();
 
