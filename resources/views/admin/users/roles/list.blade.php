@@ -1,7 +1,7 @@
 @extends ('layouts.admin')
 
 @section ('header')
-    <p class="h3">Users</p>
+    <p class="h3">Roles</p>
 @endsection
 
 @section ('main')
@@ -25,16 +25,16 @@
 	</div>
     @endif
 
-    <x-pagination :items="$items" />
+    <x-pagination :items=$items />
 
-    <input type="hidden" id="createItem" value="{{ route('admin.users.create', $query) }}">
+    <input type="hidden" id="createItem" value="{{ route('admin.users.roles.create', $query) }}">
 
-    <form id="selectedItems" action="{{ route('admin.users.index', $query) }}" method="post">
+    <form id="selectedItems" action="{{ route('admin.users.roles.index', $query) }}" method="post">
 	@method('delete')
 	@csrf
     </form>
 @endsection
 
 @push ('scripts')
-    <script type="text/javascript" src="{{ url('/') }}/js/admin/list.js"></script>
+    <script src="{{ asset('/js/admin/list.js') }}"></script>
 @endpush

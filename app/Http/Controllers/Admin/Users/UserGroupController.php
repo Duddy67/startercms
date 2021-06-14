@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Admin\Users;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -31,7 +31,7 @@ class UserGroupController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('admin.usergroups');
+        $this->middleware('admin.users.usergroups');
 	$this->model = new UserGroup;
     }
 
@@ -47,10 +47,10 @@ class UserGroupController extends Controller
         $filters = $this->getFilters($request);
 	$items = $this->model->getItems($request);
 	$rows = $this->getRows($columns, $items);
-	$url = ['route' => 'admin.usergroups', 'item_name' => 'usergroup', 'query' => $request->query()];
+	$url = ['route' => 'admin.users.usergroups', 'item_name' => 'usergroup', 'query' => $request->query()];
 	$query = $request->query();
 
-        return view('admin.usergroups.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
+        return view('admin.users.usergroups.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
     }
 
     public function create(Request $request)
@@ -59,7 +59,7 @@ class UserGroupController extends Controller
         $actions = $this->getActions('form', ['destroy']);
 	$query = $request->query();
 
-        return view('admin.usergroups.form', compact('fields', 'actions', 'query'));
+        return view('admin.users.usergroups.form', compact('fields', 'actions', 'query'));
     }
 
     public function edit(Request $request, $id)
@@ -70,7 +70,7 @@ class UserGroupController extends Controller
 	$query = $queryWithId = $request->query();
 	$queryWithId['usergroup'] = $id;
 
-        return view('admin.usergroups.form', compact('userGroup', 'fields', 'actions', 'query', 'queryWithId'));
+        return view('admin.users.usergroups.form', compact('userGroup', 'fields', 'actions', 'query', 'queryWithId'));
     }
 
     /**
@@ -99,12 +99,12 @@ class UserGroupController extends Controller
 	$query = $request->query();
 
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.usergroups.index', $query)->with('success', $message);
+	    return redirect()->route('admin.users.usergroups.index', $query)->with('success', $message);
 	}
 
 	$query['usergroup'] = $group->id;
 
-	return redirect()->route('admin.usergroups.edit', $query)->with('success', $message);
+	return redirect()->route('admin.users.usergroups.edit', $query)->with('success', $message);
     }
 
     public function store(Request $request)
@@ -123,12 +123,12 @@ class UserGroupController extends Controller
 	$query = $request->query();
 
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.usergroups.index', $query)->with('success', $message);
+	    return redirect()->route('admin.users.usergroups.index', $query)->with('success', $message);
 	}
 
 	$query['usergroup'] = $group->id;
 
-	return redirect()->route('admin.usergroups.edit', $query)->with('success', $message);
+	return redirect()->route('admin.users.usergroups.edit', $query)->with('success', $message);
     }
 
     public function destroy(Request $request, $id, $redirect = true)
@@ -141,7 +141,7 @@ class UserGroupController extends Controller
 	    return;
 	}
 
-	return redirect()->route('admin.usergroups.index', $request->query())->with('success', 'User group successfully deleted.');
+	return redirect()->route('admin.users.usergroups.index', $request->query())->with('success', 'User group successfully deleted.');
     }
 
     public function massDestroy(Request $request)
@@ -150,6 +150,6 @@ class UserGroupController extends Controller
 	    $this->destroy($request, $id, false);
 	}
 
-	return redirect()->route('admin.usergroups.index', $request->query())->with('success', count($request->input('ids')).' User group(s) successfully deleted.');
+	return redirect()->route('admin.users.usergroups.index', $request->query())->with('success', count($request->input('ids')).' User group(s) successfully deleted.');
     }
 }

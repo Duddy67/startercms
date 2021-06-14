@@ -1,7 +1,7 @@
 @extends ('layouts.admin')
 
 @section ('main')
-    @php $action = (isset($role)) ? route('admin.roles.update', $queryWithId) : route('admin.roles.store', $query) @endphp
+    @php $action = (isset($role)) ? route('admin.users.roles.update', $queryWithId) : route('admin.users.roles.store', $query) @endphp
     <form method="post" action="{{ $action }}" id="itemForm">
         @csrf
 
@@ -45,7 +45,7 @@
 	    </table>
 	@endforeach
 
-	<input type="hidden" id="itemList" value="{{ route('admin.roles.index', $query) }}">
+	<input type="hidden" id="itemList" value="{{ route('admin.users.roles.index', $query) }}">
 	<input type="hidden" id="close" name="_close" value="0">
     </form>
 
@@ -54,7 +54,7 @@
     </div>
 
     @if (isset($role))
-	<form id="deleteItem" action="{{ route('admin.roles.destroy', $queryWithId) }}" method="post">
+	<form id="deleteItem" action="{{ route('admin.users.roles.destroy', $queryWithId) }}" method="post">
 	    @method('delete')
 	    @csrf
 	</form>

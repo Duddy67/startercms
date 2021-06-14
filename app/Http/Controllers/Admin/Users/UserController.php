@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Admin\Users;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -31,7 +31,7 @@ class UserController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('admin.users');
+        $this->middleware('admin.users.users');
 	$this->model = new User;
     }
 
@@ -48,10 +48,10 @@ class UserController extends Controller
         $items = $this->model->getItems($request);
 	$rows = $this->getRows($columns, $items, ['roles']);
 	$this->setRowValues($rows, $columns, $items);
-	$url = ['route' => 'admin.users', 'item_name' => 'user', 'query' => $request->query()];
+	$url = ['route' => 'admin.users.users', 'item_name' => 'user', 'query' => $request->query()];
 	$query = $request->query();
 
-        return view('admin.users.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
+        return view('admin.users.users.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
     }
 
     public function create(Request $request)
@@ -60,7 +60,7 @@ class UserController extends Controller
         $actions = $this->getActions('form');
 	$query = $request->query();
 
-        return view('admin.users.form', compact('fields', 'actions', 'query'));
+        return view('admin.users.users.form', compact('fields', 'actions', 'query'));
     }
 
     public function edit(Request $request, $id)
@@ -68,7 +68,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
 	if (!auth()->user()->canUpdate($user) && auth()->user()->id != $user->id) {
-	    return redirect()->route('admin.users.index')->with('error', 'You are not allowed to edit this user.');
+	    return redirect()->route('admin.users.users.index')->with('error', 'You are not allowed to edit this user.');
 	}
 
         $fields = $this->getFields($user, ['password', 'password_confirmation']);
@@ -78,7 +78,7 @@ class UserController extends Controller
 	$query = $queryWithId = $request->query();
 	$queryWithId['user'] = $id;
 
-        return view('admin.users.form', compact('user', 'fields', 'actions', 'query', 'queryWithId'));
+        return view('admin.users.users.form', compact('user', 'fields', 'actions', 'query', 'queryWithId'));
     }
 
     /**
@@ -93,7 +93,7 @@ class UserController extends Controller
 	$user = User::findOrFail($id);
 
 	if (!auth()->user()->canUpdate($user) && auth()->user()->id != $user->id) {
-	    return redirect()->route('admin.users.edit', $user->id)->with('error', 'You are not allowed to update this user.');
+	    return redirect()->route('admin.users.users.edit', $user->id)->with('error', 'You are not allowed to update this user.');
 	}
 
         $this->validate($request, [
@@ -130,12 +130,12 @@ class UserController extends Controller
 	$query = $request->query();
 
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.users.index', $query)->with('success', $message);
+	    return redirect()->route('admin.users.users.index', $query)->with('success', $message);
 	}
 
 	$query['user'] = $user->id;
 
-	return redirect()->route('admin.users.edit', $query)->with('success', $message);
+	return redirect()->route('admin.users.users.edit', $query)->with('success', $message);
     }
 
     public function store(Request $request)
@@ -163,12 +163,12 @@ class UserController extends Controller
 	$query = $request->query();
 
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.users.index', $query)->with('success', $message);
+	    return redirect()->route('admin.users.users.index', $query)->with('success', $message);
 	}
 
 	$query['user'] = $user->id;
 
-	return redirect()->route('admin.users.edit', $query)->with('success', $message);
+	return redirect()->route('admin.users.users.edit', $query)->with('success', $message);
     }
 
     public function destroy(Request $request, $id)
@@ -176,13 +176,13 @@ class UserController extends Controller
 	$user = User::findOrFail($id);
 
 	if (!auth()->user()->canDelete($user)) {
-	    return redirect()->route('admin.users.edit', $user->id)->with('error', 'You are not allowed to delete this user.');
+	    return redirect()->route('admin.users.users.edit', $user->id)->with('error', 'You are not allowed to delete this user.');
 	}
 
 	$user->groups()->detach();
 	//$user->delete();
 
-	return redirect()->route('admin.users.index', $request->query())->with('success', 'The user has been successfully deleted.');
+	return redirect()->route('admin.users.users.index', $request->query())->with('success', 'The user has been successfully deleted.');
     }
 
     public function massDestroy(Request $request)
@@ -198,7 +198,7 @@ class UserController extends Controller
 			$request->session()->flash('success', $key.' user(s) has been successfully deleted.');
 		    }
 
-		    return redirect()->route('admin.users.index')->with('error', 'You are not allowed to delete this user: '.$user->name);
+		    return redirect()->route('admin.users.users.index')->with('error', 'You are not allowed to delete this user: '.$user->name);
 		}
 
 		$user->groups()->detach();
@@ -206,7 +206,7 @@ class UserController extends Controller
 	    }
 	}
 
-	return redirect()->route('admin.users.index', $request->query())->with('success', count($request->input('ids')).' user(s) has been successfully deleted.');
+	return redirect()->route('admin.users.users.index', $request->query())->with('success', count($request->input('ids')).' user(s) has been successfully deleted.');
     }
 
     /*

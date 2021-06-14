@@ -1,7 +1,7 @@
 @extends ('layouts.admin')
 
 @section ('header')
-    <p class="h3">Roles</p>
+    <p class="h3">User groups</p>
 @endsection
 
 @section ('main')
@@ -27,9 +27,9 @@
 
     <x-pagination :items=$items />
 
-    <input type="hidden" id="createItem" value="{{ route('admin.roles.create', $query) }}">
+    <input type="hidden" id="createItem" value="{{ route('admin.users.usergroups.create', $query) }}">
 
-    <form id="selectedItems" action="{{ route('admin.roles.index', $query) }}" method="post">
+    <form id="selectedItems" action="{{ route('admin.users.usergroups.index', $query) }}" method="post">
 	@method('delete')
 	@csrf
     </form>

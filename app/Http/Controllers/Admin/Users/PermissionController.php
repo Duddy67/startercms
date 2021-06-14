@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Admin\Users;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -29,7 +29,7 @@ class PermissionController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('admin.roles');
+        $this->middleware('admin.users.roles');
     }
 
     /**
@@ -42,19 +42,19 @@ class PermissionController extends Controller
         $actions = $this->getActions('list');
         $board = $this->getPermissionBoard();
 
-        return view('admin.permissions.list', compact('board', 'actions'));
+        return view('admin.users.permissions.list', compact('board', 'actions'));
     }
 
     public function build(Request $request)
     {
 	$this->buildPermissions($request);
-	return redirect()->route('admin.permissions.index');
+	return redirect()->route('admin.users.permissions.index');
     }
 
     public function rebuild(Request $request)
     {
 	$this->buildPermissions($request, true);
-	return redirect()->route('admin.permissions.index');
+	return redirect()->route('admin.users.permissions.index');
     }
 
     private function getPermissionBoard()
