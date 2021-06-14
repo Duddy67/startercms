@@ -10,7 +10,6 @@ use App\Traits\Admin\RolesPermissions;
 use Spatie\Permission\Models\Permission;
 use App\Models\Settings;
 
-use Spatie\Permission\Models\Role;
 
 class PermissionController extends Controller
 {

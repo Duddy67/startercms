@@ -177,8 +177,9 @@ trait RolesPermissions
 
     public function buildPermissions($request, $rebuild = false)
     {
+        // Only super-admin is allowed to perform these tasks.
         if (!auth()->user()->hasRole('super-admin')) {
-	    $request->session()->flash('error', 'You are not allowed to update permissions.');
+	    $request->session()->flash('error', 'You are not allowed to update or rebuild permissions.');
 
 	    return;
 	}
