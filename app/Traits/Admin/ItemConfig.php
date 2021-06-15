@@ -2,7 +2,7 @@
 
 namespace App\Traits\Admin;
 
-use App\Models\Settings;
+use App\Models\Settings\General;
 
 
 trait ItemConfig
@@ -107,13 +107,13 @@ trait ItemConfig
 		// Build the function name.
 		$function = 'get'.str_replace('_', '', ucwords($filter->name, '_')).'Options';
 
-		// Global filter.
+		// General filter.
 		if ($filter->name == 'per_page') {
-		    $options = Settings::$function();
+		    $options = General::$function();
 		}
-		// Global filter.
+		// General filter.
 		elseif ($filter->name == 'sorted_by') {
-		    $options = Settings::$function($this->modelName);
+		    $options = General::$function($this->pluginName, $this->modelName);
 		}
 		else {
 		    $options = $this->model->$function();
@@ -149,7 +149,7 @@ trait ItemConfig
 
     private function getData($type)
     {
-	$json = file_get_contents(app_path().'/Models/'.$this->modelName.'/'.$type.'.json', true);
+	$json = file_get_contents(app_path().'/Models/'.ucfirst($this->pluginName).'/'.$this->modelName.'/'.$type.'.json', true);
 
         if ($json === false) {
 	   throw new Exception('Load Failed');    

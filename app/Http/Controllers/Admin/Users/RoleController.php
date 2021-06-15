@@ -19,6 +19,11 @@ class RoleController extends Controller
      */
     protected $modelName = 'role';
 
+    /*
+     * Name of the plugin.
+     */
+    protected $pluginName = 'users';
+
 
     /**
      * Create a new controller instance.

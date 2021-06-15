@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Users;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use App\Traits\Admin\RolesPermissions;
 use Spatie\Permission\Models\Role;
-use App\Models\UserGroup;
+use App\Models\Users\UserGroup;
 
 class User extends Authenticatable
 {

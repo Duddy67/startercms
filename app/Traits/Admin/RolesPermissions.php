@@ -56,7 +56,7 @@ trait RolesPermissions
 
     public function getPermissionList($except = [])
     {
-	$json = file_get_contents(app_path().'/Models/permission/permissions.json', true);
+	$json = file_get_contents(app_path().'/Models/Users/permission/permissions.json', true);
 
         if ($json === false) {
 	   throw new Exception('Load Failed');    

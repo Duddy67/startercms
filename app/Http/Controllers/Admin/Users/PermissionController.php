@@ -8,7 +8,6 @@ use Illuminate\Validation\Rule;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\RolesPermissions;
 use Spatie\Permission\Models\Permission;
-use App\Models\Settings;
 
 
 class PermissionController extends Controller
@@ -19,6 +18,11 @@ class PermissionController extends Controller
      * Name of the model.
      */
     protected $modelName = 'permission';
+
+    /*
+     * Name of the plugin.
+     */
+    protected $pluginName = 'users';
 
 
     /**

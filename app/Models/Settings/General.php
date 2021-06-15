@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Settings;
 use Request;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Settings extends Model
+class General extends Model
 {
     use HasFactory;
 
@@ -22,9 +22,9 @@ class Settings extends Model
       ];
     }
 
-    public static function getSortedByOptions($itemName)
+    public static function getSortedByOptions($pluginName, $modelName)
     {
-	$json = file_get_contents(app_path().'/Models/'.$itemName.'/columns.json', true);
+	$json = file_get_contents(app_path().'/Models/'.ucfirst($pluginName).'/'.$modelName.'/columns.json', true);
 	$columns = json_decode($json);
 	$options = [];
 

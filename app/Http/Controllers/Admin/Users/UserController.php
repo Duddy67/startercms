@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin\Users;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use App\Models\User;
+use App\Models\Users\User;
 use Illuminate\Support\Facades\Hash;
 use App\Traits\Admin\ItemConfig;
 
@@ -22,6 +22,12 @@ class UserController extends Controller
      * Name of the model.
      */
     protected $modelName = 'user';
+
+    /*
+     * Name of the plugin.
+     */
+    protected $pluginName = 'users';
+
 
     /**
      * Create a new controller instance.

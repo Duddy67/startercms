@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin\Users;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use App\Models\UserGroup;
+use App\Models\Users\UserGroup;
 use App\Traits\Admin\ItemConfig;
 
 class UserGroupController extends Controller
@@ -21,6 +21,11 @@ class UserGroupController extends Controller
      * Name of the model.
      */
     protected $modelName = 'usergroup';
+
+    /*
+     * Name of the plugin.
+     */
+    protected $pluginName = 'users';
 
 
     /**
