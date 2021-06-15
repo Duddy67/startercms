@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use App\Traits\Admin\RolesPermissions;
 use Spatie\Permission\Models\Role;
-use App\Models\Users\UserGroup;
+use App\Models\Users\Group;
 
 class User extends Authenticatable
 {
@@ -51,7 +51,7 @@ class User extends Authenticatable
      */
     public function groups()
     {
-        return $this->belongsToMany(UserGroup::class);
+        return $this->belongsToMany(Group::class);
     }
 
     public function getItems($request)
@@ -101,7 +101,7 @@ class User extends Authenticatable
 
     public function getGroupsOptions($user = null)
     {
-        $groups = UserGroup::all();
+        $groups = Group::all();
 	$options = [];
 
 	foreach ($groups as $group) {

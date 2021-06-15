@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Users\User;
 
-class UserGroup extends Model
+class Group extends Model
 {
     use HasFactory;
 
@@ -32,7 +32,7 @@ class UserGroup extends Model
         $perPage = $request->input('per_page', 5);
         $search = $request->input('search', null);
 
-	$query = UserGroup::query();
+	$query = Group::query();
 
 	if ($search !== null) {
 	    $query->where('name', 'like', '%'.$search.'%');

@@ -1,16 +1,16 @@
 @extends ('layouts.admin')
 
 @section ('main')
-    @php $action = (isset($userGroup)) ? route('admin.users.usergroups.update', $queryWithId) : route('admin.users.usergroups.store', $query) @endphp
+    @php $action = (isset($group)) ? route('admin.users.groups.update', $queryWithId) : route('admin.users.groups.store', $query) @endphp
     <form method="post" action="{{ $action }}" id="itemForm">
         @csrf
 
-	@if (isset($userGroup))
+	@if (isset($group))
 	    @method('put')
 	@endif
 
         @foreach ($fields as $attribs)
-	    @php if (isset($userGroup)) { 
+	    @php if (isset($group)) { 
 		     $value = old($attribs->name, $attribs->value);
 		 }
 		 else {
@@ -24,13 +24,13 @@
 	    <x-input :attribs="$attribs" :value="$value" />
         @endforeach
 
-	<input type="hidden" id="itemList" value="{{ route('admin.users.usergroups.index', $query) }}">
+	<input type="hidden" id="itemList" value="{{ route('admin.users.groups.index', $query) }}">
 	<input type="hidden" id="close" name="_close" value="0">
     </form>
     <x-toolbar :items=$actions />
 
-    @if (isset($userGroup))
-	<form id="deleteItem" action="{{ route('admin.users.usergroups.destroy', $queryWithId) }}" method="post">
+    @if (isset($group))
+	<form id="deleteItem" action="{{ route('admin.users.groups.destroy', $queryWithId) }}" method="post">
 	    @method('delete')
 	    @csrf
 	</form>

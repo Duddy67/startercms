@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
-class AdminUsersUserGroups
+class AdminUsersGroups
 {
     /**
      * Handle an incoming request.
@@ -18,20 +18,20 @@ class AdminUsersUserGroups
     {
 	$routeName = $request->route()->getName();
 
-        $create = ['admin.users.usergroups.index', 'admin.users.usergroups.create', 'admin.users.usergroups.store'];
-        $update = ['admin.users.usergroups.update', 'admin.users.usergroups.edit'];
-        $delete = ['admin.users.usergroups.destroy', 'admin.users.usergroups.massDestroy'];
+        $create = ['admin.users.groups.index', 'admin.users.groups.create', 'admin.users.groups.store'];
+        $update = ['admin.users.groups.update', 'admin.users.groups.edit'];
+        $delete = ['admin.users.groups.destroy', 'admin.users.groups.massDestroy'];
 
 	if (in_array($routeName, $create) && !auth()->user()->isAllowedTo('create-user-group')) {
 	    return redirect()->route('admin')->with('error', 'You are not authorized to access this resource.');
 	}
 
 	if (in_array($routeName, $update) && !auth()->user()->isAllowedTo('update-user-group')) {
-	    return redirect()->route('admin.users.usergroups.index')->with('error', 'You are not authorized to edit user groups.');
+	    return redirect()->route('admin.users.groups.index')->with('error', 'You are not authorized to edit user groups.');
 	}
 
 	if (in_array($routeName, $delete) && !auth()->user()->isAllowedTo('delete-user-group')) {
-	    return redirect()->route('admin.users.usergroups.index')->with('error', 'You are not authorized to delete user groups.');
+	    return redirect()->route('admin.users.groups.index')->with('error', 'You are not authorized to delete user groups.');
 	}
 
         return $next($request);

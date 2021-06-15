@@ -27,9 +27,9 @@
 
     <x-pagination :items=$items />
 
-    <input type="hidden" id="createItem" value="{{ route('admin.users.usergroups.create', $query) }}">
+    <input type="hidden" id="createItem" value="{{ route('admin.users.groups.create', $query) }}">
 
-    <form id="selectedItems" action="{{ route('admin.users.usergroups.index', $query) }}" method="post">
+    <form id="selectedItems" action="{{ route('admin.users.groups.index', $query) }}" method="post">
 	@method('delete')
 	@csrf
     </form>

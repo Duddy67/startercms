@@ -9,18 +9,6 @@
 	"id": "massDestroy",
 	"label": "Delete",
 	"type": "button"
-      },
-      {
-	"id": "block",
-	"label": "Block",
-	"type": "button",
-	"class": "btn-secondary"
-      },
-      {
-	"id": "unblock",
-	"label": "Unblock",
-	"type": "button",
-	"class": "btn-secondary"
       }
   ],
   "form": [

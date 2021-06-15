@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Admin\Users;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use App\Models\Users\UserGroup;
+use App\Models\Users\Group;
 use App\Traits\Admin\ItemConfig;
 
-class UserGroupController extends Controller
+class GroupController extends Controller
 {
     use ItemConfig;
 
@@ -20,7 +20,7 @@ class UserGroupController extends Controller
     /*
      * Name of the model.
      */
-    protected $modelName = 'usergroup';
+    protected $modelName = 'group';
 
     /*
      * Name of the plugin.
@@ -36,8 +36,8 @@ class UserGroupController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('admin.users.usergroups');
-	$this->model = new UserGroup;
+        $this->middleware('admin.users.groups');
+	$this->model = new Group;
     }
 
     /**
@@ -52,10 +52,10 @@ class UserGroupController extends Controller
         $filters = $this->getFilters($request);
 	$items = $this->model->getItems($request);
 	$rows = $this->getRows($columns, $items);
-	$url = ['route' => 'admin.users.usergroups', 'item_name' => 'usergroup', 'query' => $request->query()];
+	$url = ['route' => 'admin.users.groups', 'item_name' => 'group', 'query' => $request->query()];
 	$query = $request->query();
 
-        return view('admin.users.usergroups.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
+        return view('admin.users.groups.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
     }
 
     public function create(Request $request)
@@ -64,18 +64,18 @@ class UserGroupController extends Controller
         $actions = $this->getActions('form', ['destroy']);
 	$query = $request->query();
 
-        return view('admin.users.usergroups.form', compact('fields', 'actions', 'query'));
+        return view('admin.users.groups.form', compact('fields', 'actions', 'query'));
     }
 
     public function edit(Request $request, $id)
     {
-        $userGroup = UserGroup::findOrFail($id);
-        $fields = $this->getFields($userGroup);
+        $group = Group::findOrFail($id);
+        $fields = $this->getFields($group);
         $actions = $this->getActions('form');
 	$query = $queryWithId = $request->query();
-	$queryWithId['usergroup'] = $id;
+	$queryWithId['group'] = $id;
 
-        return view('admin.users.usergroups.form', compact('userGroup', 'fields', 'actions', 'query', 'queryWithId'));
+        return view('admin.users.groups.form', compact('group', 'fields', 'actions', 'query', 'queryWithId'));
     }
 
     /**
@@ -87,13 +87,13 @@ class UserGroupController extends Controller
      */
     public function update(Request $request, $id)
     {
-	$group = UserGroup::findOrFail($id);
+	$group = Group::findOrFail($id);
 
         $this->validate($request, [
 	    'name' => [
 		'required',
 		'regex:/^[a-z0-9-]{3,}$/',
-		Rule::unique('user_groups')->ignore($id)
+		Rule::unique('groups')->ignore($id)
 	    ],
 	]);
 
@@ -104,12 +104,12 @@ class UserGroupController extends Controller
 	$query = $request->query();
 
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.users.usergroups.index', $query)->with('success', $message);
+	    return redirect()->route('admin.users.groups.index', $query)->with('success', $message);
 	}
 
-	$query['usergroup'] = $group->id;
+	$query['group'] = $group->id;
 
-	return redirect()->route('admin.users.usergroups.edit', $query)->with('success', $message);
+	return redirect()->route('admin.users.groups.edit', $query)->with('success', $message);
     }
 
     public function store(Request $request)
@@ -118,27 +118,27 @@ class UserGroupController extends Controller
 	    'name' => [
 		'required',
 		'regex:/^[a-z0-9-]{3,}$/',
-		'unique:user_groups'
+		'unique:groups'
 	    ],
 	]);
 
-	$group = UserGroup::create(['name' => $request->input('name')]);
+	$group = Group::create(['name' => $request->input('name')]);
 
 	$message = 'User group successfully added.';
 	$query = $request->query();
 
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.users.usergroups.index', $query)->with('success', $message);
+	    return redirect()->route('admin.users.groups.index', $query)->with('success', $message);
 	}
 
-	$query['usergroup'] = $group->id;
+	$query['group'] = $group->id;
 
-	return redirect()->route('admin.users.usergroups.edit', $query)->with('success', $message);
+	return redirect()->route('admin.users.groups.edit', $query)->with('success', $message);
     }
 
     public function destroy(Request $request, $id, $redirect = true)
     {
-	$group = UserGroup::findOrFail($id);
+	$group = Group::findOrFail($id);
 	$group->users()->detach();
 	//$group->delete();
 
@@ -146,7 +146,7 @@ class UserGroupController extends Controller
 	    return;
 	}
 
-	return redirect()->route('admin.users.usergroups.index', $request->query())->with('success', 'User group successfully deleted.');
+	return redirect()->route('admin.users.groups.index', $request->query())->with('success', 'User group successfully deleted.');
     }
 
     public function massDestroy(Request $request)
@@ -155,6 +155,6 @@ class UserGroupController extends Controller
 	    $this->destroy($request, $id, false);
 	}
 
-	return redirect()->route('admin.users.usergroups.index', $request->query())->with('success', count($request->input('ids')).' User group(s) successfully deleted.');
+	return redirect()->route('admin.users.groups.index', $request->query())->with('success', count($request->input('ids')).' User group(s) successfully deleted.');
     }
 }

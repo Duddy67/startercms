@@ -10,7 +10,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\Users\UserController;
 use App\Http\Controllers\Admin\Users\RoleController;
 use App\Http\Controllers\Admin\Users\PermissionController;
-use App\Http\Controllers\Admin\Users\UserGroupController;
+use App\Http\Controllers\Admin\Users\GroupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,9 +50,9 @@ Route::prefix('admin')->group(function () {
 	    // Users
 	    Route::delete('/users', [UserController::class, 'massDestroy'])->name('admin.users.users.massDestroy');
 	    Route::resource('users', UserController::class, ['as' => 'admin.users'])->except(['show']);
-	    // UserGroups
-	    Route::delete('/usergroups', [UserGroupController::class, 'massDestroy'])->name('admin.users.usergroups.massDestroy');
-	    Route::resource('usergroups', UserGroupController::class, ['as' => 'admin.users'])->except(['show']);
+	    // Groups
+	    Route::delete('/groups', [GroupController::class, 'massDestroy'])->name('admin.users.groups.massDestroy');
+	    Route::resource('groups', GroupController::class, ['as' => 'admin.users'])->except(['show']);
 	    // Roles
 	    Route::delete('/roles', [RoleController::class, 'massDestroy'])->name('admin.users.roles.massDestroy');
 	    Route::resource('roles', RoleController::class, ['as' => 'admin.users'])->except(['show']);

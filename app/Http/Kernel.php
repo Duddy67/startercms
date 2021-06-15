@@ -65,7 +65,7 @@ class Kernel extends HttpKernel
 	// Backend CMS
 	'admin' => \App\Http\Middleware\Admin::class,
 	'admin.users.users' => \App\Http\Middleware\AdminUsersUsers::class,
-	'admin.users.usergroups' => \App\Http\Middleware\AdminUsersUserGroups::class,
+	'admin.users.groups' => \App\Http\Middleware\AdminUsersGroups::class,
 	'admin.users.roles' => \App\Http\Middleware\AdminUsersRoles::class,
     ];
 }

@@ -209,8 +209,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			  Users
 			</x-menu-item>
 		    @allowto ('create-user-group')
-			@php $active = (request()->is('admin/users/usergroups*')) ? true : false @endphp
-			<x-menu-item href="{{ route('admin.users.usergroups.index') }}" :sub=true :active="$active">
+			@php $active = (request()->is('admin/users/groups*')) ? true : false @endphp
+			<x-menu-item href="{{ route('admin.users.groups.index') }}" :sub=true :active="$active">
 			  Groups
 			</x-menu-item>
 		    @endallowto
@@ -258,13 +258,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		</a>
 		  <ul class="nav nav-treeview">
 		    <x-menu-item href="#" :sub=true :active=false>
+		      General
+		    </x-menu-item>
+		    <x-menu-item href="#" :sub=true :active=false>
 		      Security
 		    </x-menu-item>
 		    <x-menu-item href="#" :sub=true :active=false>
 		      Email
-		    </x-menu-item>
-		    <x-menu-item href="#" :sub=true :active=false>
-		      Global
 		    </x-menu-item>
 		  </ul>
 	      </li>
