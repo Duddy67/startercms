@@ -10,6 +10,43 @@ class General extends Model
 {
     use HasFactory;
 
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'settings_general';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'group',
+        'key',
+        'value',
+    ];
+
+    public $timestamps = false;
+
+
+    public static function getData()
+    {
+        $results = General::all()->toArray();
+	$data = [];
+
+	foreach ($results as $param) {
+	    if (!isset($data[$param['group']])) {
+		$data[$param['group']] = [];
+	    }
+
+	    $data[$param['group']][$param['key']] = $param['value'];
+	}
+
+	return $data;
+    }
+
     public static function getPerPageOptions()
     {
       return [
@@ -36,5 +73,15 @@ class General extends Model
 	}
 
 	return $options;
+    }
+
+    /*
+     * Generic function that returns model values which are handled by select inputs. 
+     */
+    public function getSelectedValue($fieldName)
+    {
+        if ($fieldName == 'per_page') {
+	    return $this->where(['group' => 'pagination', 'key' => 'per_page'])->pluck('value')->first();
+	}
     }
 }

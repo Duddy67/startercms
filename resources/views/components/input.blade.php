@@ -5,6 +5,8 @@
 
 @php $disabled = (isset($attribs->extra) && in_array('disabled', $attribs->extra)) ? 'disabled' : '' @endphp
 @php $class = (isset($attribs->class)) ? $attribs->class : '' @endphp
+@php $name = (isset($attribs->name)) ? $attribs->name : null @endphp
+@php $name = ($name && isset($attribs->group)) ? $attribs->group.'['.$name.']' : $name @endphp
 
 @if ($attribs->type == 'text' || $attribs->type == 'password' || $attribs->type == 'date')
     <input  id="{{ $attribs->id }}" {{ $disabled }} 
@@ -15,8 +17,8 @@
 	type="{{ $attribs->type }}" class="form-control {{ $class }}" 
     @endif
 
-    @if (isset($attribs->name))
-	name="{{ $attribs->name }}"
+    @if ($name)
+	name="{{ $name }}"
     @endif
 
     @if (isset($attribs->placeholder))
@@ -36,7 +38,7 @@
     @php $multiple = (isset($attribs->extra) && in_array('multiple', $attribs->extra)) ? 'multiple' : '' @endphp
     @php $multi = ($multiple) ? '[]' : '' @endphp
 
-    <select id="{{ $attribs->id }}" class="form-control select2" {{ $multiple }} {{ $disabled }} name="{{ $attribs->name.$multi }}"
+    <select id="{{ $attribs->id }}" class="form-control select2" {{ $multiple }} {{ $disabled }} name="{{ $name.$multi }}"
     @if (isset($attribs->onchange))
 	onchange="{{ $attribs->onchange }}"
     @endif
@@ -62,8 +64,8 @@
 
     <input type="checkbox" id="{{ $attribs->id }}" class="form-check-input"
 
-    @if (isset($attribs->name))
-	name="{{ $attribs->name }}"
+    @if ($name)
+	name="{{ $name }}"
     @endif
 
     @if (isset($attribs->disabled) && $attribs->disabled)
@@ -85,8 +87,8 @@
     @endif
 @endif
 
-@if (isset($attribs->name))
-    @error($attribs->name)
+@if ($name)
+    @error($name)
 	<div class="text-danger">{{ $message }}</div>
     @enderror
 @endif

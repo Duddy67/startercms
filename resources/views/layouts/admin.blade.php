@@ -198,11 +198,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
 	  @allowto ('create-user')
-	      <li class="nav-item menu-open">
-		<a href="#" class="nav-link active">
-		  <i class="nav-icon fas fa-users"></i>
-		  <p>Users</p>
-		</a>
+	      @php $open = (request()->is('admin/users*')) ? 'menu-open' : '' @endphp
+	      <li class="nav-item {{ $open }}">
+		  @php $active = (request()->is('admin/users*')) ? 'active' : '' @endphp
+		  <a href="#" class="nav-link {{ $active }}">
+		    <i class="nav-icon fas fa-users"></i>
+		    <p>Users</p>
+		  </a>
 		  <ul class="nav nav-treeview">
 			@php $active = (request()->is('admin/users/users*')) ? true : false @endphp
 			<x-menu-item href="{{ route('admin.users.users.index') }}" :sub=true :active="$active">
@@ -231,7 +233,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 	  @endallowto
 
 	  @allowto ('create-post')
-	      <li class="nav-item menu-open">
+	      @php $open = (request()->is('admin/post*')) ? 'menu-open' : '' @endphp
+	      <li class="nav-item {{ $open }}">
 		<a href="#" class="nav-link">
 		  <i class="nav-icon fas fa-pencil-alt"></i>
 		  <p>Blog</p>
@@ -251,21 +254,24 @@ scratch. This page gets rid of all links and provides the needed markup only.
 	  @endallowto
 
 	  @allowto ('global-settings')
-	      <li class="nav-item menu-open">
-		<a href="#" class="nav-link">
-		  <i class="nav-icon fas fa-cogs"></i>
-		  <p>Settings</p>
-		</a>
+	      @php $open = (request()->is('admin/settings*')) ? 'menu-open' : '' @endphp
+	      <li class="nav-item {{ $open }}">
+		  @php $active = (request()->is('admin/settings*')) ? 'active' : '' @endphp
+		  <a href="#" class="nav-link {{ $active }}">
+		    <i class="nav-icon fas fa-cogs"></i>
+		    <p>Settings</p>
+		  </a>
 		  <ul class="nav nav-treeview">
-		    <x-menu-item href="#" :sub=true :active=false>
-		      General
-		    </x-menu-item>
-		    <x-menu-item href="#" :sub=true :active=false>
-		      Security
-		    </x-menu-item>
-		    <x-menu-item href="#" :sub=true :active=false>
-		      Email
-		    </x-menu-item>
+			@php $active = (request()->is('admin/settings/general*')) ? true : false @endphp
+			<x-menu-item href="{{ route('admin.settings.general.index') }}" :sub=true :active="$active">
+			  General
+			</x-menu-item>
+			<x-menu-item href="#" :sub=true :active=false>
+			  Security
+			</x-menu-item>
+			<x-menu-item href="#" :sub=true :active=false>
+			  Email
+			</x-menu-item>
 		  </ul>
 	      </li>
 	  @endallowto

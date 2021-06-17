@@ -64,8 +64,7 @@ trait ItemConfig
 		$fields[$key]->options = $options;
 
 		if ($item) {
-		    $function = 'get'.str_replace('_', '', ucwords($field->name, '_')).'Value';
-		    $fields[$key]->value = $item->$function();
+		    $fields[$key]->value = $item->getSelectedValue($field->name);
 		}
 	    }
 	}

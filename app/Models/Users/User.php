@@ -91,14 +91,6 @@ class User extends Authenticatable
 	return $options;
     }
 
-    /*
-     * Used to get the option role value.
-     */
-    public function getRoleValue()
-    {
-        return $this->getRoleName();
-    }
-
     public function getGroupsOptions($user = null)
     {
         $groups = Group::all();
@@ -109,14 +101,6 @@ class User extends Authenticatable
 	}
 
 	return $options;
-    }
-
-    /*
-     * Used to get the option groups value.
-     */
-    public function getGroupsValue()
-    {
-        return $this->groups->pluck('id')->toArray();
     }
 
     /*
@@ -131,6 +115,22 @@ class User extends Authenticatable
 	}
 
 	return $options;
+    }
+
+    /*
+     * Generic function that returns model values which are handled by select inputs. 
+     */
+    public function getSelectedValue($fieldName)
+    {
+        if ($fieldName == 'role') {
+	    return $this->getRoleName();
+	}
+
+        if ($fieldName == 'groups') {
+	    return $this->groups->pluck('id')->toArray();
+	}
+
+	return null;
     }
 
     public function canUpdate($user)

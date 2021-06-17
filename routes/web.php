@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\Users\UserController;
 use App\Http\Controllers\Admin\Users\RoleController;
 use App\Http\Controllers\Admin\Users\PermissionController;
 use App\Http\Controllers\Admin\Users\GroupController;
+use App\Http\Controllers\Admin\Settings\GeneralController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,6 +61,11 @@ Route::prefix('admin')->group(function () {
 	    Route::get('/permissions', [PermissionController::class, 'index'])->name('admin.users.permissions.index');
 	    Route::patch('/permissions', [PermissionController::class, 'build'])->name('admin.users.permissions.build');
 	    Route::put('/permissions', [PermissionController::class, 'rebuild'])->name('admin.users.permissions.rebuild');
+	});
+
+	Route::prefix('settings')->group(function () {
+	    Route::get('/general', [GeneralController::class, 'index'])->name('admin.settings.general.index');
+	    Route::patch('/general', [GeneralController::class, 'update'])->name('admin.settings.general.update');
 	});
     });
 });
