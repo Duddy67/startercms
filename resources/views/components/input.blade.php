@@ -1,6 +1,6 @@
 
 @if (isset($attribs->label) && $attribs->type != 'checkbox')
-    <label for="{{ $attribs->id }}">{{ $attribs->label }}</label>
+    <label for="{{ $attribs->id }}">@lang ($attribs->label)</label>
 @endif
 
 @php $disabled = (isset($attribs->extra) && in_array('disabled', $attribs->extra)) ? 'disabled' : '' @endphp

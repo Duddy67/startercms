@@ -25,17 +25,17 @@ trait ItemConfig
 	    $row = array('item_id' => $item->id);
 
 	    foreach ($columns as $column) {
-	        if (!in_array($column->id, $except)) {
+	        if (!in_array($column->name, $except)) {
 
 		    if ($column->type == 'date') {
-			$row[$column->id] = $item->{$column->id}->toFormattedDateString();
+			$row[$column->name] = $item->{$column->name}->toFormattedDateString();
 		    }
 		    else {
-			$row[$column->id] = $item->{$column->id};
+			$row[$column->name] = $item->{$column->name};
 		    }
 		}
 		else {
-		    $row[$column->id] = null;
+		    $row[$column->name] = null;
 		}
 	    }
 
@@ -102,6 +102,8 @@ trait ItemConfig
 	        continue;
 	    }
 
+	    $default = null;
+
 	    if ($filter->type == 'select') {
 		// Build the function name.
 		$function = 'get'.str_replace('_', '', ucwords($filter->name, '_')).'Options';
@@ -109,6 +111,7 @@ trait ItemConfig
 		// General filter.
 		if ($filter->name == 'per_page') {
 		    $options = General::$function();
+		    $default = General::getGeneralValue('pagination', 'per_page');
 		}
 		// General filter.
 		elseif ($filter->name == 'sorted_by') {
@@ -121,7 +124,7 @@ trait ItemConfig
 		$filters[$key]->options = $options;
 	    }
 
-	    $filters[$key]->value = $request->input($filter->name);
+	    $filters[$key]->value = $request->input($filter->name, $default);
 	}
 
 	return $filters;

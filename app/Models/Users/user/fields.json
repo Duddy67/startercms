@@ -1,33 +1,33 @@
 [
   {
-    "label": "Name",
+    "label": "labels.generic.name",
     "type": "text",
     "name": "name",
     "id": "name",
     "readonly": false,
-    "placeholder": "Name"
+    "placeholder": "labels.generic.name"
   },
   {
-    "label": "Email",
+    "label": "labels.users.email",
     "type": "text",
     "name": "email",
     "id": "email",
     "placeholder": "Email"
   },
   {
-    "label": "Password",
+    "label": "labels.users.password",
     "type": "password",
     "name": "password",
     "id": "password"
   },
   {
-    "label": "Confirm password",
+    "label": "labels.users.confirm_password",
     "type": "password",
     "name": "password_confirmation",
     "id": "password_confirmation"
   },
   {
-    "label": "Role",
+    "label": "labels.users.role",
     "type": "select",
     "name": "role",
     "id": "role",
@@ -35,7 +35,7 @@
     "options": [] 
   },
   {
-    "label": "Groups",
+    "label": "labels.users.groups",
     "type": "select",
     "name": "groups",
     "extra": ["multiple"],
@@ -44,13 +44,13 @@
     "options": [] 
   },
   {
-    "label": "Created at",
+    "label": "labels.generic.created_at",
     "type": "date",
     "name": "created_at",
     "id": "created_at"
   },
   {
-    "label": "Updated at",
+    "label": "labels.generic.updated_at",
     "type": "date",
     "name": "updated_at",
     "id": "updated_at"

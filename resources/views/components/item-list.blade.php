@@ -5,7 +5,7 @@
         </th>
         @foreach ($columns as $key => $column)
 	    <th scope="col">
-		{{ $column->label }}
+		@lang ($column->label)
 	    </th>
         @endforeach
     </thead>

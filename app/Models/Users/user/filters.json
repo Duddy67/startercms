@@ -15,6 +15,14 @@
     "options": [] 
   },
   {
+    "label": "Groups",
+    "type": "select",
+    "name": "groups",
+    "extra": ["multiple"],
+    "id": "filters-groups",
+    "options": [] 
+  },
+  {
     "label": "Sorted by",
     "type": "select",
     "name": "sorted_by",

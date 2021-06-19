@@ -11,4 +11,10 @@
     @php $icon = '<i class="'.$icon.'"></i>' @endphp
 @endif
 
-<button type="button" id="{{ $button->id }}" class="btn btn-space {{ $class }}">{!! $icon !!} {{ $button->label }}</button>
+<button type="button" id="{{ $button->id }}"  class="btn btn-space {{ $class }}" 
+
+@if (isset($button->name))
+    name="{{ $button->name }}"
+@endif
+
+>{!! $icon !!} @lang ($button->label)</button>

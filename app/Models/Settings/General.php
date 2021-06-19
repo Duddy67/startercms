@@ -47,6 +47,11 @@ class General extends Model
 	return $data;
     }
 
+    public static function getGeneralValue($group, $key)
+    {
+        return General::where(['group' => $group, 'key' => $key])->pluck('value')->first();
+    }
+
     public static function getPerPageOptions()
     {
       return [

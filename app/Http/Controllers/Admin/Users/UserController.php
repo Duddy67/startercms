@@ -74,7 +74,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
 	if (!auth()->user()->canUpdate($user) && auth()->user()->id != $user->id) {
-	    return redirect()->route('admin.users.users.index')->with('error', 'You are not allowed to edit this user.');
+	    return redirect()->route('admin.users.users.index')->with('error', __('messages.users.edit_not_auth'));
 	}
 
         $fields = $this->getFields($user, ['password', 'password_confirmation']);
@@ -99,7 +99,7 @@ class UserController extends Controller
 	$user = User::findOrFail($id);
 
 	if (!auth()->user()->canUpdate($user) && auth()->user()->id != $user->id) {
-	    return redirect()->route('admin.users.users.edit', $user->id)->with('error', 'You are not allowed to update this user.');
+	    return redirect()->route('admin.users.users.edit', $user->id)->with('error',  __('messages.users.update_not_auth'));
 	}
 
         $this->validate($request, [
@@ -131,17 +131,15 @@ class UserController extends Controller
 	}
 
 	$user->save();
-
-	$message = 'User successfully updated.';
 	$query = $request->query();
 
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.users.users.index', $query)->with('success', $message);
+	    return redirect()->route('admin.users.users.index', $query)->with('success', __('messages.users.update_success'));
 	}
 
 	$query['user'] = $user->id;
 
-	return redirect()->route('admin.users.users.edit', $query)->with('success', $message);
+	return redirect()->route('admin.users.users.edit', $query)->with('success', __('messages.users.update_success'));
     }
 
     public function store(Request $request)
@@ -165,16 +163,15 @@ class UserController extends Controller
 	    $user->groups()->attach($request->input('groups'));
 	}
 
-	$message = 'User successfully added.';
 	$query = $request->query();
 
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.users.users.index', $query)->with('success', $message);
+	    return redirect()->route('admin.users.users.index', $query)->with('success', __('messages.users.create_success'));
 	}
 
 	$query['user'] = $user->id;
 
-	return redirect()->route('admin.users.users.edit', $query)->with('success', $message);
+	return redirect()->route('admin.users.users.edit', $query)->with('success', __('messages.users.create_success'));
     }
 
     public function destroy(Request $request, $id)
@@ -182,13 +179,14 @@ class UserController extends Controller
 	$user = User::findOrFail($id);
 
 	if (!auth()->user()->canDelete($user)) {
-	    return redirect()->route('admin.users.users.edit', $user->id)->with('error', 'You are not allowed to delete this user.');
+	    return redirect()->route('admin.users.users.edit', $user->id)->with('error', __('messages.users.delete_not_auth'));
 	}
 
 	$user->groups()->detach();
+	$name = $user->name;
 	//$user->delete();
 
-	return redirect()->route('admin.users.users.index', $request->query())->with('success', 'The user has been successfully deleted.');
+	return redirect()->route('admin.users.users.index', $request->query())->with('success', __('messages.users.delete_success', ['name' => $name]));
     }
 
     public function massDestroy(Request $request)
@@ -201,10 +199,10 @@ class UserController extends Controller
 		if (!auth()->user()->canDelete($user)) {
 		    // Informs about the users previously deleted.
 		    if ($key > 0) {
-			$request->session()->flash('success', $key.' user(s) has been successfully deleted.');
+			$request->session()->flash('success', __('messages.users.delete_list_success', ['number' => $key]));
 		    }
 
-		    return redirect()->route('admin.users.users.index')->with('error', 'You are not allowed to delete this user: '.$user->name);
+		    return redirect()->route('admin.users.users.index')->with('error', __('messages.users.delete_list_not_auth', ['name' => $user->name]));
 		}
 
 		$user->groups()->detach();
@@ -212,7 +210,7 @@ class UserController extends Controller
 	    }
 	}
 
-	return redirect()->route('admin.users.users.index', $request->query())->with('success', count($request->input('ids')).' user(s) has been successfully deleted.');
+	return redirect()->route('admin.users.users.index', $request->query())->with('success', __('messages.users.delete_list_success', ['number' => count($request->input('ids'))]));
     }
 
     /*
@@ -222,9 +220,15 @@ class UserController extends Controller
     {
         foreach ($users as $key => $user) {
 	    foreach ($columns as $column) {
-	        if ($column->id == 'role') {
+	        if ($column->name == 'role') {
 		    $roles = $user->getRoleNames();
-		    $rows[$key][$column->id] = $roles[0];
+		    $rows[$key]['role'] = $roles[0];
+		}
+
+	        if ($column->name == 'groups') {
+		    $groups = $user->groups()->pluck('name')->toArray();
+		    $groups = (!empty($groups)) ? implode(',', $groups) : '-';
+		    $rows[$key]['groups'] = $groups;
 		}
 	    }
 	}

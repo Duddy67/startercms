@@ -55,7 +55,7 @@ class GeneralController extends Controller
     }
 
     /**
-     * Update the specified group.
+     * Update the general parameters.
      *
      * @param  Request  $request
      * @return Response
@@ -66,10 +66,7 @@ class GeneralController extends Controller
 
 	foreach ($post as $group => $params) {
 	  foreach ($params as $key => $value) {
-	      General::updateOrCreate(
-		  ['group' => $group, 'key' => $key],
-		  ['value' => $value]
-	      );
+	      General::updateOrCreate(['group' => $group, 'key' => $key], ['value' => $value]);
 	  }
 	}
 

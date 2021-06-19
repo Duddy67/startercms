@@ -10,6 +10,8 @@ use Spatie\Permission\Traits\HasRoles;
 use App\Traits\Admin\RolesPermissions;
 use Spatie\Permission\Models\Role;
 use App\Models\Users\Group;
+use App\Models\Settings\General;
+
 
 class User extends Authenticatable
 {
@@ -56,9 +58,10 @@ class User extends Authenticatable
 
     public function getItems($request)
     {
-        $perPage = $request->input('per_page', 5);
+        $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
         $sortedBy = $request->input('sorted_by', null);
         $roles = $request->input('roles', []);
+        $groups = $request->input('groups', []);
         $search = $request->input('search', null);
 
 	$query = User::whereHas('roles', function($query) use($roles) {
@@ -66,6 +69,12 @@ class User extends Authenticatable
 	        $query->whereIn('name', $roles);
 	    }
 	});
+
+	if (!empty($groups)) {
+	    $query->whereHas('groups', function($query) use($groups) {
+		$query->whereIn('id', $groups);
+	    });
+	}
 
 	if ($search !== null) {
 	    $query->where('name', 'like', '%'.$search.'%');
