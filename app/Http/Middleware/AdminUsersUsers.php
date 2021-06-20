@@ -23,15 +23,15 @@ class AdminUsersUsers
         $delete = ['admin.users.users.destroy', 'admin.users.users.massDestroy'];
 
 	if (in_array($routeName, $create) && !auth()->user()->isAllowedTo('create-user')) {
-	    return redirect()->route('admin')->with('error', 'You are not authorized to access this resource.');
+	    return redirect()->route('admin')->with('error', __('messages.generic.access_not_auth'));
 	}
 
 	if (in_array($routeName, $update) && !auth()->user()->isAllowedTo('update-user')) {
-	    return redirect()->route('admin.users.users.index')->with('error', 'You are not authorized to edit users.');
+	    return redirect()->route('admin.users.users.index')->with('error', __('messages.users.edit_not_auth'));
 	}
 
 	if (in_array($routeName, $delete) && !auth()->user()->isAllowedTo('delete-user')) {
-	    return redirect()->route('admin.users.users.index')->with('error', 'You are not authorized to delete users.');
+	    return redirect()->route('admin.users.users.index')->with('error', __('messages.users.delete_not_auth'));
 	}
 
         return $next($request);

@@ -104,12 +104,12 @@ class GroupController extends Controller
 	$query = $request->query();
 
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.users.groups.index', $query)->with('success', $message);
+	    return redirect()->route('admin.users.groups.index', $query)->with('success', __('messages.groups.update_success'));
 	}
 
 	$query['group'] = $group->id;
 
-	return redirect()->route('admin.users.groups.edit', $query)->with('success', $message);
+	return redirect()->route('admin.users.groups.edit', $query)->with('success', __('messages.groups.update_success'));
     }
 
     public function store(Request $request)
@@ -123,30 +123,29 @@ class GroupController extends Controller
 	]);
 
 	$group = Group::create(['name' => $request->input('name')]);
-
-	$message = 'User group successfully added.';
 	$query = $request->query();
 
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.users.groups.index', $query)->with('success', $message);
+	    return redirect()->route('admin.users.groups.index', $query)->with('success', __('messages.groups.create_success'));
 	}
 
 	$query['group'] = $group->id;
 
-	return redirect()->route('admin.users.groups.edit', $query)->with('success', $message);
+	return redirect()->route('admin.users.groups.edit', $query)->with('success', __('messages.groups.create_success'));
     }
 
     public function destroy(Request $request, $id, $redirect = true)
     {
 	$group = Group::findOrFail($id);
 	$group->users()->detach();
+	$name = $group->name;
 	//$group->delete();
 
 	if (!$redirect) {
 	    return;
 	}
 
-	return redirect()->route('admin.users.groups.index', $request->query())->with('success', 'User group successfully deleted.');
+	return redirect()->route('admin.users.groups.index', $request->query())->with('success', __('messages.groups.delete_success', ['name' => $name]));
     }
 
     public function massDestroy(Request $request)
@@ -155,6 +154,6 @@ class GroupController extends Controller
 	    $this->destroy($request, $id, false);
 	}
 
-	return redirect()->route('admin.users.groups.index', $request->query())->with('success', count($request->input('ids')).' User group(s) successfully deleted.');
+	return redirect()->route('admin.users.groups.index', $request->query())->with('success', __('messages.groups.delete_list_success', ['number' => count($request->input('ids'))]));
     }
 }

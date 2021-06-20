@@ -70,7 +70,7 @@ class GeneralController extends Controller
 	  }
 	}
 
-	return redirect()->route('admin.settings.general.index', $request->query())->with('success', 'Parameters successfully saved.');
+	return redirect()->route('admin.settings.general.index', $request->query())->with('success', __('messages.general.update_success'));
     }
 
     /*

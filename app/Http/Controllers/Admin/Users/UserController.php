@@ -74,7 +74,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
 	if (!auth()->user()->canUpdate($user) && auth()->user()->id != $user->id) {
-	    return redirect()->route('admin.users.users.index')->with('error', __('messages.users.edit_not_auth'));
+	    return redirect()->route('admin.users.users.index')->with('error', __('messages.users.edit_user_not_auth'));
 	}
 
         $fields = $this->getFields($user, ['password', 'password_confirmation']);
@@ -99,7 +99,7 @@ class UserController extends Controller
 	$user = User::findOrFail($id);
 
 	if (!auth()->user()->canUpdate($user) && auth()->user()->id != $user->id) {
-	    return redirect()->route('admin.users.users.edit', $user->id)->with('error',  __('messages.users.update_not_auth'));
+	    return redirect()->route('admin.users.users.edit', $user->id)->with('error',  __('messages.users.update_user_not_auth'));
 	}
 
         $this->validate($request, [
@@ -179,7 +179,7 @@ class UserController extends Controller
 	$user = User::findOrFail($id);
 
 	if (!auth()->user()->canDelete($user)) {
-	    return redirect()->route('admin.users.users.edit', $user->id)->with('error', __('messages.users.delete_not_auth'));
+	    return redirect()->route('admin.users.users.edit', $user->id)->with('error', __('messages.users.delete_user_not_auth'));
 	}
 
 	$user->groups()->detach();

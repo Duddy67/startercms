@@ -90,7 +90,7 @@ class RoleController extends Controller
 	$role = Role::findOrFail($id);
 
 	if (in_array($role->id, $this->getDefaultRoleIds())) {
-	    return redirect()->route('admin.users.roles.edit', $role->id)->with('error', 'You cannot modify the default roles.');
+	    return redirect()->route('admin.users.roles.edit', $role->id)->with('error', __('messages.roles.cannot_update_default_roles'));
 	}
 
         $this->validate($request, [
@@ -114,7 +114,7 @@ class RoleController extends Controller
 	    $count = array_intersect($request->input('permissions'), $level1Perms);
 
 	    if ($this->getUserRoleType() == 'admin' && $count) {
-		return redirect()->route('admin.users.roles.edit', $role->id)->with('error', 'One or more selected permissions are not authorised.');
+		return redirect()->route('admin.users.roles.edit', $role->id)->with('error', __('messages.roles.permission_not_auth'));
 	    }
 
 	    // Get the unselected permissions.
@@ -139,16 +139,15 @@ class RoleController extends Controller
 	    }
 	}
 
-	$message = 'Permission successfully updated.';
 	$query = $request->query();
 
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.users.roles.index', $query)->with('success', $message);
+	    return redirect()->route('admin.users.roles.index', $query)->with('success', __('messages.roles.update_success'));
 	}
 
 	$query['role'] = $role->id;
 
-	return redirect()->route('admin.users.roles.edit', $query)->with('success', $message);
+	return redirect()->route('admin.users.roles.edit', $query)->with('success', __('messages.roles.update_success'));
      
     }
 
@@ -174,7 +173,7 @@ class RoleController extends Controller
 	    $count = array_intersect($request->input('permissions'), $level1Perms);
 
 	    if ($this->getUserRoleType() == 'admin' && $count) {
-		return redirect()->route('admin.users.roles.edit', $role->id)->with('error', 'One or more selected permissions are not authorised.');
+		return redirect()->route('admin.users.roles.edit', $role->id)->with('error', __('messages.roles.permission_not_auth'));
 	    }
 
 	    foreach ($request->input('permissions') as $permission) {
@@ -182,16 +181,15 @@ class RoleController extends Controller
 	    }
 	}
 
-	$message = 'Role successfully added.';
 	$query = $request->query();
 
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.users.roles.index', $query)->with('success', $message);
+	    return redirect()->route('admin.users.roles.index', $query)->with('success', __('messages.roles.create_success'));
 	}
 
 	$query['role'] = $role->id;
 
-	return redirect()->route('admin.users.roles.edit', $query)->with('success', $message);
+	return redirect()->route('admin.users.roles.edit', $query)->with('success', __('messages.roles.create_success'));
     }
 
     public function destroy(Request $request, $id)
@@ -201,17 +199,18 @@ class RoleController extends Controller
 
 	if (in_array($role->name, $this->getDefaultRoles())) {
 	    $query['role'] = $role->id;
-	    return redirect()->route('admin.users.roles.edit', $query)->with('error', 'You cannot delete the default roles.');
+	    return redirect()->route('admin.users.roles.edit', $query)->with('error', __('messages.roles.cannot_delete_default_roles'));
 	}
 
 	if ($role->users->count()) {
 	    $query['role'] = $role->id;
-	    return redirect()->route('admin.users.roles.edit', $query)->with('error', 'One or more users are assigned to this role.');
+	    return redirect()->route('admin.users.roles.edit', $query)->with('error', __('messages.roles.users_assigned_to_roles', ['name' => $role->name]));
 	}
 
+	$name = $role->name;
 	$role->delete();
 
-	return redirect()->route('admin.users.roles.index', $query)->with('success', 'Role successfully deleted.');
+	return redirect()->route('admin.users.roles.index', $query)->with('success', __('messages.roles.delete_success', ['name' => $name]));
     }
 
     public function massDestroy(Request $request)
@@ -220,20 +219,20 @@ class RoleController extends Controller
 	$result = array_intersect($roles, $this->getDefaultRoles());
 
 	if (!empty($result)) {
-	    return redirect()->route('admin.users.roles.index', $request->query())->with('error', 'The following roles cannot be deleted: '.implode(',', $result));
+	    return redirect()->route('admin.users.roles.index', $request->query())->with('error',  __('messages.roles.cannot_delete_roles', ['roles' => implode(',', $result)]));
 	}
 
 	foreach ($request->input('ids') as $id) {
 	    $role = Role::findOrFail($id);
 
 	    if ($role->users->count()) {
-		return redirect()->route('admin.users.roles.index', $request->query())->with('error', 'One or more users are assigned to this role: '.$role->name);
+		return redirect()->route('admin.users.roles.index', $request->query())->with('error', __('messages.roles.users_assigned_to_roles', ['name' => $role->name]));
 	    }
 	}
 
 	Role::destroy($request->input('ids'));
 
-	return redirect()->route('admin.users.roles.index', $request->query())->with('success', count($request->input('ids')).' Role(s) successfully deleted.');
+	return redirect()->route('admin.users.roles.index', $request->query())->with('success', __('messages.roles.delete_list_success', ['number' => count($request->input('ids'))]));
     }
 
     private function getPermissionBoard($role = null)

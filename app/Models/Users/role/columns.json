@@ -1,26 +1,30 @@
 [
   {
-    "id": "id",
     "label": "ID",
+    "name": "id",
     "sortable": true,
+    "id": "id",
     "type": "string"
   },
   {
-    "id": "name",
     "label": "Name",
+    "name": "name",
     "sortable": true,
+    "id": "name",
     "type": "string"
   },
   {
-    "id": "created_at",
     "label": "Created at",
+    "name": "created_at",
     "sortable": true,
+    "id": "created_at",
     "type": "date"
   },
   {
-    "id": "updated_at",
     "label": "Updated at",
+    "name": "updated_at",
     "sortable": true,
+    "id": "updated_at",
     "type": "date"
   }
 ]

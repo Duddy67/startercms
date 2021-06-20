@@ -23,15 +23,15 @@ class AdminUsersGroups
         $delete = ['admin.users.groups.destroy', 'admin.users.groups.massDestroy'];
 
 	if (in_array($routeName, $create) && !auth()->user()->isAllowedTo('create-user-group')) {
-	    return redirect()->route('admin')->with('error', 'You are not authorized to access this resource.');
+	    return redirect()->route('admin')->with('error', __('messages.generic.access_not_auth'));
 	}
 
 	if (in_array($routeName, $update) && !auth()->user()->isAllowedTo('update-user-group')) {
-	    return redirect()->route('admin.users.groups.index')->with('error', 'You are not authorized to edit user groups.');
+	    return redirect()->route('admin.users.groups.index')->with('error', __('messages.groups.edit_not_auth'));
 	}
 
 	if (in_array($routeName, $delete) && !auth()->user()->isAllowedTo('delete-user-group')) {
-	    return redirect()->route('admin.users.groups.index')->with('error', 'You are not authorized to delete user groups.');
+	    return redirect()->route('admin.users.groups.index')->with('error', __('messages.groups.delete_not_auth'));
 	}
 
         return $next($request);

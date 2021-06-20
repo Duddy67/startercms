@@ -207,23 +207,23 @@ trait RolesPermissions
 	}
 
 	if (!empty($invalidNames)) {
-	    $request->session()->flash('error', 'The permission names: "'.implode(', ', $invalidNames).'" are invalid.');
+	    $request->session()->flash('error', __('messages.permissions.invalid_permission_names', ['names' => implode(', ', $invalidNames)]));
 	    return;
 	}
 
 	if ($rebuild) {
 	    if ($this->setPermissions($request)) {
-		$request->session()->flash('success', $count.' permissions have been successfully rebuilt.');
+		$request->session()->flash('success', __('messages.permissions.rebuild_success', ['number' => $count]));
 	    }
 
 	    return;
 	}
 
 	if ($count) {
-	    $request->session()->flash('success', $count.' permission(s) successfully updated.');
+	    $request->session()->flash('success', __('messages.permissions.build_success', ['number' => $count]));
 	}
 	else {
-	    $request->session()->flash('info', 'No new permissions have been added.');
+	    $request->session()->flash('info', __('messages.permissions.no_new_permissions'));
 	}
     }
 
@@ -242,7 +242,7 @@ trait RolesPermissions
 			    $role->givePermissionTo($permission->name);
 			}
 			catch (\Exception $e) {
-			    $request->session()->flash('error', '"'.$role.'" role doesn\'t exist.');
+			    $request->session()->flash('error', __('messages.permissions.role_does_not_exist', ['name' => $role]));
 			    return false;
 			}
 		    }
