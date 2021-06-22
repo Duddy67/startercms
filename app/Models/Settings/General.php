@@ -5,6 +5,8 @@ use Request;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+
 
 class General extends Model
 {
@@ -80,6 +82,18 @@ class General extends Model
 	return $options;
     }
 
+    public static function getTimezoneOptions()
+    {
+        $timezoneIdentifiers = \DateTimeZone::listIdentifiers();
+	$options = [];
+
+	foreach ($timezoneIdentifiers as $identifier) {
+	    $options[] = ['value' => $identifier, 'text' => $identifier];
+	}
+
+	return $options;
+    }
+
     /*
      * Generic function that returns model values which are handled by select inputs. 
      */
@@ -88,5 +102,17 @@ class General extends Model
         if ($fieldName == 'per_page') {
 	    return $this->where(['group' => 'pagination', 'key' => 'per_page'])->pluck('value')->first();
 	}
+    }
+
+    public static function getAppSettings()
+    {
+        $data = DB::table('settings_general')->where('group', 'app')->get();
+	$settings = [];
+
+	foreach ($data as $row) {
+	    $settings['app.'.$row->key] = $row->value;
+	}
+
+	return $settings;
     }
 }

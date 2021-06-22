@@ -1,14 +1,22 @@
 [
   {
-    "label": "Name",
+    "label": "labels.settings.name",
     "type": "text",
     "name": "name",
     "id": "name",
-    "group": "website",
+    "group": "app",
     "placeholder": "Name"
   },
   {
-    "label": "Per page",
+    "label": "labels.settings.timezone",
+    "type": "select",
+    "name": "timezone",
+    "id": "timezone",
+    "group": "app",
+    "options": [] 
+  },
+  {
+    "label": "labels.settings.per_page",
     "type": "select",
     "name": "per_page",
     "id": "per-page",

@@ -8,10 +8,11 @@ use Illuminate\Validation\Rule;
 use App\Models\Users\User;
 use Illuminate\Support\Facades\Hash;
 use App\Traits\Admin\ItemConfig;
+use App\Traits\Email;
 
 class UserController extends Controller
 {
-    use ItemConfig;
+    use ItemConfig, Email;
 
     /*
      * Instance of the model.
@@ -162,6 +163,8 @@ class UserController extends Controller
 	if ($request->input('groups') !== null) {
 	    $user->groups()->attach($request->input('groups'));
 	}
+
+	$this->sendRegistrationNotification($user);
 
 	$query = $request->query();
 

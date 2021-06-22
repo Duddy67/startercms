@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Settings\General;
 use App\Traits\Admin\ItemConfig;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Artisan;
+use Cache;
 
 class GeneralController extends Controller
 {
@@ -26,6 +30,7 @@ class GeneralController extends Controller
      */
     protected $pluginName = 'Settings';
 
+    protected $app = ['name', 'timezone', 'env', 'debug', 'local', 'fallback_locale'];
 
     /**
      * Create a new controller instance.
@@ -63,14 +68,29 @@ class GeneralController extends Controller
     public function update(Request $request)
     {
         $post = $request->except('_token', '_method');
+	$this->truncateSettings();
 
 	foreach ($post as $group => $params) {
 	  foreach ($params as $key => $value) {
-	      General::updateOrCreate(['group' => $group, 'key' => $key], ['value' => $value]);
+	      General::create(['group' => $group, 'key' => $key, 'value' => $value]);
 	  }
 	}
 
+	if (Cache::has('settings')) {
+	    // Delete the current "settings" variable so the config app parameters will be updated in the Admin middleware.
+	    Cache::forget('settings');
+	}
+
 	return redirect()->route('admin.settings.general.index', $request->query())->with('success', __('messages.general.update_success'));
+    }
+
+    private function truncateSettings()
+    {
+	Schema::disableForeignKeyConstraints();
+	DB::table('settings_general')->truncate();
+	Schema::enableForeignKeyConstraints();
+
+	Artisan::call('cache:clear');
     }
 
     /*
