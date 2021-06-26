@@ -7,9 +7,11 @@
 @php $class = (isset($attribs->class)) ? $attribs->class : '' @endphp
 @php $name = (isset($attribs->name)) ? $attribs->name : null @endphp
 @php $name = ($name && isset($attribs->group)) ? $attribs->group.'['.$name.']' : $name @endphp
+@php $multiple = (isset($attribs->extra) && in_array('multiple', $attribs->extra)) ? 'multiple' : '' @endphp
+@php $multi = ($multiple) ? '[]' : '' @endphp
 
-@if ($attribs->type == 'text' || $attribs->type == 'password' || $attribs->type == 'date')
-    <input  id="{{ $attribs->id }}" {{ $disabled }} 
+@if ($attribs->type == 'text' || $attribs->type == 'password' || $attribs->type == 'date' || $attribs->type == 'file')
+    <input  id="{{ $attribs->id }}" {{ $disabled }} {{ $multiple }} 
 
     @if ($attribs->type == 'date')
 	type="text" class="form-control date {{ $class }}"
@@ -18,7 +20,7 @@
     @endif
 
     @if ($name)
-	name="{{ $name }}"
+	name="{{ $name.$multi }}"
     @endif
 
     @if (isset($attribs->placeholder))
@@ -35,8 +37,6 @@
 
     >
 @elseif ($attribs->type == 'select')
-    @php $multiple = (isset($attribs->extra) && in_array('multiple', $attribs->extra)) ? 'multiple' : '' @endphp
-    @php $multi = ($multiple) ? '[]' : '' @endphp
 
     <select id="{{ $attribs->id }}" class="form-control select2" {{ $multiple }} {{ $disabled }} name="{{ $name.$multi }}"
     @if (isset($attribs->onchange))

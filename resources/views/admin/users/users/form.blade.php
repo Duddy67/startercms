@@ -3,7 +3,12 @@
 @section ('main')
 
     @php $action = (isset($user)) ? route('admin.users.users.update', $queryWithId) : route('admin.users.users.store', $query) @endphp
-    <form method="post" action="{{ $action }}" id="itemForm">
+
+    @if (isset($user) && $photo) 
+        <img src="{{ url('/').$photo->getUrl() }}" >
+    @endif
+
+    <form method="post" action="{{ $action }}" id="itemForm" enctype="multipart/form-data">
         @csrf
 
 	@if (isset($user))

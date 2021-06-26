@@ -9,6 +9,8 @@ use App\Models\Users\User;
 use Illuminate\Support\Facades\Hash;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Email;
+use App\Models\Document;
+
 
 class UserController extends Controller
 {
@@ -84,8 +86,9 @@ class UserController extends Controller
         $actions = $this->getActions('form', $except);
 	$query = $queryWithId = $request->query();
 	$queryWithId['user'] = $id;
+	$photo = $user->documents()->where('field', 'photo')->latest('created_at')->first();
 
-        return view('admin.users.users.form', compact('user', 'fields', 'actions', 'query', 'queryWithId'));
+        return view('admin.users.users.form', compact('user', 'fields', 'actions', 'query', 'queryWithId', 'photo'));
     }
 
     /**
@@ -132,6 +135,11 @@ class UserController extends Controller
 	}
 
 	$user->save();
+
+	if ($document = $this->uploadPhoto($request)) {
+	    $user->documents()->save($document);
+	}
+
 	$query = $request->query();
 
         if ($request->input('_close', null)) {
@@ -165,6 +173,10 @@ class UserController extends Controller
 	}
 
 	$this->sendRegistrationNotification($user);
+
+	if ($document = $this->uploadPhoto($request)) {
+	    $user->documents()->save($document);
+	}
 
 	$query = $request->query();
 
@@ -214,6 +226,18 @@ class UserController extends Controller
 	}
 
 	return redirect()->route('admin.users.users.index', $request->query())->with('success', __('messages.users.delete_list_success', ['number' => count($request->input('ids'))]));
+    }
+
+    private function uploadPhoto($request)
+    {
+        if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
+	    $document = new Document;
+	    $document->upload($request->file('photo'), 'user', 'photo');
+
+	    return $document;
+	}
+
+	return null;
     }
 
     /*

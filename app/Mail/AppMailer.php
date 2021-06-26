@@ -11,8 +11,10 @@ class AppMailer extends Mailable
 {
     use Queueable, SerializesModels;
 
+    /*
+     * Object that stores all of the email information such as subject, from, view etc...
+     */
     public $data;
-    public $template;
 
 
     /**
@@ -23,7 +25,6 @@ class AppMailer extends Mailable
     public function __construct($data)
     {
         $this->data = $data;
-        //$this->template = $template;
     }
 
     /**

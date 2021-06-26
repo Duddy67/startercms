@@ -54,5 +54,11 @@
     "type": "date",
     "name": "updated_at",
     "id": "updated_at"
+  },
+  {
+    "label": "labels.generic.photo",
+    "type": "file",
+    "name": "photo",
+    "id": "photo"
   }
 ]
