@@ -67,9 +67,9 @@ class User extends Authenticatable
 
     public function delete()
     {
-        Document::deleteRelatedFiles($this);
-
+        Document::deleteAttachedFiles($this);
         $this->documents()->delete();
+        $this->groups()->detach();
 
         parent::delete();
     }

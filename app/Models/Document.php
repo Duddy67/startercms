@@ -27,7 +27,7 @@ class Document extends Model
     ];
 
 
-    public function upload($file, $itemType, $fieldName)
+    public function upload($file, $itemType, $fieldName, $public = true)
     {
         $this->item_type = $itemType;
         $this->field = $fieldName;
@@ -35,6 +35,7 @@ class Document extends Model
         $this->file_name = $file->getClientOriginalName();
         $this->file_size = $file->getSize();
         $this->content_type = $file->getMimeType();
+        $this->is_public = $public;
 
 	Storage::disk('local')->putFileAs(
 	    'public',
@@ -45,9 +46,15 @@ class Document extends Model
 	return;
     }
 
-    public static function deleteRelatedFiles($item)
+    public static function deleteAttachedFiles($item)
     {
-	$documents = $item->documents()->pluck('disk_name')->toArray();
+        $documents = [];
+
+	foreach ($item->documents as $document) {
+            $public = ($document->is_public) ? 'public/' : '';
+	    $documents[] = $public.$document->disk_name;
+	}
+
 	Storage::delete($documents);
     }
 

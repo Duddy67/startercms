@@ -197,9 +197,9 @@ class UserController extends Controller
 	    return redirect()->route('admin.users.users.edit', $user->id)->with('error', __('messages.users.delete_user_not_auth'));
 	}
 
-	$user->groups()->detach();
+	//$user->groups()->detach();
 	$name = $user->name;
-	//$user->delete();
+	$user->delete();
 
 	return redirect()->route('admin.users.users.index', $request->query())->with('success', __('messages.users.delete_success', ['name' => $name]));
     }
@@ -220,8 +220,8 @@ class UserController extends Controller
 		    return redirect()->route('admin.users.users.index')->with('error', __('messages.users.delete_list_not_auth', ['name' => $user->name]));
 		}
 
-		$user->groups()->detach();
-		//$user->delete();
+		//$user->groups()->detach();
+		$user->delete();
 	    }
 	}
 
