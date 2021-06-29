@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\Users\RoleController;
 use App\Http\Controllers\Admin\Users\PermissionController;
 use App\Http\Controllers\Admin\Users\GroupController;
 use App\Http\Controllers\Admin\Settings\GeneralController;
+use App\Http\Controllers\DocumentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +33,9 @@ Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::get('/document', [DocumentController::class, 'index'])->name('document');
+Route::post('/document', [DocumentController::class, 'upload']);
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');

@@ -85,6 +85,25 @@
     @if (isset($attribs->position) && $attribs->position == 'right')
 	<label class="form-check-label" for="{{ $attribs->id }}">{{ $attribs->label }}</label>
     @endif
+@elseif ($attribs->type == 'textarea')
+    <textarea id="{{ $attribs->id }}" class="form-control"
+
+    @if ($name)
+	name="{{ $name }}"
+    @endif
+
+    @if (isset($attribs->rows))
+        rows="{{ $attribs->rows }}"
+    @endif
+
+    @if (isset($attribs->cols))
+        cols="{{ $attribs->cols}}"
+    @endif
+    >
+	@if (isset($attribs->content))
+	    {{ $attribs->content }}
+	@endif
+    </textarea>
 @endif
 
 @if ($name)

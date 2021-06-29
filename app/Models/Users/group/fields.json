@@ -17,5 +17,11 @@
     "type": "date",
     "name": "updated_at",
     "id": "updated_at"
+  },
+  {
+    "label": "Editor",
+    "type": "textarea",
+    "name": "texteditor",
+    "id": "texteditor"
   }
 ]

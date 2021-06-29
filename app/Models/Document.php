@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 
 class Document extends Model
@@ -44,6 +45,19 @@ class Document extends Model
 	);
 
 	return;
+    }
+
+    public static function getUserFiles($user = null)
+    {
+	$user = ($user) ? $user : auth()->user();
+	$files = DB::table('documents')->where(['item_type' => 'user', 'item_id' => $user->id, 'is_public' => 1])->get();
+
+	// Set the file url.
+	foreach ($files as $key => $file) {
+	    $files[$key]->url = url('/').'/storage/'.$file->disk_name;
+	}
+
+	return $files;
     }
 
     public static function deleteAttachedFiles($item)
