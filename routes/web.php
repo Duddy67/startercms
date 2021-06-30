@@ -34,8 +34,9 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/document', [DocumentController::class, 'index'])->name('document');
-Route::post('/document', [DocumentController::class, 'upload']);
+Route::get('/documents', [DocumentController::class, 'index'])->name('documents.index');
+Route::post('/documents', [DocumentController::class, 'upload']);
+Route::delete('/documents', [DocumentController::class, 'destroy'])->name('documents.destroy');
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');

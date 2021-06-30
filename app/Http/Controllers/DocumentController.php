@@ -3,10 +3,29 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Document;
+use App\Models\Cms\Document;
+use App\Traits\Admin\ItemConfig;
 
 class DocumentController extends Controller
 {
+    use ItemConfig;
+
+    /*
+     * Instance of the model.
+     */
+    protected $model;
+
+    /*
+     * Name of the model.
+     */
+    protected $modelName = 'document';
+
+    /*
+     * Name of the plugin.
+     */
+    protected $pluginName = 'cms';
+
+
     /**
      * Create a new controller instance.
      *
@@ -15,6 +34,7 @@ class DocumentController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+	$this->model = new Document;
     }
 
     /**
@@ -24,9 +44,16 @@ class DocumentController extends Controller
      */
     public function index(Request $request)
     {
-        $files = Document::getUserFiles();
+        $columns = $this->getColumns();
+        //$actions = $this->getActions('list');
+        $filters = $this->getFilters($request);
+	$items = $this->model->getItems($request);
+	$rows = $this->getRows($columns, $items);
+	$query = $request->query();
+//file_put_contents('debog_file.txt', print_r($rows, true));
+	$url = ['route' => 'documents', 'item_name' => 'document', 'query' => $query];
 
-        return view('documents.list', compact('files'));
+        return view('documents.list', compact('items', 'columns', 'rows', 'query', 'url', 'filters'));
     }
 
     public function upload(Request $request)
@@ -38,6 +65,17 @@ class DocumentController extends Controller
 	}
 
         file_put_contents('debog_file.txt', print_r($request->all(), true));
-	return redirect()->route('document')->with('success', __('messages.users.update_success'));
+	return redirect()->route('documents.index')->with('success', __('messages.users.update_success'));
     }
+
+    public function destroy(Request $request)
+    {
+	$document = Document::findOrFail($request->input('document_id', null));
+
+	$name = $document->file_name;
+	//$document->delete();
+
+	return redirect()->route('documents.index', $request->query())->with('success', __('messages.users.delete_success', ['name' => $name]));
+    }
+
 }

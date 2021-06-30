@@ -9,7 +9,7 @@ use App\Models\Users\User;
 use Illuminate\Support\Facades\Hash;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Email;
-use App\Models\Document;
+use App\Models\Cms\Document;
 
 
 class UserController extends Controller
@@ -57,8 +57,8 @@ class UserController extends Controller
         $items = $this->model->getItems($request);
 	$rows = $this->getRows($columns, $items, ['roles']);
 	$this->setRowValues($rows, $columns, $items);
-	$url = ['route' => 'admin.users.users', 'item_name' => 'user', 'query' => $request->query()];
 	$query = $request->query();
+	$url = ['route' => 'admin.users.users', 'item_name' => 'user', 'query' => $query];
 
         return view('admin.users.users.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
     }

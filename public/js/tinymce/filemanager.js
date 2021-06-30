@@ -9,7 +9,7 @@ tinymce.init({
 	    onAction: function () {
 		editor.windowManager.openUrl({
 		    title: 'URL Dialog Demo',
-		    url: 'https://codalia.dubya.net/starter/public/document',
+		    url: 'https://codalia.dubya.net/starter/public/documents',
 		    buttons: [
 			{
 			    type: "custom",
@@ -25,7 +25,7 @@ tinymce.init({
 			}
 		    ],
 		    height: 640,
-		    width: 640
+		    width: 1840
 		});
 	    }
 	});

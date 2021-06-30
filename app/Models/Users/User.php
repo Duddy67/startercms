@@ -10,7 +10,7 @@ use Spatie\Permission\Traits\HasRoles;
 use App\Traits\Admin\RolesPermissions;
 use Spatie\Permission\Models\Role;
 use App\Models\Users\Group;
-use App\Models\Document;
+use App\Models\Cms\Document;
 use App\Models\Settings\General;
 
 

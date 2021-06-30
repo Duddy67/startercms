@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Cms;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use App\Models\Settings\General;
 
 
 class Document extends Model
@@ -47,7 +48,52 @@ class Document extends Model
 	return;
     }
 
-    public static function getUserFiles($user = null)
+    public function getItems($request)
+    {
+        $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
+        $search = $request->input('search', null);
+        $sortedBy = $request->input('sorted_by', null);
+        $types = $request->input('types', []);
+
+	$query = Document::query();
+	$query->where(['item_type' => 'user', 'item_id' => auth()->user()->id, 'is_public' => 1]);
+
+	if ($search !== null) {
+	    $query->where('file_name', 'like', '%'.$search.'%');
+	}
+
+	if (!empty($types)) {
+	    $query->where('content_type', 'regexp', '^('.implode('|', $types).')');
+	}
+
+	if ($sortedBy !== null) {
+	    preg_match('#^([a-z0-9_]+)_(asc|desc)$#', $sortedBy, $matches);
+	    $query->orderBy($matches[1], $matches[2]);
+	}
+
+        $items = $query->paginate($perPage);
+
+	// Set the file url.
+	foreach ($items as $key => $item) {
+	    $items[$key]->url = url('/').'/storage/'.$item->disk_name;
+	}
+
+	return $items;
+    }
+
+    public function getTypesOptions()
+    {
+        $types = ['image', 'application', 'audio', 'video', 'text', 'font'];
+	$options = [];
+
+	foreach ($types as $type) {
+	    $options[] = ['value' => $type, 'text' => $type];
+	}
+
+	return $options;
+    }
+
+    /*public static function getUserFiles($user = null)
     {
 	$user = ($user) ? $user : auth()->user();
 	$files = DB::table('documents')->where(['item_type' => 'user', 'item_id' => $user->id, 'is_public' => 1])->get();
@@ -58,7 +104,7 @@ class Document extends Model
 	}
 
 	return $files;
-    }
+    }*/
 
     public static function deleteAttachedFiles($item)
     {

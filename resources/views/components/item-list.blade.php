@@ -22,7 +22,7 @@
 		    </div>
 		</td>
 		@foreach ($columns as $column)
-		    <td>{{ $row[$column->id] }}</td>
+		    <td>{{ $row[$column->name] }}</td>
 		@endforeach
 	    </tr>
         @endforeach

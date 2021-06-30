@@ -53,8 +53,8 @@ class GroupController extends Controller
         $filters = $this->getFilters($request);
 	$items = $this->model->getItems($request);
 	$rows = $this->getRows($columns, $items);
-	$url = ['route' => 'admin.users.groups', 'item_name' => 'group', 'query' => $request->query()];
 	$query = $request->query();
+	$url = ['route' => 'admin.users.groups', 'item_name' => 'group', 'query' => $query];
 
         return view('admin.users.groups.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
     }
