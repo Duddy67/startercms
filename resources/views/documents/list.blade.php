@@ -25,7 +25,6 @@
 	<table id="item-list" class="table table-hover table-striped">
 	    <thead class="table-success">
 		<th scope="col">
-		    <input type="checkbox" id="toggle-select">
 		</th>
 		@foreach ($columns as $key => $column)
 		    <th scope="col">
@@ -45,15 +44,22 @@
 		    <tr class="" >
 			<td>
 			    <div class="form-check">
-				<input type="checkbox" class="form-check-input" data-item-id={{ $row['item_id'] }} data-index="{{ $i }}">
+			    @if (preg_match('#^image\/#', $items[$i]->content_type))
+				<a href="#" onmouseover="document.getElementById('place-holder-{{ $items[$i]->id }}').src='{{ $items[$i]->thumbnail }}';" onmouseout="document.getElementById('place-holder-{{ $items[$i]->id }}').src='{{ url('/') }}/images/transparent.png';">
+                                  <i class="nav-icon fas fa-eye"></i>
+                                </a>
+				  <img src="{{ url('/') }}/images/transparent.png" id="place-holder-{{ $items[$i]->id }}" style="zindex: 100; position: absolute;" />
+			    @else
+				<i class="nav-icon fas fa-eye-slash"></i>
+                            @endif
 			    </div>
 			</td>
 			@foreach ($columns as $column)
 			    @if ($column->name == 'file_name')
 				<td>
                                     <a href="#" onClick="selectFile(this);" data-disk-name="{{ $items[$i]->disk_name }}" data-file-name="{{ $items[$i]->file_name }}" data-file-url="{{ $items[$i]->url }}">
-                                {{ $row[$column->name] }}</td>
-                                    </a>
+				{{ $row[$column->name] }}</a>
+                                </td>
 			    @else
 				<td>{{ $row[$column->name] }}</td>
                             @endif

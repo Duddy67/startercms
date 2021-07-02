@@ -42,6 +42,10 @@ return [
         'edit_not_auth' => 'You are not authorised to edit groups.',
         'delete_not_auth' => 'You are not authorised to delete groups.',
     ],
+    'documents' => [
+        'create_success' => 'Document successfully created.',
+        'delete_success' => 'The document ":name" has been successfully deleted.',
+    ],
     'general' => [
         'update_success' => 'Parameters successfully saved.',
     ],

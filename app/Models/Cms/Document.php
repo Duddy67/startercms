@@ -38,12 +38,14 @@ class Document extends Model
         $this->file_size = $file->getSize();
         $this->content_type = $file->getMimeType();
         $this->is_public = $public;
+	$path = ($public) ? 'public' : 'uploads';
 
-	Storage::disk('local')->putFileAs(
-	    'public',
-	    $file,
-	    $this->disk_name
-	);
+	Storage::disk('local')->putFileAs($path, $file, $this->disk_name);
+
+	if (preg_match('#^image\/#', $this->content_type)) {
+	    $imagePath = Storage::disk('local')->path(null).$path;
+	    $this->createThumbnail($imagePath);
+	}
 
 	return;
     }
@@ -76,6 +78,9 @@ class Document extends Model
 	// Set the file url.
 	foreach ($items as $key => $item) {
 	    $items[$key]->url = url('/').'/storage/'.$item->disk_name;
+	    if (preg_match('#^image\/#', $item->content_type)) {
+		$items[$key]->thumbnail = url('/').'/storage/thumbnails/'.$item->disk_name;
+	    }
 	}
 
 	return $items;
@@ -93,29 +98,18 @@ class Document extends Model
 	return $options;
     }
 
-    /*public static function getUserFiles($user = null)
+    public function delete()
     {
-	$user = ($user) ? $user : auth()->user();
-	$files = DB::table('documents')->where(['item_type' => 'user', 'item_id' => $user->id, 'is_public' => 1])->get();
+        // Removes the file from the server.
+	$path = ($this->is_public) ? 'public/' : 'uploads/';
+	Storage::delete($path.$this->disk_name);
 
-	// Set the file url.
-	foreach ($files as $key => $file) {
-	    $files[$key]->url = url('/').'/storage/'.$file->disk_name;
+	if (preg_match('#^image\/#', $this->content_type)) {
+	    Storage::delete($path.'thumbnails/'.$this->disk_name);
 	}
 
-	return $files;
-    }*/
-
-    public static function deleteAttachedFiles($item)
-    {
-        $documents = [];
-
-	foreach ($item->documents as $document) {
-            $public = ($document->is_public) ? 'public/' : '';
-	    $documents[] = $public.$document->disk_name;
-	}
-
-	Storage::delete($documents);
+	// Then deletes the model.
+        parent::delete();
     }
 
     public function getUrl()
@@ -126,5 +120,28 @@ class Document extends Model
     public function getPath()
     {
         return Storage::path($this->disk_name);
+    }
+
+    private function createThumbnail($imagePath, $thumbWidth = 100)
+    {
+        // Set the name of the PHP functions to use according to the image extension (ie: imagecreatefromjpeg(), imagegif()... ).
+        $extension = strtolower(pathinfo($imagePath.'/'.$this->disk_name, PATHINFO_EXTENSION));
+        $suffixes = ['jpg' => 'jpeg', 'jpeg' => 'jpeg', 'png' => 'png', 'gif' => 'gif', 'bmp' => 'wbmp'];
+	$imagecreatefrom = 'imagecreatefrom'.$suffixes[$extension];
+	$image = 'image'.$suffixes[$extension];
+
+	// source: https://code.tutsplus.com/tutorials/how-to-create-a-thumbnail-image-in-php--cms-36421
+        $sourceImage = $imagecreatefrom($imagePath.'/'.$this->disk_name);
+        $orgWidth = imagesx($sourceImage);
+        $orgHeight = imagesy($sourceImage);
+        $thumbHeight = floor($orgHeight * ($thumbWidth / $orgWidth));
+        $destImage = imagecreatetruecolor($thumbWidth, $thumbHeight);
+        imagecopyresampled($destImage, $sourceImage, 0, 0, 0, 0, $thumbWidth, $thumbHeight, $orgWidth, $orgHeight);
+	// Store the file in the thumbnails directory as the original file name.
+        $image($destImage, $imagePath.'/thumbnails/'.$this->disk_name);
+        imagedestroy($sourceImage);
+        imagedestroy($destImage);
+
+	return;
     }
 }
