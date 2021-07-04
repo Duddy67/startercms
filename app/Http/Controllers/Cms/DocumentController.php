@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Cms;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Cms\Document;
 use App\Traits\Admin\ItemConfig;
@@ -45,15 +46,14 @@ class DocumentController extends Controller
     public function index(Request $request)
     {
         $columns = $this->getColumns();
-        //$actions = $this->getActions('list');
         $filters = $this->getFilters($request);
 	$items = $this->model->getItems($request);
 	$rows = $this->getRows($columns, $items);
 	$query = $request->query();
 
-	$url = ['route' => 'documents', 'item_name' => 'document', 'query' => $query];
+	$url = ['route' => 'cms.documents', 'item_name' => 'document', 'query' => $query];
 
-        return view('documents.list', compact('items', 'columns', 'rows', 'query', 'url', 'filters'));
+        return view('cms.documents.list', compact('items', 'columns', 'rows', 'query', 'url', 'filters'));
     }
 
     public function upload(Request $request)
@@ -64,8 +64,7 @@ class DocumentController extends Controller
 	    auth()->user()->documents()->save($document);
 	}
 
-        //file_put_contents('debog_file.txt', print_r($request->all(), true));
-	return redirect()->route('documents.index')->with('success', __('messages.users.update_success'));
+	return redirect()->route('cms.documents.index')->with('success', __('messages.documents.create_success'));
     }
 
     public function destroy(Request $request)
@@ -75,7 +74,7 @@ class DocumentController extends Controller
 	$name = $document->file_name;
 	$document->delete();
 
-	return redirect()->route('documents.index', $request->query())->with('success', __('messages.documents.delete_success', ['name' => $name]));
+	return redirect()->route('cms.documents.index', $request->query())->with('success', __('messages.documents.delete_success', ['name' => $name]));
     }
 
 }

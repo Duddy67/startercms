@@ -75,12 +75,16 @@ class Document extends Model
 
         $items = $query->paginate($perPage);
 
-	// Set the file url.
 	foreach ($items as $key => $item) {
+	    // Set the file url.
 	    $items[$key]->url = url('/').'/storage/'.$item->disk_name;
+
+	    // Set the thumbnail url for images. 
 	    if (preg_match('#^image\/#', $item->content_type)) {
 		$items[$key]->thumbnail = url('/').'/storage/thumbnails/'.$item->disk_name;
 	    }
+
+	    $items[$key]->file_size = $this->formatSizeUnits($items[$key]->file_size);
 	}
 
 	return $items;
@@ -100,11 +104,12 @@ class Document extends Model
 
     public function delete()
     {
-        // Removes the file from the server.
+        // Removes the file(s) from the server.
 	$path = ($this->is_public) ? 'public/' : 'uploads/';
 	Storage::delete($path.$this->disk_name);
 
 	if (preg_match('#^image\/#', $this->content_type)) {
+	    // Remove the corresponding thumbnail.
 	    Storage::delete($path.'thumbnails/'.$this->disk_name);
 	}
 
@@ -122,6 +127,30 @@ class Document extends Model
         return Storage::path($this->disk_name);
     }
 
+    public function formatSizeUnits($bytes)
+    {
+        if ($bytes >= 1073741824) {
+            $bytes = number_format($bytes / 1073741824, 2) . ' GB';
+        }
+        elseif ($bytes >= 1048576) {
+            $bytes = number_format($bytes / 1048576, 2) . ' MB';
+        }
+        elseif ($bytes >= 1024) {
+            $bytes = number_format($bytes / 1024, 2) . ' KB';
+        }
+        elseif ($bytes > 1) {
+            $bytes = $bytes . ' bytes';
+        }
+        elseif ($bytes == 1) {
+            $bytes = $bytes . ' byte';
+        }
+        else {
+            $bytes = '0 bytes';
+        }
+
+        return $bytes;
+    }
+
     private function createThumbnail($imagePath, $thumbWidth = 100)
     {
         // Set the name of the PHP functions to use according to the image extension (ie: imagecreatefromjpeg(), imagegif()... ).
@@ -137,7 +166,7 @@ class Document extends Model
         $thumbHeight = floor($orgHeight * ($thumbWidth / $orgWidth));
         $destImage = imagecreatetruecolor($thumbWidth, $thumbHeight);
         imagecopyresampled($destImage, $sourceImage, 0, 0, 0, 0, $thumbWidth, $thumbHeight, $orgWidth, $orgHeight);
-	// Store the file in the thumbnails directory as the original file name.
+	// Store the file in the thumbnail directory as the original file name.
         $image($destImage, $imagePath.'/thumbnails/'.$this->disk_name);
         imagedestroy($sourceImage);
         imagedestroy($destImage);

@@ -12,7 +12,7 @@ use App\Http\Controllers\Admin\Users\RoleController;
 use App\Http\Controllers\Admin\Users\PermissionController;
 use App\Http\Controllers\Admin\Users\GroupController;
 use App\Http\Controllers\Admin\Settings\GeneralController;
-use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\Cms\DocumentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,9 +34,9 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/documents', [DocumentController::class, 'index'])->name('documents.index');
-Route::post('/documents', [DocumentController::class, 'upload']);
-Route::delete('/documents', [DocumentController::class, 'destroy'])->name('documents.destroy');
+Route::get('/cms/documents', [DocumentController::class, 'index'])->name('cms.documents.index');
+Route::post('/cms/documents', [DocumentController::class, 'upload']);
+Route::delete('/cms/documents', [DocumentController::class, 'destroy'])->name('cms.documents.destroy');
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');

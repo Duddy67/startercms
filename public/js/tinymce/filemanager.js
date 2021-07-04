@@ -5,35 +5,35 @@ tinymce.init({
     height: 300,
     setup: function (editor) {
 	editor.ui.registry.addButton('urldialog', {
-	    icon: 'code-sample',
+	    icon: 'browse',
 	    onAction: function () {
 		editor.windowManager.openUrl({
-		    title: 'URL Dialog Demo',
-		    url: 'https://codalia.dubya.net/starter/public/documents',
+		    title: 'File Manager',
+		    url: 'https://codalia.dubya.net/starter/public/cms/documents',
 		    buttons: [
-			{
-			    type: "custom",
-			    name: "insert-and-close",
-			    text: "Insert and Close",
-			    primary: true,
-			    align: "end"
-			},
 			{
 			    type: "cancel",
 			    name: "cancel",
 			    text: "Close Dialog"
 			}
 		    ],
-		    height: 640,
-		    width: 1840
+		    height: 740,
+		    width: 1240
 		});
 	    }
 	});
 
 	editor.addCommand("iframeCommand", function(ui, value) {
-	    editor.insertContent(
-		`<img src="${value.file_url}" alt=" ${ value.file_name }">`
-	    );
+	    if (value.content_type.startsWith('image')) {
+		editor.insertContent(
+		    `<img src="${value.file_url}" alt="${value.file_name}">`
+		);
+	    }
+	    else {
+		editor.insertContent(
+		    `<a target="_blank" href="${value.file_url}">${value.file_name}</a>`
+		);
+	    }
 	});
     },
 
