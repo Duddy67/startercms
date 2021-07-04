@@ -38,6 +38,10 @@ Route::get('/cms/documents', [DocumentController::class, 'index'])->name('cms.do
 Route::post('/cms/documents', [DocumentController::class, 'upload']);
 Route::delete('/cms/documents', [DocumentController::class, 'destroy'])->name('cms.documents.destroy');
 
+Route::get('/expired', function () {
+    return view('cms.documents.expired');
+})->name('expired');
+
 Route::middleware(['guest'])->group(function () {
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);

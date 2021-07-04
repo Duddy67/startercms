@@ -73,8 +73,14 @@ class DocumentController extends Controller
 
 	$name = $document->file_name;
 	$document->delete();
+	$query = $request->query();
 
-	return redirect()->route('cms.documents.index', $request->query())->with('success', __('messages.documents.delete_success', ['name' => $name]));
+        if (isset($query['page'])) {
+	    // Reset pagination to the first page.
+	    $query['page'] = 1;
+	}
+
+	return redirect()->route('cms.documents.index', $query)->with('success', __('messages.documents.delete_success', ['name' => $name]));
     }
 
 }
