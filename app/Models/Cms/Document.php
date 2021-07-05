@@ -4,7 +4,7 @@ namespace App\Models\Cms;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\File;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use App\Models\Settings\General;
@@ -122,6 +122,11 @@ class Document extends Model
         return Storage::url($this->disk_name);
     }
 
+    public function getThumbnailUrl()
+    {
+        return Storage::url('thumbnails/'.$this->disk_name);
+    }
+
     public function getPath()
     {
         return Storage::path($this->disk_name);
@@ -151,6 +156,9 @@ class Document extends Model
         return $bytes;
     }
 
+    /*
+     * Source: https://code.tutsplus.com/tutorials/how-to-create-a-thumbnail-image-in-php--cms-36421
+     */
     private function createThumbnail($imagePath, $thumbWidth = 100)
     {
         // Set the name of the PHP functions to use according to the image extension (ie: imagecreatefromjpeg(), imagegif()... ).
@@ -159,13 +167,18 @@ class Document extends Model
 	$imagecreatefrom = 'imagecreatefrom'.$suffixes[$extension];
 	$image = 'image'.$suffixes[$extension];
 
-	// source: https://code.tutsplus.com/tutorials/how-to-create-a-thumbnail-image-in-php--cms-36421
         $sourceImage = $imagecreatefrom($imagePath.'/'.$this->disk_name);
         $orgWidth = imagesx($sourceImage);
         $orgHeight = imagesy($sourceImage);
         $thumbHeight = floor($orgHeight * ($thumbWidth / $orgWidth));
         $destImage = imagecreatetruecolor($thumbWidth, $thumbHeight);
         imagecopyresampled($destImage, $sourceImage, 0, 0, 0, 0, $thumbWidth, $thumbHeight, $orgWidth, $orgHeight);
+
+	// Create the thumbnails directory if it doesn't exist.
+	if (!File::exists($imagePath.'/thumbnails')) {
+	    File::makeDirectory($imagePath.'/thumbnails', 0755, true, true);
+	}
+
 	// Store the file in the thumbnail directory as the original file name.
         $image($destImage, $imagePath.'/thumbnails/'.$this->disk_name);
         imagedestroy($sourceImage);

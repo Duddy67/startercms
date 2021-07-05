@@ -5,7 +5,7 @@
     @php $action = (isset($user)) ? route('admin.users.users.update', $queryWithId) : route('admin.users.users.store', $query) @endphp
 
     @if (isset($user) && $photo) 
-        <img src="{{ url('/').$photo->getUrl() }}" >
+        <img src="{{ url('/').$photo->getThumbnailUrl() }}" >
     @endif
 
     <form method="post" action="{{ $action }}" id="itemForm" enctype="multipart/form-data">
