@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\Users\RoleController;
 use App\Http\Controllers\Admin\Users\PermissionController;
 use App\Http\Controllers\Admin\Users\GroupController;
 use App\Http\Controllers\Admin\Settings\GeneralController;
+use App\Http\Controllers\Admin\Settings\EmailController;
 use App\Http\Controllers\Cms\DocumentController;
 
 /*
@@ -75,6 +76,9 @@ Route::prefix('admin')->group(function () {
 	Route::prefix('settings')->group(function () {
 	    Route::get('/general', [GeneralController::class, 'index'])->name('admin.settings.general.index');
 	    Route::patch('/general', [GeneralController::class, 'update'])->name('admin.settings.general.update');
+	    // Emails
+	    Route::delete('/emails', [EmailController::class, 'massDestroy'])->name('admin.settings.emails.massDestroy');
+	    Route::resource('emails', EmailController::class, ['as' => 'admin.settings'])->except(['show']);
 	});
     });
 });

@@ -8,13 +8,13 @@ use Illuminate\Validation\Rule;
 use App\Models\Users\User;
 use Illuminate\Support\Facades\Hash;
 use App\Traits\Admin\ItemConfig;
-use App\Traits\Email;
+use App\Models\Settings\Email;
 use App\Models\Cms\Document;
 
 
 class UserController extends Controller
 {
-    use ItemConfig, Email;
+    use ItemConfig;
 
     /*
      * Instance of the model.
@@ -88,6 +88,7 @@ class UserController extends Controller
 	$queryWithId['user'] = $id;
 	$photo = $user->documents()->where('field', 'photo')->latest('created_at')->first();
 
+Email::sendEmail('user_registration', $user);
         return view('admin.users.users.form', compact('user', 'fields', 'actions', 'query', 'queryWithId', 'photo'));
     }
 
@@ -172,7 +173,7 @@ class UserController extends Controller
 	    $user->groups()->attach($request->input('groups'));
 	}
 
-	$this->sendRegistrationNotification($user);
+	Email::sendEmail('user_registration', $user);
 
 	if ($document = $this->uploadPhoto($request)) {
 	    $user->documents()->save($document);

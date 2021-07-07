@@ -1,0 +1,47 @@
+[
+  {
+    "label": "Code",
+    "type": "text",
+    "name": "code",
+    "id": "code",
+    "placeholder": "Code"
+  },
+  {
+    "label": "Subject",
+    "type": "text",
+    "name": "subject",
+    "id": "subject"
+  },
+  {
+    "label": "Format",
+    "type": "select",
+    "name": "format",
+    "id": "format",
+    "options": [] 
+  },
+  {
+    "label": "Created at",
+    "type": "date",
+    "name": "created_at",
+    "id": "created_at"
+  },
+  {
+    "label": "Updated at",
+    "type": "date",
+    "name": "updated_at",
+    "id": "updated_at"
+  },
+  {
+    "label": "Body HTML",
+    "type": "textarea",
+    "name": "body_html",
+    "id": "texteditor"
+  },
+  {
+    "label": "Body Text",
+    "type": "textarea",
+    "name": "body_text",
+    "id": "bodytext",
+    "rows": "15"
+  }
+]

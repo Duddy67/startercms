@@ -1,8 +1,10 @@
 
 tinymce.init({
     selector: '#texteditor',
-    toolbar: 'urldialog',
+    plugins: 'code',
+    toolbar: 'urldialog|code',
     height: 300,
+    convert_urls: false,
     setup: function (editor) {
 	editor.ui.registry.addButton('urldialog', {
 	    icon: 'browse',

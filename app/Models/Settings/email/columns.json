@@ -1,0 +1,31 @@
+[
+  {
+    "label": "ID",
+    "name": "id",
+    "extra": ["sortable"],
+    "type": "string"
+  },
+  {
+    "label": "Code",
+    "name": "code",
+    "extra": ["sortable"],
+    "type": "string"
+  },
+  {
+    "label": "Subject",
+    "name": "subject",
+    "type": "string"
+  },
+  {
+    "label": "Created at",
+    "name": "created_at",
+    "id": "created_at",
+    "type": "date"
+  },
+  {
+    "label": "Updated at",
+    "name": "updated_at",
+    "id": "updated_at",
+    "type": "date"
+  }
+]

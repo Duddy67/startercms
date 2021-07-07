@@ -101,7 +101,6 @@ class GroupController extends Controller
 	$group->name = $request->input('name');
 	$group->save();
 
-	$message = 'User group successfully updated.';
 	$query = $request->query();
 
         if ($request->input('_close', null)) {

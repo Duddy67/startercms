@@ -266,10 +266,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			<x-menu-item href="{{ route('admin.settings.general.index') }}" :sub=true :active="$active">
 			  General
 			</x-menu-item>
-			<x-menu-item href="#" :sub=true :active=false>
-			  Security
-			</x-menu-item>
-			<x-menu-item href="#" :sub=true :active=false>
+			@php $active = (request()->is('admin/settings/emails*')) ? true : false @endphp
+			<x-menu-item href="{{ route('admin.settings.emails.index') }}" :sub=true :active="$active">
 			  Email
 			</x-menu-item>
 		  </ul>

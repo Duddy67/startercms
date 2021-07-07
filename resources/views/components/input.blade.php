@@ -99,11 +99,8 @@
     @if (isset($attribs->cols))
         cols="{{ $attribs->cols}}"
     @endif
-    >
-	@if (isset($attribs->content))
-	    {{ $attribs->content }}
-	@endif
-    </textarea>
+    >{{ $value }}</textarea>
+    
 @endif
 
 @if ($name)
