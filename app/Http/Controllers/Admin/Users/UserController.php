@@ -88,7 +88,7 @@ class UserController extends Controller
 	$queryWithId['user'] = $id;
 	$photo = $user->documents()->where('field', 'photo')->latest('created_at')->first();
 
-Email::sendEmail('user_registration', $user);
+//Email::sendEmail('forgotten_password', $user);
         return view('admin.users.users.form', compact('user', 'fields', 'actions', 'query', 'queryWithId', 'photo'));
     }
 

@@ -147,6 +147,17 @@ class User extends Authenticatable
 	return $options;
     }
 
+    public function getThumbnail()
+    {
+        $document = Document::where(['item_type' => 'user', 'field' => 'photo', 'item_id' => $this->id])->orderBy('created_at', 'desc')->first();
+
+	if ($document) {
+	    return $document->getThumbnailUrl();
+	}
+
+	return '/images/user.png';
+    }
+
     /*
      * Generic function that returns model values which are handled by select inputs. 
      */

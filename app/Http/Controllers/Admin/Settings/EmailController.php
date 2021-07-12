@@ -36,7 +36,7 @@ class EmailController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        //$this->middleware('admin.settings.emails');
+        $this->middleware('admin.settings.emails');
 	$this->model = new Email;
     }
 
@@ -126,10 +126,13 @@ class EmailController extends Controller
 	    ],
 	]);*/
 
+	$plainText = ($request->input('format') == 'plain_text') ? 1 : 0;
+
 	$email = Email::create(['code' => $request->input('code'),
 				'subject' => $request->input('subject'),
 				'body_html' => $request->input('body_html'),
 				'body_text' => $request->input('body_text'),
+				'plain_text' => $plainText,
 	]);
 
 	$query = $request->query();
@@ -153,7 +156,7 @@ class EmailController extends Controller
 	    return;
 	}
 
-	return redirect()->route('admin.settings.emails.index', $request->query())->with('success', __('messages.emails.delete_success', ['name' => $name]));
+	return redirect()->route('admin.settings.emails.index', $request->query())->with('success', __('messages.emails.delete_success', ['name' => $code]));
     }
 
     public function massDestroy(Request $request)

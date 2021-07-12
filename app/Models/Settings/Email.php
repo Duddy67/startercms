@@ -103,7 +103,7 @@ class Email extends Model
 
     public static function parseSubject($subject, $data)
     {
-        if (preg_match_all('#{{.+}}#U', $subject, $matches)) {
+        if (preg_match_all('#{{\s?\$[a-z0-9_]+\s?}}#U', $subject, $matches)) {
 	    $results = $matches[0];
 	    $patterns = $replacements = [];
 

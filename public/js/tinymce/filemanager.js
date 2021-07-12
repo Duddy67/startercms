@@ -3,7 +3,7 @@ tinymce.init({
     selector: '#texteditor',
     plugins: 'code',
     toolbar: 'urldialog|code',
-    height: 300,
+    height: 500,
     convert_urls: false,
     setup: function (editor) {
 	editor.ui.registry.addButton('urldialog', {

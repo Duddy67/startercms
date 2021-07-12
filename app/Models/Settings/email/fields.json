@@ -32,13 +32,11 @@
     "id": "updated_at"
   },
   {
-    "label": "Body HTML",
     "type": "textarea",
     "name": "body_html",
     "id": "texteditor"
   },
   {
-    "label": "Body Text",
     "type": "textarea",
     "name": "body_text",
     "id": "bodytext",

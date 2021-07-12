@@ -54,6 +54,21 @@
 	"name": "delete-role",
 	"type": "level1",
 	"default": "admin"
+      },
+      {
+	"name": "create-email",
+	"type": "level1",
+	"default": "admin"
+      },
+      {
+	"name": "update-email",
+	"type": "level1",
+	"default": "admin"
+      },
+      {
+	"name": "delete-email",
+	"type": "level1",
+	"default": "admin"
       }
   ],
   "blog": [
