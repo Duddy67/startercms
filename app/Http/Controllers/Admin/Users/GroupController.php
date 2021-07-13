@@ -99,6 +99,7 @@ class GroupController extends Controller
 	]);
 
 	$group->name = $request->input('name');
+	$group->description = $request->input('description');
 	$group->save();
 
 	$query = $request->query();
@@ -122,7 +123,7 @@ class GroupController extends Controller
 	    ],
 	]);
 
-	$group = Group::create(['name' => $request->input('name')]);
+	$group = Group::create(['name' => $request->input('name'), 'description' => $request->input('description')]);
 	$query = $request->query();
 
         if ($request->input('_close', null)) {

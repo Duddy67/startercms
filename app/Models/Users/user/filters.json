@@ -1,13 +1,13 @@
 [
   {
-    "label": "Search",
+    "label": "labels.filter.search",
     "type": "text",
     "name": "search",
     "id": "search",
-    "placeholder": "Search by name"
+    "placeholder": "labels.filter.search_by_name"
   },
   {
-    "label": "Roles",
+    "label": "labels.users.roles",
     "type": "select",
     "name": "roles",
     "extra": ["multiple"],
@@ -15,7 +15,7 @@
     "options": [] 
   },
   {
-    "label": "Groups",
+    "label": "labels.users.groups",
     "type": "select",
     "name": "groups",
     "extra": ["multiple"],
@@ -23,19 +23,19 @@
     "options": [] 
   },
   {
-    "label": "Sorted by",
+    "label": "labels.filter.sorted_by",
     "type": "select",
     "name": "sorted_by",
     "id": "filters-sortedBy",
-    "blank": "- Select -",
+    "blank": "labels.generic.select_option",
     "options": [] 
   },
   {
-    "label": "Per page",
+    "label": "labels.filter.per_page",
     "type": "select",
     "name": "per_page",
     "id": "filters-perPage",
-    "blank": "- Select -",
+    "blank": "labels.generic.select_option",
     "options": [] 
   }
 ]

@@ -6,12 +6,12 @@
 		<x-input :attribs="$filter" :value="$filter->value" />
 
 		@if ($filter->name == 'search') 
-		    <button type="button" id="search-btn" class="btn btn-space btn-secondary"> Search</button>
-		    <button type="button" id="clear-search-btn" class="btn btn-space btn-secondary"> Clear</button>
+		    <button type="button" id="search-btn" class="btn btn-space btn-secondary">@lang ($filter->label)</button>
+		    <button type="button" id="clear-search-btn" class="btn btn-space btn-secondary">@lang ('labels.button.clear')</button>
 		@endif
 
 		@if ($total == ($key + 1)) 
-		    <button type="button" id="clear-all-btn" class="btn btn-space btn-secondary"> Clear all</button>
+		    <button type="button" id="clear-all-btn" class="btn btn-space btn-secondary">@lang ('labels.button.clear_all')</button>
 		@endif
 	    </div>
 	@endforeach

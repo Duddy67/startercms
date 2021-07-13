@@ -1,27 +1,27 @@
 [
   {
-    "label": "Name",
+    "label": "labels.generic.name",
     "type": "text",
     "name": "name",
     "id": "name",
-    "placeholder": "Name"
+    "placeholder": "labels.generic.name"
   },
   {
-    "label": "Type",
+    "label": "labels.generic.type",
     "type": "text",
     "name": "_role_type",
     "id": "_role_type",
     "extra": ["disabled"],
-    "placeholder": "Unknown"
+    "placeholder": "labels.generic.unknown"
   },
   {
-    "label": "Created at",
+    "label": "labels.generic.created_at",
     "type": "date",
     "name": "created_at",
     "id": "created_at"
   },
   {
-    "label": "Updated at",
+    "label": "labels.generic.updated_at",
     "type": "date",
     "name": "updated_at",
     "id": "updated_at"

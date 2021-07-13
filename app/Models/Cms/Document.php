@@ -29,6 +29,13 @@ class Document extends Model
     ];
 
 
+    /*
+     * Stores the file linked to a document model.
+     * @param  Illuminate\Http\UploadedFile  $file
+     * @param  string  $itemType
+     * @param  string  $fieldName
+     * @return void
+     */
     public function upload($file, $itemType, $fieldName, $public = true)
     {
         $this->item_type = $itemType;
@@ -50,6 +57,9 @@ class Document extends Model
 	return;
     }
 
+    /*
+     * Gets the document items according to the filter, sort and pagination settings.
+     */
     public function getItems($request)
     {
         $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
@@ -90,6 +100,9 @@ class Document extends Model
 	return $items;
     }
 
+    /*
+     * Builds the options for the 'types' select field.
+     */
     public function getTypesOptions()
     {
         $types = ['image', 'application', 'audio', 'video', 'text', 'font'];
@@ -102,14 +115,17 @@ class Document extends Model
 	return $options;
     }
 
+    /*
+     * Override.
+     */
     public function delete()
     {
-        // Removes the file(s) from the server.
+        // Removes the file from the server.
 	$path = ($this->is_public) ? 'public/' : 'uploads/';
 	Storage::delete($path.$this->disk_name);
 
 	if (preg_match('#^image\/#', $this->content_type)) {
-	    // Remove the corresponding thumbnail.
+	    // Removes the corresponding thumbnail.
 	    Storage::delete($path.'thumbnails/'.$this->disk_name);
 	}
 
@@ -117,21 +133,34 @@ class Document extends Model
         parent::delete();
     }
 
+    /*
+     * Returns a relative url to the file linked to the document.
+     */
     public function getUrl()
     {
         return Storage::url($this->disk_name);
     }
 
+    /*
+     * Returns a relative url to the thumbnail of the image file linked to the document.
+     */
     public function getThumbnailUrl()
     {
         return Storage::url('thumbnails/'.$this->disk_name);
     }
 
+    /*
+     * Returns the absolute path to the file linked to the document.
+     */
     public function getPath()
     {
         return Storage::path($this->disk_name);
     }
 
+    /*
+     * Returns the given bytes in the proper size format according to the byte units.
+     * @return string
+     */
     public function formatSizeUnits($bytes)
     {
         if ($bytes >= 1073741824) {
@@ -157,6 +186,9 @@ class Document extends Model
     }
 
     /*
+     * Creates a thumbnail for a given image.
+     * @return void
+     *
      * Source: https://code.tutsplus.com/tutorials/how-to-create-a-thumbnail-image-in-php--cms-36421
      */
     private function createThumbnail($imagePath, $thumbWidth = 100)

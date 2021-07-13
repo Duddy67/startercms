@@ -12,7 +12,7 @@
     "type": "text",
     "name": "email",
     "id": "email",
-    "placeholder": "Email"
+    "placeholder": "labels.users.email"
   },
   {
     "label": "labels.users.password",
@@ -31,7 +31,7 @@
     "type": "select",
     "name": "role",
     "id": "role",
-    "blank": "- Select -",
+    "blank": "labels.generic.select_option",
     "options": [] 
   },
   {
@@ -40,7 +40,7 @@
     "name": "groups",
     "extra": ["multiple"],
     "id": "groups",
-    "blank": "- Select -",
+    "blank": "labels.generic.select_option",
     "options": [] 
   },
   {

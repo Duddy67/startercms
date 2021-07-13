@@ -2,45 +2,38 @@
   {
     "label": "labels.generic.id",
     "name": "id",
-    "id": "id",
     "type": "string",
     "extra": ["sortable"]
   },
   {
     "label": "labels.generic.name",
     "name": "name",
-    "id": "name",
     "extra": ["sortable"],
     "type": "string"
   },
   {
     "label": "labels.users.email",
     "name": "email",
-    "id": "email",
     "type": "string"
   },
   {
     "label": "labels.users.role",
     "name": "role",
-    "id": "role",
     "type": "string"
   },
   {
     "label": "labels.users.groups",
     "name": "groups",
-    "id": "groups",
     "type": "string"
   },
   {
     "label": "labels.generic.created_at",
     "name": "created_at",
-    "id": "created_at",
     "type": "date"
   },
   {
     "label": "labels.generic.updated_at",
     "name": "updated_at",
-    "id": "updated_at",
     "type": "date"
   }
 ]

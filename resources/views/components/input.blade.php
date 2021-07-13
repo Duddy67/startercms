@@ -24,7 +24,7 @@
     @endif
 
     @if (isset($attribs->placeholder))
-	placeholder="{{ $attribs->placeholder }}"
+	placeholder="@lang ($attribs->placeholder)"
     @endif
 
     @if ($disabled)
@@ -44,7 +44,7 @@
     @endif
     >
 	@if (isset($attribs->blank))
-	    <option value="">{{ $attribs->blank }}</option>
+	    <option value="">@lang ($attribs->blank)</option>
 	@endif
 
         @foreach ($attribs->options as $option)

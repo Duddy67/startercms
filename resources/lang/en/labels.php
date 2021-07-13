@@ -2,9 +2,19 @@
 
 return [
 
+    'title' => [
+	'users' => 'Users',
+	'groups' => 'Groups',
+	'roles' => 'Roles',
+	'permissions' => 'Permissions',
+	'general' => 'General',
+	'settings' => 'Settings',
+	'emails' => 'Emails',
+    ],
     'users' => [
 	'email' => 'Email',
 	'role' => 'Role',
+	'roles' => 'Roles',
 	'groups' => 'Groups',
 	'password' => 'Password',
 	'confirm_password' => 'Confirm password',
@@ -24,7 +34,16 @@ return [
 	'published_down' => 'Finish publishing',
 	'access' => 'Access',
 	'category' => 'Category',
+	'type' => 'Type',
 	'none' => 'None',
+	'unknown' => 'Unknown',
+	'select_option' => '- Select -',
+    ],
+    'filter' => [
+	'search' => 'Search',
+	'search_by_name' => 'Search by name',
+	'sorted_by' => 'Sorted by',
+	'per_page' => 'Per page',
     ],
     'button' => [
 	'new' => 'New',
@@ -35,6 +54,8 @@ return [
 	'save' => 'Save',
 	'save_close' => 'Save & close',
 	'cancel' => 'Cancel',
+	'update' => 'Update',
+	'rebuild' => 'Rebuild',
     ],
 ];
 

@@ -28,6 +28,9 @@ class Group extends Model
         return $this->belongsToMany(User::class);
     }
 
+    /*
+     * Gets the group items according to the filter, sort and pagination settings.
+     */
     public function getItems($request)
     {
         $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));

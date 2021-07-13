@@ -214,29 +214,29 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		  @php $active = (request()->is('admin/users*')) ? 'active' : '' @endphp
 		  <a href="#" class="nav-link {{ $active }}">
 		    <i class="nav-icon fas fa-users"></i>
-		    <p>Users<i class="right fas fa-angle-left"></i></p>
+		    <p>@lang ('labels.title.users')<i class="right fas fa-angle-left"></i></p>
 		  </a>
 		  <ul class="nav nav-treeview">
 			@php $active = (request()->is('admin/users/users*')) ? true : false @endphp
 			<x-menu-item href="{{ route('admin.users.users.index') }}" :sub=true :active="$active">
-			  Users
+			  @lang ('labels.title.users')
 			</x-menu-item>
 		    @allowto ('create-user-group')
 			@php $active = (request()->is('admin/users/groups*')) ? true : false @endphp
 			<x-menu-item href="{{ route('admin.users.groups.index') }}" :sub=true :active="$active">
-			  Groups
+			  @lang ('labels.title.groups')
 			</x-menu-item>
 		    @endallowto
 		    @allowto ('create-role')
 			@php $active = (request()->is('admin/users/roles*')) ? true : false @endphp
 			<x-menu-item href="{{ route('admin.users.roles.index') }}" :sub=true :active="$active">
-			  Roles
+			  @lang ('labels.title.roles')
 			</x-menu-item>
 		    @endallowto
 		    @allowto ('create-permission')
 			@php $active = (request()->is('admin/users/permissions*')) ? true : false @endphp
 			<x-menu-item href="{{ route('admin.users.permissions.index') }}" :sub=true :active="$active">
-			  Permissions
+			  @lang ('labels.title.permissions')
 			</x-menu-item>
 		    @endallowto
 		  </ul>
@@ -270,16 +270,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		  @php $active = (request()->is('admin/settings*')) ? 'active' : '' @endphp
 		  <a href="#" class="nav-link {{ $active }}">
 		    <i class="nav-icon fas fa-cogs"></i>
-		    <p>Settings<i class="right fas fa-angle-left"></i></p>
+		    <p>@lang ('labels.title.settings')<i class="right fas fa-angle-left"></i></p>
 		  </a>
 		  <ul class="nav nav-treeview">
 			@php $active = (request()->is('admin/settings/general*')) ? true : false @endphp
 			<x-menu-item href="{{ route('admin.settings.general.index') }}" :sub=true :active="$active">
-			  General
+			  @lang ('labels.title.general')
 			</x-menu-item>
 			@php $active = (request()->is('admin/settings/emails*')) ? true : false @endphp
 			<x-menu-item href="{{ route('admin.settings.emails.index') }}" :sub=true :active="$active">
-			  Email
+			  @lang ('labels.title.emails')
 			</x-menu-item>
 		  </ul>
 	      </li>

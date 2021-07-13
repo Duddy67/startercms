@@ -65,10 +65,13 @@ class User extends Authenticatable
         return $this->HasMany(Document::class, 'item_id');
     }
 
+    /*
+     * Override.
+     */
     public function delete()
     {
 	foreach ($this->documents as $document) {
-	    // Ensure the files are removed from the server, (see the Document delete() function).
+	    // Ensure the linked file is removed from the server, (see the Document delete() function).
 	    $document->delete();
 	}
 
@@ -77,6 +80,9 @@ class User extends Authenticatable
         parent::delete();
     }
 
+    /*
+     * Gets the user items according to the filter, sort and pagination settings.
+     */
     public function getItems($request)
     {
         $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
@@ -109,6 +115,9 @@ class User extends Authenticatable
         return $query->paginate($perPage);
     }
 
+    /*
+     * Builds the options for the 'role' select field.
+     */
     public function getRoleOptions($user = null)
     {
 	$roles = auth()->user()->getAssignableRoles($user);
@@ -121,6 +130,9 @@ class User extends Authenticatable
 	return $options;
     }
 
+    /*
+     * Builds the options for the 'groups' select field.
+     */
     public function getGroupsOptions($user = null)
     {
         $groups = Group::all();
@@ -134,7 +146,7 @@ class User extends Authenticatable
     }
 
     /*
-     * Used with filters.
+     * Builds the options for the 'roles' select field, (used with filters).
      */
     public function getRolesOptions()
     {
@@ -145,17 +157,6 @@ class User extends Authenticatable
 	}
 
 	return $options;
-    }
-
-    public function getThumbnail()
-    {
-        $document = Document::where(['item_type' => 'user', 'field' => 'photo', 'item_id' => $this->id])->orderBy('created_at', 'desc')->first();
-
-	if ($document) {
-	    return $document->getThumbnailUrl();
-	}
-
-	return '/images/user.png';
     }
 
     /*
@@ -174,6 +175,24 @@ class User extends Authenticatable
 	return null;
     }
 
+    /*
+     * Returns a relative url to the user's photo thumbnail.
+     */
+    public function getThumbnail()
+    {
+        $document = Document::where(['item_type' => 'user', 'field' => 'photo', 'item_id' => $this->id])->orderBy('created_at', 'desc')->first();
+
+	if ($document) {
+	    return $document->getThumbnailUrl();
+	}
+
+	// Returns a default user image.
+	return '/images/user.png';
+    }
+
+    /*
+     * Checks whether the current user is allowed to update a given user according to their role.
+     */
     public function canUpdate($user)
     {
         if (is_int($user)) {
@@ -189,6 +208,9 @@ class User extends Authenticatable
 	return false;
     }
 
+    /*
+     * Checks whether the current user is allowed to delete a given user according to their role.
+     */
     public function canDelete($user)
     {
         if (is_int($user)) {
