@@ -43,18 +43,31 @@ class PermissionController extends Controller
      */
     public function index()
     {
+        // Gather the needed data to build the permission list.
         $actions = $this->getActions('list');
         $board = $this->getPermissionBoard();
 
         return view('admin.users.permissions.list', compact('board', 'actions'));
     }
 
+    /*
+     * Creates or updates the list.
+     *
+     * @param  Request  $request
+     * @return Response
+     */
     public function build(Request $request)
     {
 	$this->buildPermissions($request);
 	return redirect()->route('admin.users.permissions.index');
     }
 
+    /*
+     * Rebuilds all of the list.
+     *
+     * @param  Request  $request
+     * @return Response
+     */
     public function rebuild(Request $request)
     {
 	$this->buildPermissions($request, true);
@@ -72,6 +85,7 @@ class PermissionController extends Controller
 
 	    foreach ($permissions as $permission) {
 	        $missing = '';
+		// Check for missing permissions.
 		if (Permission::where('name', $permission->name)->first() === null) {
 		    $missing = ' (missing !)';
 		}

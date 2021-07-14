@@ -1,32 +1,32 @@
 [
   {
-    "label": "Code",
+    "label": "labels.generic.code",
     "type": "text",
     "name": "code",
     "id": "code",
-    "placeholder": "Code"
+    "placeholder": "labels.generic.code"
   },
   {
-    "label": "Subject",
+    "label": "labels.emails.subject",
     "type": "text",
     "name": "subject",
     "id": "subject"
   },
   {
-    "label": "Format",
+    "label": "labels.generic.format",
     "type": "select",
     "name": "format",
     "id": "format",
     "options": [] 
   },
   {
-    "label": "Created at",
+    "label": "labels.generic.created_at",
     "type": "date",
     "name": "created_at",
     "id": "created_at"
   },
   {
-    "label": "Updated at",
+    "label": "labels.generic.created_at",
     "type": "date",
     "name": "updated_at",
     "id": "updated_at"

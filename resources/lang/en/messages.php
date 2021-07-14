@@ -51,5 +51,6 @@ return [
     ],
     'generic' => [
         'access_not_auth' => 'You are not authorised to access this resource.',
+        'no_item_selected' => 'No item selected.',
     ]
 ];

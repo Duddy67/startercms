@@ -39,10 +39,12 @@ class RoleController extends Controller
     /**
      * Show the role list.
      *
+     * @param  Request  $request
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function index(Request $request)
     {
+        // Gather the needed data to build the item list.
         $columns = $this->getColumns();
         $actions = $this->getActions('list');
         $filters = $this->getFilters($request);
@@ -54,8 +56,15 @@ class RoleController extends Controller
         return view('admin.users.roles.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
     }
 
+    /**
+     * Show the form for creating a new role.
+     *
+     * @param  Request  $request
+     * @return Response
+     */
     public function create(Request $request)
     {
+        // Gather the needed data to build the form.
         $fields = $this->getFields();
         $actions = $this->getActions('form');
 	$board = $this->getPermissionBoard();
@@ -64,9 +73,17 @@ class RoleController extends Controller
         return view('admin.users.roles.form', compact('fields', 'actions', 'board', 'query'));
     }
 
+    /**
+     * Show the form for editing the specified role.
+     *
+     * @param  Request  $request
+     * @param  int  $id
+     * @return Response
+     */
     public function edit(Request $request, $id)
     {
         $role = Role::findById($id);
+        // Gather the needed data to build the form.
 	$except = (in_array($role->name, $this->getDefaultRoles())) ? ['_role_type'] : [];
         $fields = $this->getFields($role, $except);
 	$this->setFieldValues($fields, $role);
@@ -151,6 +168,12 @@ class RoleController extends Controller
      
     }
 
+    /**
+     * Store a new role.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -192,6 +215,13 @@ class RoleController extends Controller
 	return redirect()->route('admin.users.roles.edit', $query)->with('success', __('messages.roles.create_success'));
     }
 
+    /**
+     * Remove the specified role from storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return Response
+     */
     public function destroy(Request $request, $id)
     {
 	$role = Role::findOrFail($id);
@@ -213,6 +243,12 @@ class RoleController extends Controller
 	return redirect()->route('admin.users.roles.index', $query)->with('success', __('messages.roles.delete_success', ['name' => $name]));
     }
 
+    /**
+     * Remove one or more roles from storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return Response
+     */
     public function massDestroy(Request $request)
     {
         $roles = Role::whereIn('id', $request->input('ids'))->pluck('name')->toArray();
@@ -235,6 +271,9 @@ class RoleController extends Controller
 	return redirect()->route('admin.users.roles.index', $request->query())->with('success', __('messages.roles.delete_list_success', ['number' => count($request->input('ids'))]));
     }
 
+    /*
+     * Builds the permission board.
+     */
     private function getPermissionBoard($role = null)
     {
         // N.B: Only super-admin and users type admin are allowed to manage roles.
@@ -304,6 +343,10 @@ class RoleController extends Controller
 
     /*
      * Sets field values specific to the Role model.
+     *
+     * @param  Array of stdClass Objects  $fields
+     * @param  \App\Models\Users\Role  $role
+     * @return void
      */
     private function setFieldValues(&$fields, $role)
     {

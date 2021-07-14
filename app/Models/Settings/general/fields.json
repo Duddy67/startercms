@@ -5,7 +5,7 @@
     "name": "name",
     "id": "name",
     "group": "app",
-    "placeholder": "Name"
+    "placeholder": "labels.generic.name"
   },
   {
     "label": "labels.settings.timezone",
@@ -21,7 +21,7 @@
     "name": "per_page",
     "id": "per-page",
     "group": "pagination",
-    "blank": "- Select -",
+    "blank": "labels.generic.select_option",
     "options": [] 
   }
 ]

@@ -8,6 +8,9 @@ use App\Models\Settings\General;
 trait ItemConfig
 {
 
+    /*
+     * @return Array of stdClass Objects
+     */  
     public function getColumns()
     {
 	$columns = $this->getData('columns');

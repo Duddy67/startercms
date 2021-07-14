@@ -2,7 +2,7 @@
   "form": [
     {
       "id": "save",
-      "label": "Save",
+      "label": "labels.button.new",
       "type": "button"
     }
   ]

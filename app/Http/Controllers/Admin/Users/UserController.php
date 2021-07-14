@@ -47,10 +47,12 @@ class UserController extends Controller
     /**
      * Show the user list.
      *
+     * @param  Request  $request
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function index(Request $request)
     {
+        // Gather the needed data to build the item list.
         $columns = $this->getColumns();
         $actions = $this->getActions('list');
         $filters = $this->getFilters($request);
@@ -63,8 +65,15 @@ class UserController extends Controller
         return view('admin.users.users.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
     }
 
+    /**
+     * Show the form for creating a new user.
+     *
+     * @param  Request  $request
+     * @return Response
+     */
     public function create(Request $request)
     {
+        // Gather the needed data to build the form.
         $fields = $this->getFields();
         $actions = $this->getActions('form');
 	$query = $request->query();
@@ -72,6 +81,13 @@ class UserController extends Controller
         return view('admin.users.users.form', compact('fields', 'actions', 'query'));
     }
 
+    /**
+     * Show the form for editing the specified user.
+     *
+     * @param  Request  $request
+     * @param  int  $id
+     * @return Response
+     */
     public function edit(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -80,6 +96,7 @@ class UserController extends Controller
 	    return redirect()->route('admin.users.users.index')->with('error', __('messages.users.edit_user_not_auth'));
 	}
 
+        // Gather the needed data to build the form.
         $fields = $this->getFields($user, ['password', 'password_confirmation']);
 	// Users cannot delete their own account.
 	$except = (auth()->user()->id == $user->id) ? ['destroy'] : [];
@@ -88,7 +105,6 @@ class UserController extends Controller
 	$queryWithId['user'] = $id;
 	$photo = $user->documents()->where('field', 'photo')->latest('created_at')->first();
 
-//Email::sendEmail('forgotten_password', $user);
         return view('admin.users.users.form', compact('user', 'fields', 'actions', 'query', 'queryWithId', 'photo'));
     }
 
@@ -152,6 +168,12 @@ class UserController extends Controller
 	return redirect()->route('admin.users.users.edit', $query)->with('success', __('messages.users.update_success'));
     }
 
+    /**
+     * Store a new user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -190,6 +212,13 @@ class UserController extends Controller
 	return redirect()->route('admin.users.users.edit', $query)->with('success', __('messages.users.create_success'));
     }
 
+    /**
+     * Remove the specified user from storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return Response
+     */
     public function destroy(Request $request, $id)
     {
 	$user = User::findOrFail($id);
@@ -204,13 +233,21 @@ class UserController extends Controller
 	return redirect()->route('admin.users.users.index', $request->query())->with('success', __('messages.users.delete_success', ['name' => $name]));
     }
 
+    /**
+     * Remove one or more users from storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return Response
+     */
     public function massDestroy(Request $request)
     {
         if ($request->input('ids') !== null) {
 
+	    // Remove the users selected from the list.
 	    foreach ($request->input('ids') as $key => $id) {
 		$user = User::findOrFail($id);
 
+		// Stop the deletions as soon as the current user is not authorized to delete one of the user in the list.
 		if (!auth()->user()->canDelete($user)) {
 		    // Informs about the users previously deleted.
 		    if ($key > 0) {
@@ -222,11 +259,19 @@ class UserController extends Controller
 
 		$user->delete();
 	    }
+
+	    return redirect()->route('admin.users.users.index', $request->query())->with('success', __('messages.users.delete_list_success', ['number' => count($request->input('ids'))]));
 	}
 
-	return redirect()->route('admin.users.users.index', $request->query())->with('success', __('messages.users.delete_list_success', ['number' => count($request->input('ids'))]));
+	return redirect()->route('admin.users.users.index', $request->query())->with('error', __('messages.generic.no_item_selected'));
     }
 
+    /*
+     * Creates a Document associated with the uploaded photo file.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \App\Models\Cms\Document
+     */
     private function uploadPhoto($request)
     {
         if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
@@ -240,7 +285,12 @@ class UserController extends Controller
     }
 
     /*
-     * Sets row values specific to the User model.
+     * Sets the row values specific to the User model.
+     *
+     * @param  Array  $rows
+     * @param  Array of stdClass Objects  $columns
+     * @param  \Illuminate\Pagination\LengthAwarePaginator  $users
+     * @return void
      */
     private function setRowValues(&$rows, $columns, $users)
     {
@@ -262,6 +312,10 @@ class UserController extends Controller
 
     /*
      * Sets field values specific to the User model.
+     *
+     * @param  Array of stdClass Objects  $fields
+     * @param  \App\Models\Users\User  $user
+     * @return void
      */
     private function setFieldValues(&$fields, $user)
     {

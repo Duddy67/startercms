@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Mail\AppMailer;
 use Illuminate\Support\Facades\Mail;
 
+
 class Email extends Model
 {
     use HasFactory;
@@ -25,8 +26,12 @@ class Email extends Model
     ];
 
 
+    /*
+     * Override.
+     */
     public function save(array $options = [])
     {
+        // Replace the HTML entities set by the editor in the code placeholders (eg: {{ $data-&gt;name }}).
 	$this->body_html = preg_replace('#({{.+)-&gt;(.+}})#', '$1->$2', $this->body_html);
 
         parent::save($options);
@@ -34,18 +39,26 @@ class Email extends Model
 	$this->setViewFiles();
     }
 
+    /*
+     * Override.
+     */
     public function delete()
     {
         $code = $this->code;
 
         parent::delete();
 
+	// Delete template files associated with the model.
 	unlink(resource_path().'/views/emails/'.$code.'.blade.php');
 	unlink(resource_path().'/views/emails/'.$code.'_plain.blade.php');
     }
 
+    /*
+     * Creates or updates the template files associated with the model.
+     */
     private function setViewFiles()
     {
+        // Name the email template after the code attribute.
 	$html = resource_path().'/views/emails/'.$this->code.'.blade.php';
 	$text = resource_path().'/views/emails/'.$this->code.'_plain.blade.php';
 
@@ -53,6 +66,9 @@ class Email extends Model
 	file_put_contents($text, $this->body_text);
     }
 
+    /*
+     * Gets the email items according to the filter, sort and pagination settings.
+     */
     public function getItems($request)
     {
         $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
@@ -73,6 +89,9 @@ class Email extends Model
         return $query->paginate($perPage);
     }
 
+    /*
+     * Builds the options for the 'format' select field.
+     */
     public function getFormatOptions()
     {
         return [
@@ -91,6 +110,12 @@ class Email extends Model
 	}
     }
 
+    /*
+     * Send an email through a given email template.
+     * @param  string  $code
+     * @param  Item Instance  data$
+     * @return void
+     */
     public static function sendEmail($code, $data)
     {
 	$email = Email::where('code', $code)->first();
@@ -101,6 +126,12 @@ class Email extends Model
 	Mail::to($recipient)->send(new AppMailer($data));
     }
 
+    /*
+     * Replaces the possibles variable set in the email subject with their values.
+     * @param  string  $subject
+     * @param  Item Instance  data$
+     * @return string
+     */
     public static function parseSubject($subject, $data)
     {
         if (preg_match_all('#{{\s?\$[a-z0-9_]+\s?}}#U', $subject, $matches)) {

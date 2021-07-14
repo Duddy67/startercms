@@ -30,6 +30,11 @@ class General extends Model
         'value',
     ];
 
+    /**
+     * No timestamps.
+     *
+     * @var boolean
+     */
     public $timestamps = false;
 
 
@@ -49,6 +54,12 @@ class General extends Model
 	return $data;
     }
 
+    /*
+     * Returns the value of a given key from a given group.
+     * @param  string  $group
+     * @param  string  $key
+     * @return string
+     */
     public static function getGeneralValue($group, $key)
     {
         return General::where(['group' => $group, 'key' => $key])->pluck('value')->first();

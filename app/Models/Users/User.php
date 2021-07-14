@@ -82,6 +82,9 @@ class User extends Authenticatable
 
     /*
      * Gets the user items according to the filter, sort and pagination settings.
+     *
+     * @param  Request  $request
+     * @return \Illuminate\Pagination\LengthAwarePaginator
      */
     public function getItems($request)
     {
