@@ -13,16 +13,16 @@
         @foreach ($rows as $i => $row)
 	     @php 
 	         $query = $url['query'];
-                 $query[$url['item_name']] = $row['item_id'];
+                 $query[$url['item_name']] = $row->item_id;
             @endphp
 	    <tr class="clickable-row" data-href="{{ route($url['route'].'.edit', $query) }}">
 		<td>
 		    <div class="form-check">
-			<input type="checkbox" class="form-check-input" data-item-id={{ $row['item_id'] }} data-index="{{ $i }}">
+			<input type="checkbox" class="form-check-input" data-item-id={{ $row->item_id }} data-index="{{ $i }}">
 		    </div>
 		</td>
 		@foreach ($columns as $column)
-		    <td>{{ $row[$column->name] }}</td>
+		    <td>{{ $row->{$column->name} }}</td>
 		@endforeach
 	    </tr>
         @endforeach

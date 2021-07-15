@@ -65,7 +65,7 @@ class GroupController extends Controller
      * Show the form for creating a new group.
      *
      * @param  Request  $request
-     * @return Response
+     * @return \Illuminate\Contracts\Support\Renderable
      */
     public function create(Request $request)
     {
@@ -82,7 +82,7 @@ class GroupController extends Controller
      *
      * @param  Request  $request
      * @param  int  $id
-     * @return Response
+     * @return \Illuminate\Contracts\Support\Renderable
      */
     public function edit(Request $request, $id)
     {

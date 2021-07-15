@@ -127,7 +127,7 @@ class RoleController extends Controller
         if ($request->input('permissions') !== null) {
 
 	    // Ensure an admin doesn't use any level1 permissions. 
-	    $level1Perms = $this->getPermissionArray(['level2', 'level3']);
+	    $level1Perms = $this->getPermissionNameList(['level2', 'level3']);
 	    $count = array_intersect($request->input('permissions'), $level1Perms);
 
 	    if ($this->getUserRoleType() == 'admin' && $count) {
@@ -192,7 +192,7 @@ class RoleController extends Controller
         if ($request->input('permissions') !== null) {
 
 	    // Ensure an admin doesn't use any level1 permissions. 
-	    $level1Perms = $this->getPermissionArray(['level2', 'level3']);
+	    $level1Perms = $this->getPermissionNameList(['level2', 'level3']);
 	    $count = array_intersect($request->input('permissions'), $level1Perms);
 
 	    if ($this->getUserRoleType() == 'admin' && $count) {

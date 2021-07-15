@@ -11,7 +11,7 @@
 	</div>
     </div>
 
-    @foreach ($board as $section => $permissions)
+    @foreach ($list as $section => $permissions)
 	<h5 class="font-weight-bold">{{ $section }}</h5>
 	<table class="table table-striped">
 	    <tbody>

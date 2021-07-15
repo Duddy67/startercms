@@ -33,6 +33,7 @@ return [
         'build_success' => ':number permissions have been successfully built.',
         'rebuild_success' => ':number permissions have been successfully rebuilt.',
         'no_new_permissions' => 'No new permissions have been built.',
+        'missing_alert' => '(missing !)',
     ],
     'groups' => [
         'create_success' => 'Group successfully created.',

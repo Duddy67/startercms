@@ -47,6 +47,7 @@ class GeneralController extends Controller
     /**
      * Show the general settings.
      *
+     * @param  Request  $request
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function index(Request $request)
@@ -84,6 +85,11 @@ class GeneralController extends Controller
 	return redirect()->route('admin.settings.general.index', $request->query())->with('success', __('messages.general.update_success'));
     }
 
+    /**
+     * Empties the setting table.
+     *
+     * @return void
+     */
     private function truncateSettings()
     {
 	Schema::disableForeignKeyConstraints();
@@ -95,6 +101,10 @@ class GeneralController extends Controller
 
     /*
      * Sets field values specific to the General model.
+     *
+     * @param  Array of stdClass Objects  $fields
+     * @param  \App\Models\Users\User  $user
+     * @return void
      */
     private function setFieldValues(&$fields)
     {

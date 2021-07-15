@@ -233,12 +233,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			  @lang ('labels.title.roles')
 			</x-menu-item>
 		    @endallowto
-		    @allowto ('create-permission')
+		    @if (auth()->user()->hasRole('super-admin'))
 			@php $active = (request()->is('admin/users/permissions*')) ? true : false @endphp
 			<x-menu-item href="{{ route('admin.users.permissions.index') }}" :sub=true :active="$active">
 			  @lang ('labels.title.permissions')
 			</x-menu-item>
-		    @endallowto
+		    @endif
 		  </ul>
 	      </li>
 	  @endallowto

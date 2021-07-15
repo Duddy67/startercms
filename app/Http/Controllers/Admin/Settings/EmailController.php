@@ -41,12 +41,14 @@ class EmailController extends Controller
     }
 
     /**
-     * Show the role list.
+     * Show the email list.
      *
+     * @param  Request  $request
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function index(Request $request)
     {
+        // Gather the needed data to build the item list.
         $columns = $this->getColumns();
         $actions = $this->getActions('list');
         $filters = $this->getFilters($request);
@@ -58,8 +60,15 @@ class EmailController extends Controller
         return view('admin.settings.emails.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
     }
 
+    /**
+     * Show the form for creating a new email.
+     *
+     * @param  Request  $request
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
     public function create(Request $request)
     {
+        // Gather the needed data to build the form.
         $fields = $this->getFields();
         $actions = $this->getActions('form', ['destroy']);
 	$query = $request->query();
@@ -67,8 +76,16 @@ class EmailController extends Controller
         return view('admin.settings.emails.form', compact('fields', 'actions', 'query'));
     }
 
+    /**
+     * Show the form for editing the specified group.
+     *
+     * @param  Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
     public function edit(Request $request, $id)
     {
+        // Gather the needed data to build the form.
         $email = Email::findOrFail($id);
         $fields = $this->getFields($email);
         $actions = $this->getActions('form');
@@ -79,7 +96,7 @@ class EmailController extends Controller
     }
 
     /**
-     * Update the specified user email.
+     * Update the specified email.
      *
      * @param  Request  $request
      * @param  int  $id
@@ -102,7 +119,6 @@ class EmailController extends Controller
 	$email->body_html = $request->input('body_html');
 	$email->body_text = $request->input('body_text');
 	$email->plain_text = ($request->input('format') == 'plain_text') ? 1 : 0;
-//file_put_contents('debog_file.txt', print_r($request->all(), true));
 	$email->save();
 
 	$query = $request->query();
@@ -116,6 +132,12 @@ class EmailController extends Controller
 	return redirect()->route('admin.settings.emails.edit', $query)->with('success', __('messages.emails.update_success'));
     }
 
+    /**
+     * Store a new email.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function store(Request $request)
     {
         /*$this->validate($request, [
@@ -146,6 +168,13 @@ class EmailController extends Controller
 	return redirect()->route('admin.settings.emails.edit', $query)->with('success', __('messages.emails.create_success'));
     }
 
+    /**
+     * Remove the specified email from storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return Response
+     */
     public function destroy(Request $request, $id, $redirect = true)
     {
 	$email = Email::findOrFail($id);
@@ -159,6 +188,12 @@ class EmailController extends Controller
 	return redirect()->route('admin.settings.emails.index', $request->query())->with('success', __('messages.emails.delete_success', ['name' => $code]));
     }
 
+    /**
+     * Remove one or more emails from storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return Response
+     */
     public function massDestroy(Request $request)
     {
         foreach ($request->input('ids') as $id) {

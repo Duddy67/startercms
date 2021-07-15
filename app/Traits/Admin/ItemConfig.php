@@ -7,8 +7,9 @@ use App\Models\Settings\General;
 
 trait ItemConfig
 {
-
     /*
+     * Returns the column data for an item list.
+     *
      * @return Array of stdClass Objects
      */  
     public function getColumns()
@@ -20,25 +21,34 @@ trait ItemConfig
 	return $columns;
     }
 
+    /*
+     * Sets the values for each item row.
+     *
+     * @param Array of stdClass Objects  $columns
+     * @param \Illuminate\Pagination\LengthAwarePaginator  $items
+     * @param Array  $except 
+     * @return Array of stdClass Objects
+     */  
     public function getRows($columns, $items, $except = [])
     {
         $rows = [];
 
         foreach ($items as $item) {
-	    $row = array('item_id' => $item->id);
+	    $row = new \stdClass();
+	    $row->item_id = $item->id;
 
 	    foreach ($columns as $column) {
 	        if (!in_array($column->name, $except)) {
 
 		    if ($column->type == 'date') {
-			$row[$column->name] = $item->{$column->name}->toFormattedDateString();
+			$row->{$column->name} = $item->{$column->name}->toFormattedDateString();
 		    }
 		    else {
-			$row[$column->name] = $item->{$column->name};
+			$row->{$column->name} = $item->{$column->name};
 		    }
 		}
 		else {
-		    $row[$column->name] = null;
+		    $row->{$column->name} = null;
 		}
 	    }
 
@@ -48,6 +58,12 @@ trait ItemConfig
 	return $rows;
     }
 
+    /*
+     * Returns the field data for an item form.
+     *
+     * @param A model instance  $item
+     * @return Array of stdClass Objects
+     */  
     public function getFields($item = null, $except = [])
     {
 	$fields = $this->getData('fields');
@@ -96,6 +112,12 @@ trait ItemConfig
 	return $fields;
     }
 
+    /*
+     * Returns the filter data for an item list.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return Array of stdClass Objects
+     */  
     public function getFilters($request)
     {
 	$filters = $this->getData('filters');
@@ -133,6 +155,13 @@ trait ItemConfig
 	return $filters;
     }
 
+    /*
+     * Returns the action data for an item list or form.
+     *
+     * @param  string  $section
+     * @param  Array  $except
+     * @return Array of stdClass Objects
+     */  
     public function getActions($section, $except = [])
     {
 	$actions = $this->getData('actions');
@@ -142,16 +171,21 @@ trait ItemConfig
 	}
 
 	if (!empty($except)) {
-	  foreach ($actions->{$section} as $key => $action) {
-	      if (in_array($action->id, $except)) {
-		  unset($actions->{$section}[$key]);
-	      }
-	  } 
+	    foreach ($actions->{$section} as $key => $action) {
+		if (in_array($action->id, $except)) {
+		    unset($actions->{$section}[$key]);
+		}
+	    } 
 	}
 
 	return $actions->{$section};
     }
 
+    /*
+     * Gets a json file related to a given item then returns the decoded data.
+     *
+     * @return Array of stdClass Objects / stdClass Object
+     */  
     private function getData($type)
     {
 	$json = file_get_contents(app_path().'/Models/'.ucfirst($this->pluginName).'/'.$this->modelName.'/'.$type.'.json', true);

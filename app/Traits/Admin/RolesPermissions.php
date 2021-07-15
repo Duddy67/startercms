@@ -8,11 +8,15 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
+use App\Models\Settings\General;
+
 
 trait RolesPermissions
 {
     /*
      * Roles that cannot be deleted nor updated.
+     *
+     * @return Array
      */
     public function getDefaultRoles()
     {
@@ -25,11 +29,21 @@ trait RolesPermissions
 	];
     }
 
+    /*
+     * Ids of the Roles that cannot be deleted nor updated.
+     *
+     * @return Array
+     */
     public function getDefaultRoleIds()
     {
         return [1,2,3,4,5];
     }
 
+    /*
+     * The role hierarchy defined numerically. 
+     *
+     * @return Array
+     */
     public function getRoleHierarchy()
     {
 	return [
@@ -41,6 +55,11 @@ trait RolesPermissions
 	];
     }
 
+    /*
+     * Validation patterns for permission names.
+     *
+     * @return Array
+     */
     public function getPermissionPatterns()
     {
         return [
@@ -54,6 +73,12 @@ trait RolesPermissions
 	];
     }
 
+    /*
+     * Gets the permissions.json file and returns it as a list.
+     *
+     * @param Array  $except (optional)
+     * @return Array of stdClass Objects.
+     */
     public function getPermissionList($except = [])
     {
 	$json = file_get_contents(app_path().'/Models/Users/permission/permissions.json', true);
@@ -82,9 +107,15 @@ trait RolesPermissions
 	return $list;
     }
 
+    /*
+     * Gets the role items according to the filter, sort and pagination settings.
+     *
+     * @param  Request  $request
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
     public function getItems($request)
     {
-        $perPage = $request->input('per_page', 5);
+        $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
         $search = $request->input('search', null);
 
 	$query = Role::query();
@@ -96,20 +127,32 @@ trait RolesPermissions
         return $query->paginate($perPage);
     }
 
-    public function getPermissionArray($except = [])
+    /*
+     * Returns the permission names.
+     *
+     * @param Array  $except (optional)
+     * @return Array
+     */
+    public function getPermissionNameList($except = [])
     {
         $list = $this->getPermissionList($except);
-	$array = [];
+	$nameList = [];
 
 	foreach ($list as $permissions) {
 	    foreach ($permissions as $permission) {
-	        $array[] = $permission->name;
+	        $nameList[] = $permission->name;
 	    }
 	}
 
-	return $array;
+	return $nameList;
     }
 
+    /*
+     * Returns the role type of a given user or of the current user.
+     *
+     * @param \App\Models\Users\User  $user (optional)
+     * @return string
+     */
     public function getUserRoleType($user = null)
     {
         // Get the given user or the current user.
@@ -124,6 +167,12 @@ trait RolesPermissions
 
     }
 
+    /*
+     * Returns the type of a given role according its permissions.
+     *
+     * @param \Spatie\Permission\Models\Role or string  $role
+     * @return string
+     */
     public function getRoleType($role)
     {
 	$role = (is_string($role)) ? Role::findByName($role) : $role;
@@ -142,42 +191,49 @@ trait RolesPermissions
 	}
     }
 
+    /*
+     * Returns roles that a user is allowed (from they role type) to assign to an other user.
+     *
+     * @param  \App\Models\Users\User $user (optional)
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
     public function getAssignableRoles($user = null)
     {
-        $roleType = $this->getUserRoleType();
-
 	// Check first if the user is editing their own user account.
 	if ($user && auth()->user()->id == $user->id) {
-	    // Only display the user role.
-	    $roles = Role::where('name', $user->getRoleNames()->toArray()[0])->get();
+	    // Only display the user's role as users cannot change their own role.
+	    return Role::where('name', $user->getRoleNames()->toArray()[0])->get();
 	}
-	// Move on to the role types.
-	elseif ($roleType == 'registered') {
+
+        $roleType = $this->getUserRoleType();
+
+	if ($roleType == 'manager') {
 	  $roles = Role::whereDoesntHave('permissions', function ($query) {
-	      $query->whereNotIn('name', ['create-user', 'create-permission', 'create-role']);
-	  })->where('name', '!=', 'super-admin')->get();
-	}
-	elseif ($roleType == 'manager') {
-	  $roles = Role::whereDoesntHave('permissions', function ($query) {
-	      $query->where('name', 'create-user')->whereNotIn('name', ['create-permission', 'create-role']);
+	      $query->whereIn('name', ['create-role', 'create-user']);
 	  })->where('name', '!=', 'super-admin')->get();
 	}
 	elseif ($roleType == 'admin') {
 	  $roles = Role::whereDoesntHave('permissions', function ($query) {
-	      $query->whereIn('name', ['create-permission', 'create-role']);
+	      $query->whereIn('name', ['create-role']);
 	  })->where('name', '!=', 'super-admin')->get();
 	}
-	// super-admin
-	else {
+	elseif ($roleType == 'super-admin') {
 	    $roles = Role::whereNotIn('name', ['super-admin'])->get();
 	}
 
 	return $roles;
     }
 
+    /*
+     * Builds or rebuilds the permissions from the permissions.json file. 
+     *
+     * @param  Request  $request
+     * @param  boolean  $rebuild  (optional)
+     * @return void
+     */
     public function buildPermissions($request, $rebuild = false)
     {
-        // Only super-admin is allowed to perform these tasks.
+        // Only the super-admin is allowed to perform these tasks.
         if (!auth()->user()->hasRole('super-admin')) {
 	    $request->session()->flash('error', 'You are not allowed to update or rebuild permissions.');
 
@@ -188,11 +244,12 @@ trait RolesPermissions
 	    $this->truncatePermissions();
 	}
 
-	$permissions = $this->getPermissionArray();
+	$permissions = $this->getPermissionNameList();
 	$invalidNames = [];
 	$count = 0;
 
 	foreach ($permissions as $permission) {
+	  // Creates the new permissions.
 	  if (Permission::where('name', $permission)->first() === null) {
 	      // Check for permission names.
 	      if (!preg_match('#^'.implode('|', $this->getPermissionPatterns()).'$#', $permission)) {
@@ -253,6 +310,11 @@ trait RolesPermissions
 	return true;
     }
 
+    /*
+     * Empties the permissions and role permission pivot tables.
+     *
+     * @return void
+     */
     private function truncatePermissions()
     {
 	Schema::disableForeignKeyConstraints();
@@ -263,6 +325,11 @@ trait RolesPermissions
 	Artisan::call('cache:clear');
     }
 
+    /*
+     * Used on the very first registration (the super-user) in the CMS.
+     *
+     * @return void
+     */
     public function createRoles()
     {
         if (Role::whereIn('name', $this->getDefaultRoles())->doesntExist()) {

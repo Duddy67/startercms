@@ -45,9 +45,9 @@ class PermissionController extends Controller
     {
         // Gather the needed data to build the permission list.
         $actions = $this->getActions('list');
-        $board = $this->getPermissionBoard();
+        $list = $this->getList();
 
-        return view('admin.users.permissions.list', compact('board', 'actions'));
+        return view('admin.users.permissions.list', compact('list', 'actions'));
     }
 
     /*
@@ -74,7 +74,12 @@ class PermissionController extends Controller
 	return redirect()->route('admin.users.permissions.index');
     }
 
-    private function getPermissionBoard()
+    /*
+     * Set the list of permissions to display.
+     *
+     * @return Array
+     */
+    private function getList()
     {
 	$permList = $this->getPermissionList();
 
@@ -84,13 +89,13 @@ class PermissionController extends Controller
 	    $list[$section] = [];
 
 	    foreach ($permissions as $permission) {
-	        $missing = '';
 		// Check for missing permissions.
 		if (Permission::where('name', $permission->name)->first() === null) {
-		    $missing = ' (missing !)';
+		    $list[$section][] = $permission->name.' '.__('messages.permissions.missing_alert');
+		    continue;
 		}
 
-		$list[$section][] = $permission->name.$missing;
+		$list[$section][] = $permission->name;
 	    }
 	}
 

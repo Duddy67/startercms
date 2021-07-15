@@ -69,7 +69,7 @@ class UserController extends Controller
      * Show the form for creating a new user.
      *
      * @param  Request  $request
-     * @return Response
+     * @return \Illuminate\Contracts\Support\Renderable
      */
     public function create(Request $request)
     {
@@ -86,7 +86,7 @@ class UserController extends Controller
      *
      * @param  Request  $request
      * @param  int  $id
-     * @return Response
+     * @return \Illuminate\Contracts\Support\Renderable
      */
     public function edit(Request $request, $id)
     {
@@ -298,13 +298,13 @@ class UserController extends Controller
 	    foreach ($columns as $column) {
 	        if ($column->name == 'role') {
 		    $roles = $user->getRoleNames();
-		    $rows[$key]['role'] = $roles[0];
+		    $rows[$key]->role = $roles[0];
 		}
 
 	        if ($column->name == 'groups') {
 		    $groups = $user->groups()->pluck('name')->toArray();
 		    $groups = (!empty($groups)) ? implode(',', $groups) : '-';
-		    $rows[$key]['groups'] = $groups;
+		    $rows[$key]->groups = $groups;
 		}
 	    }
 	}
