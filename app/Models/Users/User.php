@@ -194,7 +194,7 @@ class User extends Authenticatable
     }
 
     /*
-     * Checks whether the current user is allowed to update a given user according to their role.
+     * Checks whether the current user is allowed to update a given user according to their role type.
      */
     public function canUpdate($user)
     {
@@ -212,7 +212,7 @@ class User extends Authenticatable
     }
 
     /*
-     * Checks whether the current user is allowed to delete a given user according to their role.
+     * Checks whether the current user is allowed to delete a given user according to their role type.
      */
     public function canDelete($user)
     {

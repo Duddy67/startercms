@@ -40,6 +40,20 @@ trait RolesPermissions
     }
 
     /*
+     * Role types which are allowed to create users and modify their roles.
+     *
+     * @return Array
+     */
+    public function getAllowedRoleTypes()
+    {
+        return [
+	    'super-admin',
+	    'admin',
+	    'manager'
+	];
+    }
+
+    /*
      * The role hierarchy defined numerically. 
      *
      * @return Array
@@ -191,8 +205,14 @@ trait RolesPermissions
 	}
     }
 
+    public function getUserRoleLevel($user = null)
+    {
+        $roleType = $this->getUserRoleType($user);
+	return $this->getRoleHierarchy()[$roleType];
+    }
+
     /*
-     * Returns roles that a user is allowed (from they role type) to assign to an other user.
+     * Returns the roles that a user is allowed to assign to an other user.
      *
      * @param  \App\Models\Users\User $user (optional)
      * @return \Illuminate\Database\Eloquent\Collection
@@ -205,7 +225,13 @@ trait RolesPermissions
 	    return Role::where('name', $user->getRoleNames()->toArray()[0])->get();
 	}
 
+	// Get the current user's role type.
         $roleType = $this->getUserRoleType();
+
+	if (!in_array($roleType, $this->getAllowedRoleTypes())) {
+	    // Returns an empty collection.
+	    return new \Illuminate\Database\Eloquent\Collection();
+	}
 
 	if ($roleType == 'manager') {
 	  $roles = Role::whereDoesntHave('permissions', function ($query) {
@@ -222,6 +248,30 @@ trait RolesPermissions
 	}
 
 	return $roles;
+    }
+
+    /*
+     * Returns the users that a user is allowed to assign as owner of an item.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getAssignableUsers()
+    {
+	$results = $this->getAssignableRoles();
+
+	if ($results->isEmpty()) {
+	    return $results;
+	}
+
+        $roles = [];
+
+	foreach ($results as $role) {
+	    $roles[] = $role->name;
+	}
+
+	return \App\Models\Users\User::whereHas('roles', function ($query) use($roles) {
+	    $query->whereIn('name', $roles);
+	})->orWhere('id', auth()->user()->id)->get();
     }
 
     /*
@@ -284,6 +334,12 @@ trait RolesPermissions
 	}
     }
 
+    /*
+     * Sets the default roles' permissions.
+     *
+     * @param  Request  $request
+     * @return void
+     */
     private function setPermissions($request)
     {
 	$permList = $this->getPermissionList();
@@ -326,7 +382,7 @@ trait RolesPermissions
     }
 
     /*
-     * Used on the very first registration (the super-user) in the CMS.
+     * Used during the very first registration (the super-user) in the CMS.
      *
      * @return void
      */

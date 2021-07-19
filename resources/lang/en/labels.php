@@ -35,6 +35,7 @@ return [
 	'created_by' => 'Created by',
 	'updated_at' => 'Updated at',
 	'updated_by' => 'Updated by',
+	'access_level' => 'Access level',
 	'status' => 'Status',
 	'published_up' => 'Start publishing',
 	'published_down' => 'Finish publishing',

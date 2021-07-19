@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\Users\Group;
+use App\Models\Users\User;
 use App\Traits\Admin\ItemConfig;
 
 
@@ -117,6 +118,11 @@ class GroupController extends Controller
 
 	$group->name = $request->input('name');
 	$group->description = $request->input('description');
+	$group->created_by = $request->input('created_by');
+	$group->updated_by = auth()->user()->id;
+	$group->access_level = $request->input('access_level');
+	$owner = User::findOrFail($group->created_by);
+	$group->role_level = auth()->user()->getUserRoleLevel($owner);
 	$group->save();
 
 	$query = $request->query();
@@ -147,7 +153,16 @@ class GroupController extends Controller
 	    ],
 	]);
 
-	$group = Group::create(['name' => $request->input('name'), 'description' => $request->input('description')]);
+	$group = Group::create([
+	  'name' => $request->input('name'), 
+	  'description' => $request->input('description'), 
+	  'access_level' => $request->input('access_level'), 
+	  'created_by' => auth()->user()->id
+	]);
+
+	$group->role_level = auth()->user()->getUserRoleLevel();
+	$group->save();
+
 	$query = $request->query();
 
         if ($request->input('_close', null)) {

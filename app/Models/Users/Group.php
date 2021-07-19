@@ -18,6 +18,9 @@ class Group extends Model
      */
     protected $fillable = [
         'name',
+        'created_by',
+        'description',
+        'access_level',
     ];
 
     /**
@@ -38,6 +41,7 @@ class Group extends Model
         $sortedBy = $request->input('sorted_by', null);
 
 	$query = Group::query();
+	$query->select('groups.*', 'users.name as user_name')->leftJoin('users', 'groups.created_by', '=', 'users.id');
 
 	if ($search !== null) {
 	    $query->where('name', 'like', '%'.$search.'%');
@@ -48,7 +52,38 @@ class Group extends Model
 	    $query->orderBy($matches[1], $matches[2]);
 	}
 
+	$query->where('role_level', '<', auth()->user()->getUserRoleLevel())
+	      ->orWhereIn('access_level', ['public_ro', 'public_rw'])
+	      ->orWhere('created_by', auth()->user()->id);
+
         return $query->paginate($perPage);
     }
 
+    public function getCreatedByOptions()
+    {
+	$users = auth()->user()->getAssignableUsers();
+	$options = [];
+
+//file_put_contents('debog_file.txt', print_r($users, true));
+	foreach ($users as $user) {
+	    $options[] = ['value' => $user->id, 'text' => $user->name];
+	}
+
+	return $options;
+    }
+
+    /*
+     * Generic function that returns model values which are handled by select inputs. 
+     */
+    public function getSelectedValue($fieldName)
+    {
+        if ($fieldName == 'created_by') {
+	    return $this->created_by;
+	}
+	elseif ($fieldName == 'access_level') {
+	    return $this->access_level;
+	}
+
+	return null;
+    }
 }

@@ -12,6 +12,11 @@
     "type": "string"
   },
   {
+    "label": "labels.generic.created_by",
+    "name": "created_by",
+    "type": "string"
+  },
+  {
     "label": "labels.generic.created_at",
     "name": "created_at",
     "type": "date"

@@ -43,6 +43,9 @@ trait ItemConfig
 		    if ($column->type == 'date') {
 			$row->{$column->name} = $item->{$column->name}->toFormattedDateString();
 		    }
+		    elseif ($column->name == 'created_by') {
+		        $row->created_by = $item->user_name;
+		    }
 		    else {
 			$row->{$column->name} = $item->{$column->name};
 		    }
@@ -79,7 +82,14 @@ trait ItemConfig
 	    if ($field->type == 'select') {
 	        // Build the function name.
 		$function = 'get'.str_replace('_', '', ucwords($field->name, '_')).'Options';
-		$options = $this->model->$function($item);
+
+		if ($field->name == 'access_level') {
+		    $options = General::$function();
+		}
+		else {
+		    $options = $this->model->$function($item);
+		}
+
 		$fields[$key]->options = $options;
 
 		if ($item) {

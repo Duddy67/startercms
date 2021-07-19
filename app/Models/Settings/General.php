@@ -77,6 +77,15 @@ class General extends Model
       ];
     }
 
+    public static function getAccessLevelOptions()
+    {
+      return [
+	  ['value' => 'private', 'text' => 'Private'],
+	  ['value' => 'public_ro', 'text' => 'Public read only'],
+	  ['value' => 'public_rw', 'text' => 'Public read write'],
+      ];
+    }
+
     public static function getSortedByOptions($pluginName, $modelName)
     {
 	$json = file_get_contents(app_path().'/Models/'.ucfirst($pluginName).'/'.$modelName.'/columns.json', true);
