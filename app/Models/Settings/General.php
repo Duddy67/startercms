@@ -80,9 +80,9 @@ class General extends Model
     public static function getAccessLevelOptions()
     {
       return [
-	  ['value' => 'private', 'text' => 'Private'],
-	  ['value' => 'public_ro', 'text' => 'Public read only'],
-	  ['value' => 'public_rw', 'text' => 'Public read write'],
+	  ['value' => 'private', 'text' => __('labels.generic.private')],
+	  ['value' => 'public_ro', 'text' => __('labels.generic.public_ro')],
+	  ['value' => 'public_rw', 'text' => __('labels.generic.public_rw')],
       ];
     }
 

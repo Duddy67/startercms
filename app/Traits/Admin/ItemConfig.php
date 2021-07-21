@@ -46,6 +46,9 @@ trait ItemConfig
 		    elseif ($column->name == 'created_by') {
 		        $row->created_by = $item->user_name;
 		    }
+		    elseif ($column->name == 'access_level') {
+		        $row->access_level = __('labels.generic.'.$item->access_level);
+		    }
 		    else {
 			$row->{$column->name} = $item->{$column->name};
 		    }
@@ -84,6 +87,7 @@ trait ItemConfig
 		$function = 'get'.str_replace('_', '', ucwords($field->name, '_')).'Options';
 
 		if ($field->name == 'access_level') {
+		    // Common options.
 		    $options = General::$function();
 		}
 		else {

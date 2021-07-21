@@ -8,37 +8,47 @@
       {
 	"name": "update-user",
 	"type": "level2",
-	"default": "admin|manager"
+	"default": "admin"
       },
       {
 	"name": "delete-user",
 	"type": "level2",
-	"default": "admin|manager"
+	"default": "admin"
       },
       {
 	"name": "update-own-user",
 	"type": "level2",
-	"default": ""
+	"default": "manager"
       },
       {
 	"name": "delete-own-user",
 	"type": "level2",
-	"default": ""
+	"default": "manager"
       },
       {
-	"name": "create-user-group",
+	"name": "create-group",
 	"type": "level2",
 	"default": "admin|manager"
       },
       {
-	"name": "update-user-group",
+	"name": "update-group",
 	"type": "level2",
-	"default": "admin|manager"
+	"default": "admin"
       },
       {
-	"name": "delete-user-group",
+	"name": "delete-group",
 	"type": "level2",
-	"default": "admin|manager"
+	"default": "admin"
+      },
+      {
+	"name": "update-own-group",
+	"type": "level2",
+	"default": "manager"
+      },
+      {
+	"name": "delete-own-group",
+	"type": "level2",
+	"default": "manager"
       },
       {
 	"name": "create-role",

@@ -87,8 +87,13 @@ class GroupController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        // Gather the needed data to build the form.
         $group = Group::findOrFail($id);
+
+	if (!$group->canAccess()) {
+	    return redirect()->route('admin.users.groups.index')->with('error',  __('messages.generic.access_not_auth'));
+	}
+
+        // Gather the needed data to build the form.
         $fields = $this->getFields($group);
         $actions = $this->getActions('form');
 	$query = $queryWithId = $request->query();
@@ -108,6 +113,10 @@ class GroupController extends Controller
     {
 	$group = Group::findOrFail($id);
 
+	if (!$group->canEdit()) {
+	    return redirect()->route('admin.users.groups.edit', array_merge($request->query(), ['group' => $id]))->with('error',  __('messages.generic.edit_not_auth'));
+	}
+
         $this->validate($request, [
 	    'name' => [
 		'required',
@@ -122,19 +131,20 @@ class GroupController extends Controller
 	$group->updated_by = auth()->user()->id;
 	$group->access_level = $request->input('access_level');
 	$owner = User::findOrFail($group->created_by);
+
+	if (auth()->user()->getUserRoleLevel($owner) >= auth()->user()->getUserRoleLevel()) {
+	    return redirect()->route('admin.users.groups.index')->with('error',  __('messages.generic.owner_not_valid'));
+	}
+
 	$group->role_level = auth()->user()->getUserRoleLevel($owner);
 	$group->save();
 
-	$query = $request->query();
-
         if ($request->input('_close', null)) {
 	    // Redirect to the list.
-	    return redirect()->route('admin.users.groups.index', $query)->with('success', __('messages.groups.update_success'));
+	    return redirect()->route('admin.users.groups.index', $request->query())->with('success', __('messages.groups.update_success'));
 	}
 
-	$query['group'] = $group->id;
-
-	return redirect()->route('admin.users.groups.edit', $query)->with('success', __('messages.groups.update_success'));
+	return redirect()->route('admin.users.groups.edit', array_merge($request->query(), ['group' => $id]))->with('success', __('messages.groups.update_success'));
     }
 
     /**
@@ -163,15 +173,11 @@ class GroupController extends Controller
 	$group->role_level = auth()->user()->getUserRoleLevel();
 	$group->save();
 
-	$query = $request->query();
-
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.users.groups.index', $query)->with('success', __('messages.groups.create_success'));
+	    return redirect()->route('admin.users.groups.index', $request->query())->with('success', __('messages.groups.create_success'));
 	}
 
-	$query['group'] = $group->id;
-
-	return redirect()->route('admin.users.groups.edit', $query)->with('success', __('messages.groups.create_success'));
+	return redirect()->route('admin.users.groups.edit', array_merge($request->query(), ['group' => $group->id]))->with('success', __('messages.groups.create_success'));
     }
 
     /**

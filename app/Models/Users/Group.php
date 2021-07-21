@@ -86,4 +86,40 @@ class Group extends Model
 
 	return null;
     }
+
+    public function canAccess()
+    {
+        if ($this->access_level == 'public_ro' || $this->canEdit()) {
+	    return true;
+	}
+
+	return false;
+    }
+
+    public function canEdit()
+    {
+        if ($this->access_level == 'public_rw' || $this->role_level < auth()->user()->getUserRoleLevel() || $this->created_by == auth()->user()->id) {
+	    return true;
+	}
+
+	return false;
+    }
+
+    public function canDelete($group)
+    {
+        if (auth()->user()->hasRole('super-admin')) {
+	    return true;
+	}
+
+        if (is_int($group)) {
+	    $group = Group::findOrFail($group);
+	}
+
+	// The group role level is lower than the current user's or the current user owns the group.
+	if ($group->role_level < auth()->user()->getUserRoleLevel() || $group->created_by == auth()->user()->id) {
+	    return true;
+	}
+
+	return false;
+    }
 }

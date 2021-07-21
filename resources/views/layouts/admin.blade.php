@@ -221,7 +221,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			<x-menu-item href="{{ route('admin.users.users.index') }}" :sub=true :active="$active">
 			  @lang ('labels.title.users')
 			</x-menu-item>
-		    @allowto ('create-user-group')
+		    @allowto ('create-group')
 			@php $active = (request()->is('admin/users/groups*')) ? true : false @endphp
 			<x-menu-item href="{{ route('admin.users.groups.index') }}" :sub=true :active="$active">
 			  @lang ('labels.title.groups')
