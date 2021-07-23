@@ -132,8 +132,9 @@ class GroupController extends Controller
 	$group->access_level = $request->input('access_level');
 	$owner = User::findOrFail($group->created_by);
 
+	// Ensure the selected owner matches the current user's role level.
 	if (auth()->user()->getUserRoleLevel($owner) >= auth()->user()->getUserRoleLevel()) {
-	    return redirect()->route('admin.users.groups.index')->with('error',  __('messages.generic.owner_not_valid'));
+	    return redirect()->route('admin.users.groups.edit', array_merge($request->query(), ['group' => $id]))->with('error',  __('messages.generic.owner_not_valid'));
 	}
 
 	$group->role_level = auth()->user()->getUserRoleLevel($owner);
@@ -190,14 +191,14 @@ class GroupController extends Controller
     public function destroy(Request $request, $id)
     {
 	$group = Group::findOrFail($id);
-	$group->users()->detach();
-	$name = $group->name;
-	$group->delete();
 
-	// Do not redirect during mass deletion.
-	if (debug_backtrace()[1]['function'] == 'massDestroy') {
-	    return;
+	if (!$group->canDelete()) {
+	    return redirect()->route('admin.users.groups.edit', array_merge($request->query(), ['group' => $id]))->with('error',  __('messages.generic.delete_not_auth'));
 	}
+
+	//$group->users()->detach();
+	$name = $group->name;
+	//$group->delete();
 
 	return redirect()->route('admin.users.groups.index', $request->query())->with('success', __('messages.groups.delete_success', ['name' => $name]));
     }
@@ -212,7 +213,18 @@ class GroupController extends Controller
     {
         // Remove the groups selected from the list.
         foreach ($request->input('ids') as $id) {
-	    $this->destroy($request, $id);
+	    $group = Group::findOrFail($id);
+
+	    if (!$group->canDelete()) {
+	      return redirect()->route('admin.users.groups.index', $request->query())->with(
+		  [
+		      'error' => __('messages.generic.delete_not_auth'), 
+		      'success' => __('messages.groups.delete_list_success', ['number' => count($request->input('ids'))])
+		  ]);
+	    }
+
+	    //$group->users()->detach();
+	    //$group->delete();
 	}
 
 	return redirect()->route('admin.users.groups.index', $request->query())->with('success', __('messages.groups.delete_list_success', ['number' => count($request->input('ids'))]));

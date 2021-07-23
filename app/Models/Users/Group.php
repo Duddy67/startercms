@@ -87,6 +87,11 @@ class Group extends Model
 	return null;
     }
 
+    /*
+     * Checks whether the current user is allowed to access a given group according to their role level.
+     *
+     * @return boolean
+     */
     public function canAccess()
     {
         if ($this->access_level == 'public_ro' || $this->canEdit()) {
@@ -96,6 +101,11 @@ class Group extends Model
 	return false;
     }
 
+    /*
+     * Checks whether the current user is allowed to edit a given group according to their role level.
+     *
+     * @return boolean
+     */
     public function canEdit()
     {
         if ($this->access_level == 'public_rw' || $this->role_level < auth()->user()->getUserRoleLevel() || $this->created_by == auth()->user()->id) {
@@ -105,18 +115,19 @@ class Group extends Model
 	return false;
     }
 
-    public function canDelete($group)
+    /*
+     * Checks whether the current user is allowed to delete a given group according to their role level.
+     *
+     * @return boolean
+     */
+    public function canDelete()
     {
         if (auth()->user()->hasRole('super-admin')) {
 	    return true;
 	}
 
-        if (is_int($group)) {
-	    $group = Group::findOrFail($group);
-	}
-
-	// The group role level is lower than the current user's or the current user owns the group.
-	if ($group->role_level < auth()->user()->getUserRoleLevel() || $group->created_by == auth()->user()->id) {
+	// The owner role level is lower than the current user's or the current user owns the group.
+	if ($this->role_level < auth()->user()->getUserRoleLevel() || $this->created_by == auth()->user()->id) {
 	    return true;
 	}
 

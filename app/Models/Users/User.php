@@ -120,6 +120,9 @@ class User extends Authenticatable
 
     /*
      * Builds the options for the 'role' select field.
+     *
+     * @param  \App\Models\Users\User $request (optional)
+     * @return Array
      */
     public function getRoleOptions($user = null)
     {
@@ -135,6 +138,9 @@ class User extends Authenticatable
 
     /*
      * Builds the options for the 'groups' select field.
+     *
+     * @param  \App\Models\Users\User $user (optional)
+     * @return Array
      */
     public function getGroupsOptions($user = null)
     {
@@ -150,6 +156,8 @@ class User extends Authenticatable
 
     /*
      * Builds the options for the 'roles' select field, (used with filters).
+     *
+     * @return Array
      */
     public function getRolesOptions()
     {
@@ -180,6 +188,8 @@ class User extends Authenticatable
 
     /*
      * Returns a relative url to the user's photo thumbnail.
+     *
+     * @return string
      */
     public function getThumbnail()
     {
@@ -195,6 +205,9 @@ class User extends Authenticatable
 
     /*
      * Checks whether the current user is allowed to update a given user according to their role type.
+     *
+     * @param  \App\Models\Users\User $user
+     * @return boolean
      */
     public function canUpdate($user)
     {
@@ -213,6 +226,9 @@ class User extends Authenticatable
 
     /*
      * Checks whether the current user is allowed to delete a given user according to their role type.
+     *
+     * @param  \App\Models\Users\User $user
+     * @return boolean
      */
     public function canDelete($user)
     {
@@ -236,6 +252,8 @@ class User extends Authenticatable
 
     /*
      * Returns the user's role name.
+     *
+     * @return boolean
      */
     public function getRoleName()
     {
@@ -244,6 +262,9 @@ class User extends Authenticatable
 
     /*
      * Blade directive
+     *
+     * @param  \Spatie\Permission\Models\Permission $permission
+     * @return boolean
      */
     public function isAllowedTo($permission)
     {
@@ -252,6 +273,8 @@ class User extends Authenticatable
 
     /*
      * Blade directive
+     *
+     * @return boolean
      */
     public function canAccessAdmin()
     {

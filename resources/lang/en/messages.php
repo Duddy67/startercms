@@ -53,6 +53,7 @@ return [
     'generic' => [
         'access_not_auth' => 'You are not authorised to access this resource.',
         'edit_not_auth' => 'You are not authorised to edit this resource.',
+        'delete_not_auth' => 'You are not authorised to delete this resource.',
         'owner_not_valid' => 'The owner of the item is not valid.',
         'no_item_selected' => 'No item selected.',
     ]
