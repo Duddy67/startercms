@@ -60,10 +60,10 @@
 			    @if ($column->name == 'file_name')
 				<td>
                                     <a href="#" onClick="selectFile(this);" data-content-type="{{ $items[$i]->content_type }}" data-file-name="{{ $items[$i]->file_name }}" data-file-url="{{ $items[$i]->url }}">
-				    {{ $row[$column->name] }}</a>
+				    {{ $row->{$column->name} }}</a>
                                 </td>
 			    @else
-				<td>{{ $row[$column->name] }}</td>
+				<td>{{ $row->{$column->name} }}</td>
                             @endif
 			@endforeach
 			<td>
