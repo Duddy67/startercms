@@ -1,7 +1,7 @@
 (function($) {
     // Run a function when the page is fully loaded including graphics.
     $(window).on('load', function() {
-	let actions = ['create', 'massDestroy'];
+	let actions = ['create', 'massDestroy', 'batch'];
 
 	actions.forEach(function (action) {
 	    $('#'+action).click( function() { $.fn[action](); });
@@ -86,11 +86,26 @@
 	    return false;
 	}
 
+        // Remove possible inputs from a previous selection.
+	$('input[name="ids\\[\\]"]').each(function () {
+	    $(this).remove();
+	});
+
 	for (let i = 0; i < ids.length; i++) {
 	    inputs += '<input type="hidden" name="ids[]" value="'+ids[i]+'">';
 	}
 	
 	$('#selectedItems').append(inputs);
+
+        let iframe = $('iframe[name="batch"]');
+	if (iframe.length) {
+	    // Remove possible inputs from a previous selection.
+	    $('input[name="ids\\[\\]"]', iframe.contents()).each(function () {
+		$(this).remove();
+	    });
+
+	    $('#batchForm', iframe.contents()).append(inputs);
+	}
 
 	return true;
     }
@@ -103,6 +118,14 @@
 	if ($.fn.setSelectedItems()) {
 	    $('#selectedItems').submit();
 	    //alert('destroy');
+	}
+    }
+
+    $.fn.batch = function() {
+	if ($.fn.setSelectedItems()) {
+	    $('#batch-window').css('display', 'block');
+
+	    //alert('batch');
 	}
     }
 

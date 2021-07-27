@@ -9,6 +9,11 @@
 	"id": "massDestroy",
 	"label": "labels.button.delete",
 	"type": "button"
+      },
+      {
+	"id": "batch",
+	"label": "labels.button.batch",
+	"type": "button"
       }
   ],
   "form": [
@@ -30,6 +35,18 @@
       {
 	"id": "destroy",
 	"label": "labels.button.delete",
+	"type": "button"
+      }
+  ],
+  "batch": [
+      {
+	"id": "massUpdate",
+	"label": "labels.button.update",
+	"type": "button"
+      },
+      {
+	"id": "cancel",
+	"label": "labels.button.cancel",
 	"type": "button"
       }
   ]

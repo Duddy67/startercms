@@ -60,6 +60,8 @@ Route::prefix('admin')->group(function () {
 	Route::prefix('users')->group(function () {
 	    // Users
 	    Route::delete('/users', [UserController::class, 'massDestroy'])->name('admin.users.users.massDestroy');
+	    Route::get('/users/batch', [UserController::class, 'batch'])->name('admin.users.users.batch');
+	    Route::put('/users/batch', [UserController::class, 'massUpdate'])->name('admin.users.users.massUpdate');
 	    Route::resource('users', UserController::class, ['as' => 'admin.users'])->except(['show']);
 	    // Groups
 	    Route::delete('/groups', [GroupController::class, 'massDestroy'])->name('admin.users.groups.massDestroy');

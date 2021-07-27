@@ -266,6 +266,21 @@ class UserController extends Controller
 	return redirect()->route('admin.users.users.index', $request->query())->with('error', __('messages.generic.no_item_selected'));
     }
 
+    public function batch(Request $request)
+    {
+        $fields = $this->getFields(null, ['name', 'email', 'photo', 'created_at', 'updated_at', 'password', 'password_confirmation']);
+        $actions = $this->getActions('batch');
+	$query = $request->query();
+
+        return view('admin.users.users.batch', compact('fields', 'actions', 'query'));
+    }
+
+    public function massUpdate(Request $request)
+    {
+file_put_contents('debog_file.txt', print_r($request->all(), true));
+	return redirect()->route('admin.users.users.index')->with('error', __('messages.users.edit_user_not_auth'));
+    }
+
     /*
      * Creates a Document associated with the uploaded photo file.
      *

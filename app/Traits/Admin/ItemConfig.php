@@ -180,7 +180,7 @@ trait ItemConfig
     {
 	$actions = $this->getData('actions');
 
-	if ($section != 'list' && $section != 'form') {
+	if (!in_array($section, ['list', 'form', 'batch'])) {
 	    return null;
 	}
 
