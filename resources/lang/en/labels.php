@@ -67,6 +67,7 @@ return [
 	'cancel' => 'Cancel',
 	'update' => 'Update',
 	'rebuild' => 'Rebuild',
+	'batch' => 'Batch',
     ],
 ];
 

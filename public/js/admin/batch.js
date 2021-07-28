@@ -7,19 +7,12 @@
 	});
 
 	$('#massUpdate').click (function () {
-	    /*$('input[name="_method"]', parent.document).val('put');
-	    let action = $('#selectedItems', parent.document).attr('action');
-	    $('#selectedItems', parent.document).attr('action', action+'/batch');
-	    $('#selectedItems', parent.document).submit();*/
-	    //let iframe = $('iframe[name="batch"]');
-	    //$('iframe[name="batch"]').find('form').submit();
 	    $('#batchForm').submit();
-	        /*$('iframe[name="batch"]').load(function() {
-		    $(this).contents().find('form').submit(function() {
-			return false;
-		    });
-		});*/
 	});
     });
+
+    if (jQuery.fn.select2) {
+	$('.select2').select2();
+    }
 
 })(jQuery);

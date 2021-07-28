@@ -277,8 +277,39 @@ class UserController extends Controller
 
     public function massUpdate(Request $request)
     {
-file_put_contents('debog_file.txt', print_r($request->all(), true));
-	return redirect()->route('admin.users.users.index')->with('error', __('messages.users.edit_user_not_auth'));
+        $updates = 0;
+	$messages = [];
+
+        foreach ($request->input('ids') as $key => $id) {
+	    $user = User::findOrFail($id);
+
+	    // Check for authorisation.
+	    if (!auth()->user()->canUpdate($user) && auth()->user()->id != $user->id) {
+		$messages['error'] = __('messages.generic.mass_update_not_auth');
+		continue;
+	    }
+
+	    if (!empty($request->input('role'))) {
+		// Users cannot modify the role attribute in their own account.
+		if (auth()->user()->id != $user->id) {
+		    $user->syncRoles($request->input('role'));
+		}
+		else {
+		    $messages['error'] = __('messages.generic.mass_update_not_auth');
+		    continue;
+		}
+	    }
+
+	    if ($request->input('groups') !== null) {
+		$user->groups()->syncWithoutDetaching($request->input('groups'));
+	    }
+
+	    $updates++;
+	}
+
+	$messages['success'] = __('messages.generic.mass_update_success', ['number' => $updates]);
+
+	return redirect()->route('admin.users.users.index')->with($messages);
     }
 
     /*

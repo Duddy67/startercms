@@ -36,7 +36,7 @@
 
     <div id="batch-window" class="modal">
 	<div class="modal-content">
-	    <iframe src="{{ route('admin.users.users.batch', $query) }}" name="batch"></iframe>
+	    <iframe src="{{ route('admin.users.users.batch', $query) }}" id="batchIframe" name="batch"></iframe>
 	</div>
     </div>
 @endsection

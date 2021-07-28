@@ -56,5 +56,7 @@ return [
         'delete_not_auth' => 'You are not authorised to delete this resource.',
         'owner_not_valid' => 'The owner of the item is not valid.',
         'no_item_selected' => 'No item selected.',
+        'mass_update_success' => ':number items successfully updated.',
+        'mass_update_not_auth' => 'You are not authorised to update one or more selected items.',
     ]
 ];

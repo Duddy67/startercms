@@ -86,7 +86,7 @@
 	    return false;
 	}
 
-        // Remove possible inputs from a previous selection.
+        // Remove a possible previous selection from the selectedItems form.
 	$('input[name="ids\\[\\]"]').each(function () {
 	    $(this).remove();
 	});
@@ -99,7 +99,7 @@
 
         let iframe = $('iframe[name="batch"]');
 	if (iframe.length) {
-	    // Remove possible inputs from a previous selection.
+	    // Remove a possible previous selection from the batchForm form.
 	    $('input[name="ids\\[\\]"]', iframe.contents()).each(function () {
 		$(this).remove();
 	    });
@@ -117,15 +117,12 @@
     $.fn.massDestroy = function() {
 	if ($.fn.setSelectedItems()) {
 	    $('#selectedItems').submit();
-	    //alert('destroy');
 	}
     }
 
     $.fn.batch = function() {
 	if ($.fn.setSelectedItems()) {
 	    $('#batch-window').css('display', 'block');
-
-	    //alert('batch');
 	}
     }
 
