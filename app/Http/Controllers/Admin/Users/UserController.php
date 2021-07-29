@@ -266,6 +266,12 @@ class UserController extends Controller
 	return redirect()->route('admin.users.users.index', $request->query())->with('error', __('messages.generic.no_item_selected'));
     }
 
+    /**
+     * Show the batch form (in an iframe).
+     *
+     * @param  Request  $request
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
     public function batch(Request $request)
     {
         $fields = $this->getFields(null, ['name', 'email', 'photo', 'created_at', 'updated_at', 'password', 'password_confirmation']);
@@ -275,6 +281,12 @@ class UserController extends Controller
         return view('admin.users.users.batch', compact('fields', 'actions', 'query'));
     }
 
+    /**
+     * Updates role and groups parameters of one or more users.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return Response
+     */
     public function massUpdate(Request $request)
     {
         $updates = 0;
@@ -290,10 +302,11 @@ class UserController extends Controller
 	    }
 
 	    if (!empty($request->input('role'))) {
-		// Users cannot modify the role attribute in their own account.
+
 		if (auth()->user()->id != $user->id) {
 		    $user->syncRoles($request->input('role'));
 		}
+		// Users cannot modify the role attribute of their own account.
 		else {
 		    $messages['error'] = __('messages.generic.mass_update_not_auth');
 		    continue;
