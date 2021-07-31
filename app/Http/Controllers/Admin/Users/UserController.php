@@ -108,6 +108,14 @@ class UserController extends Controller
         return view('admin.users.users.form', compact('user', 'fields', 'actions', 'query', 'queryWithId', 'photo'));
     }
 
+    public function cancel(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+	//$this->checkIn($user);
+
+	return redirect()->route('admin.users.users.index', $request->query());
+    }
+
     /**
      * Update the specified user.
      *

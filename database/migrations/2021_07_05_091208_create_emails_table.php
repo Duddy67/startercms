@@ -21,6 +21,8 @@ class CreateEmailsTable extends Migration
             $table->text('body_text')->nullable();
             $table->string('description')->nullable();
             $table->boolean('plain_text')->nullable();
+            $table->unsignedBigInteger('checked_out')->nullable();
+            $table->timestamp('checked_out_time')->nullable();
             $table->timestamps();
         });
     }

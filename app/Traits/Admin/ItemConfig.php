@@ -3,6 +3,7 @@
 namespace App\Traits\Admin;
 
 use App\Models\Settings\General;
+use Illuminate\Support\Facades\DB;
 
 
 trait ItemConfig
@@ -36,6 +37,11 @@ trait ItemConfig
         foreach ($items as $item) {
 	    $row = new \stdClass();
 	    $row->item_id = $item->id;
+
+	    if ($item->checked_out !== null) {
+	        $row->checked_out = DB::table('users')->where('id', $item->checked_out)->pluck('name')->first();
+	        $row->checked_out_time = $item->checked_out_time->toFormattedDateString();
+	    }
 
 	    foreach ($columns as $column) {
 	        if (!in_array($column->name, $except)) {

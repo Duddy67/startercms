@@ -95,6 +95,14 @@ class RoleController extends Controller
         return view('admin.users.roles.form', compact('role', 'fields', 'actions', 'board', 'query', 'queryWithId'));
     }
 
+    public function cancel(Request $request, $id)
+    {
+        $role = Role::findOrFail($id);
+	//$this->checkIn($user);
+
+	return redirect()->route('admin.users.roles.index', $request->query());
+    }
+
     /**
      * Update the specified role.
      *
@@ -130,7 +138,7 @@ class RoleController extends Controller
 	    $level1Perms = $this->getPermissionNameList(['level2', 'level3']);
 	    $count = array_intersect($request->input('permissions'), $level1Perms);
 
-	    if ($this->getUserRoleType() == 'admin' && $count) {
+	    if ($this->getUserRoleType(auth()->user()) == 'admin' && $count) {
 		return redirect()->route('admin.users.roles.edit', $role->id)->with('error', __('messages.roles.permission_not_auth'));
 	    }
 
@@ -195,7 +203,7 @@ class RoleController extends Controller
 	    $level1Perms = $this->getPermissionNameList(['level2', 'level3']);
 	    $count = array_intersect($request->input('permissions'), $level1Perms);
 
-	    if ($this->getUserRoleType() == 'admin' && $count) {
+	    if ($this->getUserRoleType(auth()->user()) == 'admin' && $count) {
 		return redirect()->route('admin.users.roles.edit', $role->id)->with('error', __('messages.roles.permission_not_auth'));
 	    }
 
@@ -278,7 +286,7 @@ class RoleController extends Controller
     {
         // N.B: Only super-admin and users type admin are allowed to manage roles.
 
-        $userRoleType = $this->getUserRoleType();
+        $userRoleType = $this->getUserRoleType(auth()->user());
 	$hierarchy = $this->getRoleHierarchy();
 
 	if ($userRoleType == 'admin') {
@@ -321,7 +329,7 @@ class RoleController extends Controller
 
 		    // Disable permissions according to the edited role type.
 
-                    $roleType = $this->getRoleType($role);
+                    $roleType = $this->defineRoleType($role);
 
 		    if ($role->name == 'super-admin') {
 		        // super-admin has all permissions.
@@ -359,7 +367,7 @@ class RoleController extends Controller
 	    }
 
 	    if ($field->name == '_role_type') {
-	        $value = ($role->name == 'super-admin') ? 'super-admin' : $this->getRoleType($role);
+	        $value = ($role->name == 'super-admin') ? 'super-admin' : $this->defineRoleType($role);
 	        $field->value = $value;
 	    }
 	}

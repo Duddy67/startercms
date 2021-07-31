@@ -162,23 +162,33 @@ trait RolesPermissions
     }
 
     /*
-     * Returns the role type of a given user or of the current user.
+     * Returns the role type of a given user.
      *
-     * @param \App\Models\Users\User  $user (optional)
+     * @param \App\Models\Users\User  $user 
      * @return string
      */
-    public function getUserRoleType($user = null)
+    public function getUserRoleType($user)
     {
-        // Get the given user or the current user.
-        $user = ($user) ? $user : auth()->user();
         $roleName = $user->getRoleNames()->toArray()[0];
 
-	if ($roleName == 'super-admin') {
-	    return 'super-admin';
+	if (in_array($roleName, $this->getDefaultRoles())) {
+	    return $roleName;
 	}
 
-	return $this->getRoleType($roleName);
+	return $this->defineRoleType($roleName);
 
+    }
+
+    /*
+     * Returns the role level of a given user.
+     *
+     * @param \App\Models\Users\User  $user 
+     * @return integer
+     */
+    public function getUserRoleLevel($user)
+    {
+        $roleType = $this->getUserRoleType($user);
+	return $this->getRoleHierarchy()[$roleType];
     }
 
     /*
@@ -187,7 +197,7 @@ trait RolesPermissions
      * @param \Spatie\Permission\Models\Role or string  $role
      * @return string
      */
-    public function getRoleType($role)
+    public function defineRoleType($role)
     {
 	$role = (is_string($role)) ? Role::findByName($role) : $role;
 
@@ -205,12 +215,6 @@ trait RolesPermissions
 	}
     }
 
-    public function getUserRoleLevel($user = null)
-    {
-        $roleType = $this->getUserRoleType($user);
-	return $this->getRoleHierarchy()[$roleType];
-    }
-
     /*
      * Returns the roles that a user is allowed to assign to an other user.
      *
@@ -226,7 +230,7 @@ trait RolesPermissions
 	}
 
 	// Get the current user's role type.
-        $roleType = $this->getUserRoleType();
+        $roleType = $this->getUserRoleType(auth()->user());
 
 	if (!in_array($roleType, $this->getAllowedRoleTypes())) {
 	    // Returns an empty collection.

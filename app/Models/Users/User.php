@@ -48,6 +48,17 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'checked_out_time'
+    ];
+
 
     /**
      * The groups that belong to the user.
@@ -217,7 +228,7 @@ class User extends Authenticatable
 
 	$hierarchy = $this->getRoleHierarchy();
         // Users can only update users lower in the hierarchy.
-	if ($hierarchy[$this->getUserRoleType()] > $hierarchy[$this->getUserRoleType($user)]) {
+	if ($hierarchy[$this->getRoleType()] > $hierarchy[$this->getUserRoleType($user)]) {
 	    return true;
 	}
 
@@ -243,7 +254,7 @@ class User extends Authenticatable
 
 	$hierarchy = $this->getRoleHierarchy();
         // Users can only delete users lower in the hierarchy.
-	if ($hierarchy[$this->getUserRoleType()] > $hierarchy[$this->getUserRoleType($user)]) {
+	if ($hierarchy[$this->getRoleType()] > $hierarchy[$this->getUserRoleType($user)]) {
 	    return true;
 	}
 
@@ -253,11 +264,38 @@ class User extends Authenticatable
     /*
      * Returns the user's role name.
      *
-     * @return boolean
+     * @return string
      */
     public function getRoleName()
     {
         return $this->getRoleNames()->toArray()[0];
+    }
+
+    /*
+     * Returns the user's role level.
+     *
+     * @return integer
+     */
+    public function getRoleLevel()
+    {
+        $roleType = $this->getRoleType();
+
+	return $this->getRoleHierarchy()[$roleType];
+    }
+
+    /*
+     * Returns the user's role type.
+     *
+     * @return string
+     */
+    public function getRoleType()
+    {
+        if (in_array($this->getRoleName(), $this->getDefaultRoles())) {
+	    return $this->getRoleName();
+	}
+	else {
+	    return $this->defineRoleType($this->getRoleName());
+	}
     }
 
     /*
@@ -278,6 +316,6 @@ class User extends Authenticatable
      */
     public function canAccessAdmin()
     {
-        return in_array($this->getUserRoleType(), ['super-admin', 'admin', 'manager', 'assistant']);
+        return in_array($this->getRoleType(), ['super-admin', 'admin', 'manager', 'assistant']);
     }
 }

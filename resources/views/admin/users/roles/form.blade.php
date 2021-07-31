@@ -45,7 +45,7 @@
 	    </table>
 	@endforeach
 
-	<input type="hidden" id="itemList" value="{{ route('admin.users.roles.index', $query) }}">
+	<input type="hidden" id="cancelEdit" value="{{ route('admin.users.roles.cancel', $queryWithId) }}">
 	<input type="hidden" id="close" name="_close" value="0">
     </form>
 

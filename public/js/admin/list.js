@@ -1,7 +1,7 @@
 (function($) {
     // Run a function when the page is fully loaded including graphics.
     $(window).on('load', function() {
-	let actions = ['create', 'massDestroy', 'batch'];
+	let actions = ['create', 'massDestroy', 'batch', 'checkin'];
 
 	actions.forEach(function (action) {
 	    $('#'+action).click( function() { $.fn[action](); });
@@ -97,6 +97,7 @@
 	
 	$('#selectedItems').append(inputs);
 
+        // Check for batch iframe.
         let iframe = $('iframe[name="batch"]');
 	if (iframe.length) {
 	    // Remove a possible previous selection from the batchForm form.
@@ -116,6 +117,16 @@
 
     $.fn.massDestroy = function() {
 	if ($.fn.setSelectedItems()) {
+	    $('#selectedItems input[name="_method"]').val('delete');
+	    $('#selectedItems').attr('action', $('#destroyItems').val());
+	    $('#selectedItems').submit();
+	}
+    }
+
+    $.fn.checkin = function() {
+	if ($.fn.setSelectedItems()) {
+	    $('#selectedItems input[name="_method"]').val('put');
+	    $('#selectedItems').attr('action', $('#checkinItems').val());
 	    $('#selectedItems').submit();
 	}
     }

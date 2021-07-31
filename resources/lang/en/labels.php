@@ -68,6 +68,7 @@ return [
 	'update' => 'Update',
 	'rebuild' => 'Rebuild',
 	'batch' => 'Batch',
+	'checkin' => 'Check-in',
     ],
 ];
 

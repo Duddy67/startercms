@@ -8,11 +8,12 @@ use Illuminate\Validation\Rule;
 use App\Models\Users\Group;
 use App\Models\Users\User;
 use App\Traits\Admin\ItemConfig;
+use App\Traits\Admin\CheckInCheckOut;
 
 
 class GroupController extends Controller
 {
-    use ItemConfig;
+    use ItemConfig, CheckInCheckOut;
 
     /*
      * Instance of the model.
@@ -93,6 +94,12 @@ class GroupController extends Controller
 	    return redirect()->route('admin.users.groups.index')->with('error',  __('messages.generic.access_not_auth'));
 	}
 
+	if ($group->checked_out) {
+	    return redirect()->route('admin.users.groups.index')->with('error',  __('messages.generic.checked_out'));
+	}
+
+	$this->checkOut($group);
+
         // Gather the needed data to build the form.
         $fields = $this->getFields($group);
         $actions = $this->getActions('form');
@@ -100,6 +107,14 @@ class GroupController extends Controller
 	$queryWithId['group'] = $id;
 
         return view('admin.users.groups.form', compact('group', 'fields', 'actions', 'query', 'queryWithId'));
+    }
+
+    public function cancel(Request $request, $id)
+    {
+        $group = Group::findOrFail($id);
+	$this->checkIn($group);
+
+	return redirect()->route('admin.users.groups.index', $request->query());
     }
 
     /**
@@ -133,7 +148,7 @@ class GroupController extends Controller
 	$owner = User::findOrFail($group->created_by);
 
 	// Ensure the selected owner matches the current user's role level.
-	if (auth()->user()->getUserRoleLevel($owner) >= auth()->user()->getUserRoleLevel()) {
+	if (auth()->user()->getUserRoleLevel($owner) >= auth()->user()->getRoleLevel()) {
 	    return redirect()->route('admin.users.groups.edit', array_merge($request->query(), ['group' => $id]))->with('error',  __('messages.generic.owner_not_valid'));
 	}
 
@@ -141,6 +156,7 @@ class GroupController extends Controller
 	$group->save();
 
         if ($request->input('_close', null)) {
+	    $this->checkIn($group);
 	    // Redirect to the list.
 	    return redirect()->route('admin.users.groups.index', $request->query())->with('success', __('messages.groups.update_success'));
 	}
@@ -171,7 +187,7 @@ class GroupController extends Controller
 	  'created_by' => auth()->user()->id
 	]);
 
-	$group->role_level = auth()->user()->getUserRoleLevel();
+	$group->role_level = auth()->user()->getRoleLevel();
 	$group->save();
 
         if ($request->input('_close', null)) {
@@ -228,5 +244,34 @@ class GroupController extends Controller
 	}
 
 	return redirect()->route('admin.users.groups.index', $request->query())->with('success', __('messages.groups.delete_list_success', ['number' => count($request->input('ids'))]));
+    }
+
+    public function massCheckIn(Request $request)
+    {
+//file_put_contents('debog_file.txt', print_r($request->all(), true));
+        $checkedIn = 0;
+	$messages = [];
+        // Check in the groups selected from the list.
+        foreach ($request->input('ids') as $id) {
+	    $group = Group::findOrFail($id);
+
+	    if ($group->checked_out === null) {
+	        continue;
+	    }
+
+	    if (!$this->canCheckIn($group)) {
+	        $messages['error'] = __('messages.generic.check_in_not_auth');
+	        continue;
+	    }
+
+	    $this->checkIn($group);
+	    $checkedIn++;
+	}
+
+	if ($checkedIn) {
+	    $messages['success'] = __('messages.generic.check_in_success', ['number' => $checkedIn]);
+	}
+
+	return redirect()->route('admin.users.groups.index', $request->query())->with($messages);
     }
 }

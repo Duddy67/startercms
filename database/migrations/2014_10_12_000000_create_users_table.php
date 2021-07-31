@@ -20,6 +20,8 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->unsignedBigInteger('checked_out')->nullable();
+            $table->timestamp('checked_out_time')->nullable();
             $table->timestamps();
         });
     }

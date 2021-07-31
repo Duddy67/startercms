@@ -22,7 +22,7 @@ class Admin
      */
     public function handle(Request $request, Closure $next)
     {
-        if (in_array($this->getUserRoleType(), ['super-admin', 'admin', 'manager', 'assistant'])) {
+        if (in_array($this->getUserRoleType(auth()->user()), ['super-admin', 'admin', 'manager', 'assistant'])) {
 
 	    $settings = Cache::rememberForever('settings', function () {
 	        // Updates the config app parameters.

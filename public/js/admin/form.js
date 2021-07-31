@@ -19,8 +19,7 @@
   }
 
   $.fn.cancel = function() {
-      // Redirect to the item list.
-      window.location.replace($('#itemList').val());
+      window.location.replace($('#cancelEdit').val());
   }
 
   $.fn.destroy = function() {

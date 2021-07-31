@@ -24,6 +24,17 @@ class Group extends Model
     ];
 
     /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'checked_out_time'
+    ];
+
+    /**
      * The users that belong to the group.
      */
     public function users()
@@ -52,7 +63,7 @@ class Group extends Model
 	    $query->orderBy($matches[1], $matches[2]);
 	}
 
-	$query->where('role_level', '<', auth()->user()->getUserRoleLevel())
+	$query->where('role_level', '<', auth()->user()->getRoleLevel())
 	      ->orWhereIn('access_level', ['public_ro', 'public_rw'])
 	      ->orWhere('created_by', auth()->user()->id);
 
@@ -64,7 +75,6 @@ class Group extends Model
 	$users = auth()->user()->getAssignableUsers();
 	$options = [];
 
-//file_put_contents('debog_file.txt', print_r($users, true));
 	foreach ($users as $user) {
 	    $options[] = ['value' => $user->id, 'text' => $user->name];
 	}
@@ -108,7 +118,7 @@ class Group extends Model
      */
     public function canEdit()
     {
-        if ($this->access_level == 'public_rw' || $this->role_level < auth()->user()->getUserRoleLevel() || $this->created_by == auth()->user()->id) {
+        if ($this->access_level == 'public_rw' || $this->role_level < auth()->user()->getRoleLevel() || $this->created_by == auth()->user()->id) {
 	    return true;
 	}
 
@@ -127,7 +137,7 @@ class Group extends Model
 	}
 
 	// The owner role level is lower than the current user's or the current user owns the group.
-	if ($this->role_level < auth()->user()->getUserRoleLevel() || $this->created_by == auth()->user()->id) {
+	if ($this->role_level < auth()->user()->getRoleLevel() || $this->created_by == auth()->user()->id) {
 	    return true;
 	}
 

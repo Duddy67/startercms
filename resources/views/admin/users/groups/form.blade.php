@@ -24,7 +24,7 @@
 	    <x-input :attribs="$attribs" :value="$value" />
         @endforeach
 
-	<input type="hidden" id="itemList" value="{{ route('admin.users.groups.index', $query) }}">
+	<input type="hidden" id="cancelEdit" value="{{ route('admin.users.groups.cancel', $queryWithId) }}">
 	<input type="hidden" id="close" name="_close" value="0">
     </form>
     <x-toolbar :items=$actions />

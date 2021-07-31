@@ -28,6 +28,8 @@
     <x-pagination :items=$items />
 
     <input type="hidden" id="createItem" value="{{ route('admin.users.groups.create', $query) }}">
+    <input type="hidden" id="destroyItems" value="{{ route('admin.users.groups.index', $query) }}">
+    <input type="hidden" id="checkinItems" value="{{ route('admin.users.groups.massCheckIn', $query) }}">
 
     <form id="selectedItems" action="{{ route('admin.users.groups.index', $query) }}" method="post">
 	@method('delete')

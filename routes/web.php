@@ -62,12 +62,18 @@ Route::prefix('admin')->group(function () {
 	    Route::delete('/users', [UserController::class, 'massDestroy'])->name('admin.users.users.massDestroy');
 	    Route::get('/users/batch', [UserController::class, 'batch'])->name('admin.users.users.batch');
 	    Route::put('/users/batch', [UserController::class, 'massUpdate'])->name('admin.users.users.massUpdate');
+	    Route::get('/users/{user}/cancel', [UserController::class, 'cancel'])->name('admin.users.users.cancel');
+	    Route::put('/users/checkin', [UserController::class, 'massCheckIn'])->name('admin.users.users.massCheckIn');
 	    Route::resource('users', UserController::class, ['as' => 'admin.users'])->except(['show']);
 	    // Groups
 	    Route::delete('/groups', [GroupController::class, 'massDestroy'])->name('admin.users.groups.massDestroy');
+	    Route::get('/groups/{group}/cancel', [GroupController::class, 'cancel'])->name('admin.users.groups.cancel');
+	    Route::put('/groups/checkin', [GroupController::class, 'massCheckIn'])->name('admin.users.groups.massCheckIn');
 	    Route::resource('groups', GroupController::class, ['as' => 'admin.users'])->except(['show']);
 	    // Roles
 	    Route::delete('/roles', [RoleController::class, 'massDestroy'])->name('admin.users.roles.massDestroy');
+	    Route::get('/roles/{role}/cancel', [RoleController::class, 'cancel'])->name('admin.users.roles.cancel');
+	    Route::put('/roles/checkin', [RoleController::class, 'massCheckIn'])->name('admin.users.roles.massCheckIn');
 	    Route::resource('roles', RoleController::class, ['as' => 'admin.users'])->except(['show']);
 	    // Permissions
 	    Route::get('/permissions', [PermissionController::class, 'index'])->name('admin.users.permissions.index');
@@ -80,6 +86,8 @@ Route::prefix('admin')->group(function () {
 	    Route::patch('/general', [GeneralController::class, 'update'])->name('admin.settings.general.update');
 	    // Emails
 	    Route::delete('/emails', [EmailController::class, 'massDestroy'])->name('admin.settings.emails.massDestroy');
+	    Route::get('/emails/{email}/cancel', [EmailController::class, 'cancel'])->name('admin.settings.emails.cancel');
+	    Route::put('/emails/checkin', [EmailController::class, 'massCheckIn'])->name('admin.settings.emails.massCheckIn');
 	    Route::resource('emails', EmailController::class, ['as' => 'admin.settings'])->except(['show']);
 	});
     });
