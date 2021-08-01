@@ -1,7 +1,7 @@
 @extends ('layouts.admin')
 
 @section ('main')
-    @php $action = (isset($group)) ? route('admin.users.groups.update', $queryWithId) : route('admin.users.groups.store', $query) @endphp
+    @php $action = (isset($group)) ? route('admin.users.groups.update', $query) : route('admin.users.groups.store', $query) @endphp
     <form method="post" action="{{ $action }}" id="itemForm">
         @csrf
 
@@ -24,13 +24,13 @@
 	    <x-input :attribs="$attribs" :value="$value" />
         @endforeach
 
-	<input type="hidden" id="cancelEdit" value="{{ route('admin.users.groups.cancel', $queryWithId) }}">
+	<input type="hidden" id="cancelEdit" value="{{ route('admin.users.groups.cancel', $query) }}">
 	<input type="hidden" id="close" name="_close" value="0">
     </form>
     <x-toolbar :items=$actions />
 
     @if (isset($group))
-	<form id="deleteItem" action="{{ route('admin.users.groups.destroy', $queryWithId) }}" method="post">
+	<form id="deleteItem" action="{{ route('admin.users.groups.destroy', $query) }}" method="post">
 	    @method('delete')
 	    @csrf
 	</form>
@@ -43,5 +43,6 @@
     <link rel="stylesheet" href="{{ url('/') }}/vendor/adminlte/plugins/jquery-ui/jquery-ui.min.css"></script>
     <script type="text/javascript" src="{{ url('/') }}/js/admin/datepicker.js"></script>
     <script type="text/javascript" src="{{ url('/') }}/js/admin/form.js"></script>
+    <script type="text/javascript" src="{{ url('/') }}/js/admin/disable.toolbars.js"></script>
     <script type="text/javascript" src="{{ url('/') }}/js/tinymce/filemanager.js"></script>
 @endpush

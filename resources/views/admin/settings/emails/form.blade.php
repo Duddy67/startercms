@@ -52,7 +52,7 @@
 	    @endif
         @endforeach
 
-	<input type="hidden" id="itemList" value="{{ route('admin.settings.emails.index', $query) }}">
+	<input type="hidden" id="cancelEdit" value="{{ route('admin.settings.emails.cancel', $queryWithId) }}">
 	<input type="hidden" id="close" name="_close" value="0">
     </form>
     <x-toolbar :items=$actions />
@@ -71,5 +71,6 @@
     <link rel="stylesheet" href="{{ url('/') }}/vendor/adminlte/plugins/jquery-ui/jquery-ui.min.css"></script>
     <script type="text/javascript" src="{{ url('/') }}/js/admin/datepicker.js"></script>
     <script type="text/javascript" src="{{ url('/') }}/js/admin/form.js"></script>
+    <script type="text/javascript" src="{{ url('/') }}/js/admin/disable.toolbars.js"></script>
     <script type="text/javascript" src="{{ url('/') }}/js/tinymce/filemanager.js"></script>
 @endpush

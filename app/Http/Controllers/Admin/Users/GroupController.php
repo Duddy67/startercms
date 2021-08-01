@@ -94,7 +94,7 @@ class GroupController extends Controller
 	    return redirect()->route('admin.users.groups.index')->with('error',  __('messages.generic.access_not_auth'));
 	}
 
-	if ($group->checked_out) {
+	if ($group->checked_out && $group->checked_out != auth()->user()->id) {
 	    return redirect()->route('admin.users.groups.index')->with('error',  __('messages.generic.checked_out'));
 	}
 
@@ -103,23 +103,26 @@ class GroupController extends Controller
         // Gather the needed data to build the form.
         $fields = $this->getFields($group);
         $actions = $this->getActions('form');
-	$query = $queryWithId = $request->query();
-	$queryWithId['group'] = $id;
+	//$query = $queryWithId = $request->query();
+	$query = array_merge($request->query(), ['group' => $id]);
+	//$queryWithId['group'] = $id;
 
-        return view('admin.users.groups.form', compact('group', 'fields', 'actions', 'query', 'queryWithId'));
+        return view('admin.users.groups.form', compact('group', 'fields', 'actions', 'query'));
     }
 
     /**
      * Checks the record back in.
      *
      * @param  Request  $request
-     * @param  int  $id
+     * @param  int  $id (optional)
      * @return Response
      */
-    public function cancel(Request $request, $id)
+    public function cancel(Request $request, $id = null)
     {
-        $record = Group::findOrFail($id);
-	$this->checkIn($record);
+        if ($id) {
+	    $record = Group::findOrFail($id);
+	    $this->checkIn($record);
+	}
 
 	return redirect()->route('admin.users.groups.index', $request->query());
     }

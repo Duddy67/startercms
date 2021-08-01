@@ -97,6 +97,10 @@ class UserController extends Controller
 	    return redirect()->route('admin.users.users.index')->with('error', __('messages.users.edit_user_not_auth'));
 	}
 
+	if ($user->checked_out && $user->checked_out != auth()->user()->id) {
+	    return redirect()->route('admin.users.users.index')->with('error',  __('messages.generic.checked_out'));
+	}
+
 	$this->checkOut($user);
 
         // Gather the needed data to build the form.
@@ -115,13 +119,15 @@ class UserController extends Controller
      * Checks the record back in.
      *
      * @param  Request  $request
-     * @param  int  $id
+     * @param  int  $id (optional)
      * @return Response
      */
-    public function cancel(Request $request, $id)
+    public function cancel(Request $request, $id = null)
     {
-        $record = User::findOrFail($id);
-	$this->checkIn($record);
+        if ($id) {
+	    $record = User::findOrFail($id);
+	    $this->checkIn($record);
+	}
 
 	return redirect()->route('admin.users.users.index', $request->query());
     }

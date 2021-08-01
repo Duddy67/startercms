@@ -88,6 +88,13 @@ class EmailController extends Controller
     {
         // Gather the needed data to build the form.
         $email = Email::findOrFail($id);
+
+	if ($email->checked_out && $email->checked_out != auth()->user()->id) {
+	    return redirect()->route('admin.settings.emails.index')->with('error',  __('messages.generic.checked_out'));
+	}
+
+	$this->checkOut($email);
+
         $fields = $this->getFields($email);
         $actions = $this->getActions('form');
 	$query = $queryWithId = $request->query();
@@ -100,15 +107,17 @@ class EmailController extends Controller
      * Checks the record back in.
      *
      * @param  Request  $request
-     * @param  int  $id
+     * @param  int  $id (optional)
      * @return Response
      */
-    public function cancel(Request $request, $id)
+    public function cancel(Request $request, $id = null)
     {
-        $record = Email::findOrFail($id);
-	$this->checkIn($record);
+        if ($id) {
+	    $record = Email::findOrFail($id);
+	    $this->checkIn($record);
+	}
 
-	return redirect()->route('admin.users.roles.index', $request->query());
+	return redirect()->route('admin.settings.emails.index', $request->query());
     }
 
     /**

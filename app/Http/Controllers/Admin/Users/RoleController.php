@@ -84,7 +84,13 @@ class RoleController extends Controller
     public function edit(Request $request, $id)
     {
         $role = Role::findById($id);
+
+	if ($role->checked_out && $role->checked_out != auth()->user()->id) {
+	    return redirect()->route('admin.users.roles.index')->with('error',  __('messages.generic.checked_out'));
+	}
+
 	$this->checkOut($role);
+
         // Gather the needed data to build the form.
 	$except = (in_array($role->name, $this->getDefaultRoles())) ? ['_role_type'] : [];
         $fields = $this->getFields($role, $except);
@@ -101,13 +107,15 @@ class RoleController extends Controller
      * Checks the record back in.
      *
      * @param  Request  $request
-     * @param  int  $id
+     * @param  int  $id (optional)
      * @return Response
      */
-    public function cancel(Request $request, $id)
+    public function cancel(Request $request, $id = null)
     {
-        $record = Role::findOrFail($id);
-	$this->checkIn($record);
+        if ($id) {
+	    $record = Role::findOrFail($id);
+	    $this->checkIn($record);
+	}
 
 	return redirect()->route('admin.users.roles.index', $request->query());
     }
