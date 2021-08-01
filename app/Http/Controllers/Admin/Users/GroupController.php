@@ -109,10 +109,17 @@ class GroupController extends Controller
         return view('admin.users.groups.form', compact('group', 'fields', 'actions', 'query', 'queryWithId'));
     }
 
+    /**
+     * Checks the record back in.
+     *
+     * @param  Request  $request
+     * @param  int  $id
+     * @return Response
+     */
     public function cancel(Request $request, $id)
     {
-        $group = Group::findOrFail($id);
-	$this->checkIn($group);
+        $record = Group::findOrFail($id);
+	$this->checkIn($record);
 
 	return redirect()->route('admin.users.groups.index', $request->query());
     }
@@ -220,7 +227,7 @@ class GroupController extends Controller
     }
 
     /**
-     * Remove one or more groups from storage.
+     * Removes one or more groups from storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return Response
@@ -246,31 +253,15 @@ class GroupController extends Controller
 	return redirect()->route('admin.users.groups.index', $request->query())->with('success', __('messages.groups.delete_list_success', ['number' => count($request->input('ids'))]));
     }
 
+    /**
+     * Checks in one or more groups.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return Response
+     */
     public function massCheckIn(Request $request)
     {
-//file_put_contents('debog_file.txt', print_r($request->all(), true));
-        $checkedIn = 0;
-	$messages = [];
-        // Check in the groups selected from the list.
-        foreach ($request->input('ids') as $id) {
-	    $group = Group::findOrFail($id);
-
-	    if ($group->checked_out === null) {
-	        continue;
-	    }
-
-	    if (!$this->canCheckIn($group)) {
-	        $messages['error'] = __('messages.generic.check_in_not_auth');
-	        continue;
-	    }
-
-	    $this->checkIn($group);
-	    $checkedIn++;
-	}
-
-	if ($checkedIn) {
-	    $messages['success'] = __('messages.generic.check_in_success', ['number' => $checkedIn]);
-	}
+        $messages = $this->checkInMultiple($request->input('ids'), '\\App\\Models\\Users\\Group');
 
 	return redirect()->route('admin.users.groups.index', $request->query())->with($messages);
     }

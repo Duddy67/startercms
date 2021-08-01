@@ -19,12 +19,13 @@
 		<td>
 		    <div class="form-check">
 			<input type="checkbox" class="form-check-input" data-item-id={{ $row->item_id }} data-index="{{ $i }}">
+
+			@if (isset($row->checked_out))
+			    <div class="checked-out">
+				<p class="mb-0"><small>{{ $row->checked_out }}&nbsp;&nbsp;<i class="fa fa-lock"></i><br>{{ $row->checked_out_time }}</small></p>
+			    </div>
+			@endif
 		    </div>
-		    @if (isset($row->checked_out))
-			<div class="">
-			    <p class="mb-0"><small>{{ $row->checked_out }}&nbsp;&nbsp;<i class="fa fa-lock"></i><br>{{ $row->checked_out_time }}</small></p>
-			</div>
-		    @endif
 		</td>
 		@foreach ($columns as $column)
 		    <td>{{ $row->{$column->name} }}</td>

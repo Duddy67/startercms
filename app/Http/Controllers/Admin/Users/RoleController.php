@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Traits\Admin\ItemConfig;
+use App\Traits\Admin\CheckInCheckOut;
 use App\Traits\Admin\RolesPermissions;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
 {
-    use ItemConfig, RolesPermissions;
+    use ItemConfig, RolesPermissions, CheckInCheckOut;
 
     /*
      * Name of the model.
@@ -60,7 +61,7 @@ class RoleController extends Controller
      * Show the form for creating a new role.
      *
      * @param  Request  $request
-     * @return Response
+     * @return \Illuminate\Contracts\Support\Renderable
      */
     public function create(Request $request)
     {
@@ -78,11 +79,12 @@ class RoleController extends Controller
      *
      * @param  Request  $request
      * @param  int  $id
-     * @return Response
+     * @return \Illuminate\Contracts\Support\Renderable
      */
     public function edit(Request $request, $id)
     {
         $role = Role::findById($id);
+	$this->checkOut($role);
         // Gather the needed data to build the form.
 	$except = (in_array($role->name, $this->getDefaultRoles())) ? ['_role_type'] : [];
         $fields = $this->getFields($role, $except);
@@ -95,10 +97,17 @@ class RoleController extends Controller
         return view('admin.users.roles.form', compact('role', 'fields', 'actions', 'board', 'query', 'queryWithId'));
     }
 
+    /**
+     * Checks the record back in.
+     *
+     * @param  Request  $request
+     * @param  int  $id
+     * @return Response
+     */
     public function cancel(Request $request, $id)
     {
-        $role = Role::findOrFail($id);
-	//$this->checkIn($user);
+        $record = Role::findOrFail($id);
+	$this->checkIn($record);
 
 	return redirect()->route('admin.users.roles.index', $request->query());
     }
@@ -167,6 +176,7 @@ class RoleController extends Controller
 	$query = $request->query();
 
         if ($request->input('_close', null)) {
+	    $this->checkIn($user);
 	    return redirect()->route('admin.users.roles.index', $query)->with('success', __('messages.roles.update_success'));
 	}
 
@@ -277,6 +287,19 @@ class RoleController extends Controller
 	Role::destroy($request->input('ids'));
 
 	return redirect()->route('admin.users.roles.index', $request->query())->with('success', __('messages.roles.delete_list_success', ['number' => count($request->input('ids'))]));
+    }
+
+    /**
+     * Checks in one or more roles.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return Response
+     */
+    public function massCheckIn(Request $request)
+    {
+        $messages = $this->checkInMultiple($request->input('ids'), '\\Spatie\\Permission\\Models\\Role');
+
+	return redirect()->route('admin.users.roles.index', $request->query())->with($messages);
     }
 
     /*

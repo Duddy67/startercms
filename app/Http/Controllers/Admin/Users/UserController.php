@@ -8,13 +8,14 @@ use Illuminate\Validation\Rule;
 use App\Models\Users\User;
 use Illuminate\Support\Facades\Hash;
 use App\Traits\Admin\ItemConfig;
+use App\Traits\Admin\CheckInCheckOut;
 use App\Models\Settings\Email;
 use App\Models\Cms\Document;
 
 
 class UserController extends Controller
 {
-    use ItemConfig;
+    use ItemConfig, CheckInCheckOut;
 
     /*
      * Instance of the model.
@@ -96,6 +97,8 @@ class UserController extends Controller
 	    return redirect()->route('admin.users.users.index')->with('error', __('messages.users.edit_user_not_auth'));
 	}
 
+	$this->checkOut($user);
+
         // Gather the needed data to build the form.
         $fields = $this->getFields($user, ['password', 'password_confirmation']);
 	// Users cannot delete their own account.
@@ -108,10 +111,17 @@ class UserController extends Controller
         return view('admin.users.users.form', compact('user', 'fields', 'actions', 'query', 'queryWithId', 'photo'));
     }
 
+    /**
+     * Checks the record back in.
+     *
+     * @param  Request  $request
+     * @param  int  $id
+     * @return Response
+     */
     public function cancel(Request $request, $id)
     {
-        $user = User::findOrFail($id);
-	//$this->checkIn($user);
+        $record = User::findOrFail($id);
+	$this->checkIn($record);
 
 	return redirect()->route('admin.users.users.index', $request->query());
     }
@@ -168,6 +178,7 @@ class UserController extends Controller
 	$query = $request->query();
 
         if ($request->input('_close', null)) {
+	    $this->checkIn($user);
 	    return redirect()->route('admin.users.users.index', $query)->with('success', __('messages.users.update_success'));
 	}
 
@@ -272,6 +283,19 @@ class UserController extends Controller
 	}
 
 	return redirect()->route('admin.users.users.index', $request->query())->with('error', __('messages.generic.no_item_selected'));
+    }
+
+    /**
+     * Checks in one or more users.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return Response
+     */
+    public function massCheckIn(Request $request)
+    {
+        $messages = $this->checkInMultiple($request->input('ids'), '\\App\\Models\\Users\\User');
+
+	return redirect()->route('admin.users.users.index', $request->query())->with($messages);
     }
 
     /**

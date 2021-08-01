@@ -7,10 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\Settings\Email;
 use App\Traits\Admin\ItemConfig;
+use App\Traits\Admin\CheckInCheckOut;
 
 class EmailController extends Controller
 {
-    use ItemConfig;
+    use ItemConfig, CheckInCheckOut;
 
     /*
      * Instance of the model.
@@ -93,6 +94,34 @@ class EmailController extends Controller
 	$queryWithId['email'] = $id;
 
         return view('admin.settings.emails.form', compact('email', 'fields', 'actions', 'query', 'queryWithId'));
+    }
+
+    /**
+     * Checks the record back in.
+     *
+     * @param  Request  $request
+     * @param  int  $id
+     * @return Response
+     */
+    public function cancel(Request $request, $id)
+    {
+        $record = Email::findOrFail($id);
+	$this->checkIn($record);
+
+	return redirect()->route('admin.users.roles.index', $request->query());
+    }
+
+    /**
+     * Checks in one or more emails.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return Response
+     */
+    public function massCheckIn(Request $request)
+    {
+        $messages = $this->checkInMultiple($request->input('ids'), '\\App\\Models\\Settings\\Email');
+
+	return redirect()->route('admin.settings.emails.index', $request->query())->with($messages);
     }
 
     /**

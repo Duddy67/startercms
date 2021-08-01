@@ -4,6 +4,7 @@ namespace App\Traits\Admin;
 
 use App\Models\Settings\General;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 
 trait ItemConfig
@@ -40,7 +41,13 @@ trait ItemConfig
 
 	    if ($item->checked_out !== null) {
 	        $row->checked_out = DB::table('users')->where('id', $item->checked_out)->pluck('name')->first();
-	        $row->checked_out_time = $item->checked_out_time->toFormattedDateString();
+
+		if (is_string($item->checked_out_time)) {
+		    // Converts the string date into Carbon object.
+		    $item->checked_out_time = Carbon::parse($item->checked_out_time);
+		}
+
+		$row->checked_out_time = $item->checked_out_time->toFormattedDateString();
 	    }
 
 	    foreach ($columns as $column) {
