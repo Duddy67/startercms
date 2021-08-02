@@ -103,9 +103,8 @@ class GroupController extends Controller
         // Gather the needed data to build the form.
         $fields = $this->getFields($group);
         $actions = $this->getActions('form');
-	//$query = $queryWithId = $request->query();
+	// Add the id parameter to the query.
 	$query = array_merge($request->query(), ['group' => $id]);
-	//$queryWithId['group'] = $id;
 
         return view('admin.users.groups.form', compact('group', 'fields', 'actions', 'query'));
     }

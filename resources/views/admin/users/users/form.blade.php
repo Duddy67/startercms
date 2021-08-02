@@ -2,7 +2,7 @@
 
 @section ('main')
 
-    @php $action = (isset($user)) ? route('admin.users.users.update', $queryWithId) : route('admin.users.users.store', $query) @endphp
+    @php $action = (isset($user)) ? route('admin.users.users.update', $query) : route('admin.users.users.store', $query) @endphp
 
     @if (isset($user) && $photo) 
         <img src="{{ url('/').$photo->getThumbnailUrl() }}" >
@@ -37,7 +37,7 @@
 	    </div>
         @endforeach
 
-	<input type="hidden" id="cancelEdit" value="{{ route('admin.users.users.cancel', $queryWithId) }}">
+	<input type="hidden" id="cancelEdit" value="{{ route('admin.users.users.cancel', $query) }}">
 	<input type="hidden" id="close" name="_close" value="0">
     </form>
 
@@ -46,7 +46,7 @@
     </div>
 
     @if (isset($user))
-	<form id="deleteItem" action="{{ route('admin.users.users.destroy', $queryWithId) }}" method="post">
+	<form id="deleteItem" action="{{ route('admin.users.users.destroy', $query) }}" method="post">
 	    @method('delete')
 	    @csrf
 	</form>

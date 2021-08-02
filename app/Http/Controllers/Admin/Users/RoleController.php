@@ -97,10 +97,10 @@ class RoleController extends Controller
 	$this->setFieldValues($fields, $role);
 	$board = $this->getPermissionBoard($role);
         $actions = $this->getActions('form');
-	$query = $queryWithId = $request->query();
-	$queryWithId['role'] = $id;
+	// Add the id parameter to the query.
+	$query = array_merge($request->query(), ['role' => $id]);
 
-        return view('admin.users.roles.form', compact('role', 'fields', 'actions', 'board', 'query', 'queryWithId'));
+        return view('admin.users.roles.form', compact('role', 'fields', 'actions', 'board', 'query'));
     }
 
     /**
@@ -181,16 +181,12 @@ class RoleController extends Controller
 	    }
 	}
 
-	$query = $request->query();
-
         if ($request->input('_close', null)) {
-	    $this->checkIn($user);
-	    return redirect()->route('admin.users.roles.index', $query)->with('success', __('messages.roles.update_success'));
+	    $this->checkIn($role);
+	    return redirect()->route('admin.users.roles.index', $request->query())->with('success', __('messages.roles.update_success'));
 	}
 
-	$query['role'] = $role->id;
-
-	return redirect()->route('admin.users.roles.edit', $query)->with('success', __('messages.roles.update_success'));
+	return redirect()->route('admin.users.roles.edit', array_merge($request->query(), ['role' => $id]))->with('success', __('messages.roles.update_success'));
      
     }
 

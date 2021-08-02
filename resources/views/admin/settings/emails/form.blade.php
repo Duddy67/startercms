@@ -1,7 +1,7 @@
 @extends ('layouts.admin')
 
 @section ('main')
-    @php $action = (isset($email)) ? route('admin.settings.emails.update', $queryWithId) : route('admin.settings.emails.store', $query) @endphp
+    @php $action = (isset($email)) ? route('admin.settings.emails.update', $query) : route('admin.settings.emails.store', $query) @endphp
     <form method="post" action="{{ $action }}" id="itemForm">
         @csrf
 
@@ -52,13 +52,13 @@
 	    @endif
         @endforeach
 
-	<input type="hidden" id="cancelEdit" value="{{ route('admin.settings.emails.cancel', $queryWithId) }}">
+	<input type="hidden" id="cancelEdit" value="{{ route('admin.settings.emails.cancel', $query) }}">
 	<input type="hidden" id="close" name="_close" value="0">
     </form>
     <x-toolbar :items=$actions />
 
     @if (isset($email))
-	<form id="deleteItem" action="{{ route('admin.settings.emails.destroy', $queryWithId) }}" method="post">
+	<form id="deleteItem" action="{{ route('admin.settings.emails.destroy', $query) }}" method="post">
 	    @method('delete')
 	    @csrf
 	</form>

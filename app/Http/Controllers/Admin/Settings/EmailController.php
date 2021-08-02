@@ -97,10 +97,10 @@ class EmailController extends Controller
 
         $fields = $this->getFields($email);
         $actions = $this->getActions('form');
-	$query = $queryWithId = $request->query();
-	$queryWithId['email'] = $id;
+	// Add the id parameter to the query.
+	$query = array_merge($request->query(), ['email' => $id]);
 
-        return view('admin.settings.emails.form', compact('email', 'fields', 'actions', 'query', 'queryWithId'));
+        return view('admin.settings.emails.form', compact('email', 'fields', 'actions', 'query'));
     }
 
     /**
@@ -159,15 +159,11 @@ class EmailController extends Controller
 	$email->plain_text = ($request->input('format') == 'plain_text') ? 1 : 0;
 	$email->save();
 
-	$query = $request->query();
-
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.settings.emails.index', $query)->with('success', __('messages.emails.update_success'));
+	    return redirect()->route('admin.settings.emails.index', $request->query())->with('success', __('messages.emails.update_success'));
 	}
 
-	$query['email'] = $email->id;
-
-	return redirect()->route('admin.settings.emails.edit', $query)->with('success', __('messages.emails.update_success'));
+	return redirect()->route('admin.settings.emails.edit', array_merge($request->query(), ['email' => $id]))->with('success', __('messages.emails.update_success'));
     }
 
     /**

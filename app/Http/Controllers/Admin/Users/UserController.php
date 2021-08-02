@@ -108,11 +108,11 @@ class UserController extends Controller
 	// Users cannot delete their own account.
 	$except = (auth()->user()->id == $user->id) ? ['destroy'] : [];
         $actions = $this->getActions('form', $except);
-	$query = $queryWithId = $request->query();
-	$queryWithId['user'] = $id;
+	// Add the id parameter to the query.
+	$query = array_merge($request->query(), ['user' => $id]);
 	$photo = $user->documents()->where('field', 'photo')->latest('created_at')->first();
 
-        return view('admin.users.users.form', compact('user', 'fields', 'actions', 'query', 'queryWithId', 'photo'));
+        return view('admin.users.users.form', compact('user', 'fields', 'actions', 'query', 'photo'));
     }
 
     /**
@@ -181,16 +181,12 @@ class UserController extends Controller
 	    $user->documents()->save($document);
 	}
 
-	$query = $request->query();
-
         if ($request->input('_close', null)) {
 	    $this->checkIn($user);
-	    return redirect()->route('admin.users.users.index', $query)->with('success', __('messages.users.update_success'));
+	    return redirect()->route('admin.users.users.index', $request->query())->with('success', __('messages.users.update_success'));
 	}
 
-	$query['user'] = $user->id;
-
-	return redirect()->route('admin.users.users.edit', $query)->with('success', __('messages.users.update_success'));
+	return redirect()->route('admin.users.users.edit', array_merge($request->query(), ['user' => $id]))->with('success', __('messages.users.update_success'));
     }
 
     /**
