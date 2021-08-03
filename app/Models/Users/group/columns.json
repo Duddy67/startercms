@@ -12,14 +12,14 @@
     "type": "string"
   },
   {
-    "label": "labels.generic.created_by",
-    "name": "created_by",
-    "type": "string"
-  },
-  {
     "label": "labels.generic.access_level",
     "name": "access_level",
     "extra": ["sortable"],
+    "type": "string"
+  },
+  {
+    "label": "labels.generic.created_by",
+    "name": "created_by",
     "type": "string"
   },
   {

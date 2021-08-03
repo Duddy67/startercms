@@ -122,26 +122,6 @@ trait RolesPermissions
     }
 
     /*
-     * Gets the role items according to the filter, sort and pagination settings.
-     *
-     * @param  Request  $request
-     * @return \Illuminate\Pagination\LengthAwarePaginator
-     */
-    public function getItems($request)
-    {
-        $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
-        $search = $request->input('search', null);
-
-	$query = Role::query();
-
-	if ($search !== null) {
-	    $query->where('name', 'like', '%'.$search.'%');
-	}
-
-        return $query->paginate($perPage);
-    }
-
-    /*
      * Returns the permission names.
      *
      * @param Array  $except (optional)

@@ -89,6 +89,10 @@ class EmailController extends Controller
         // Gather the needed data to build the form.
         $email = Email::findOrFail($id);
 
+	if (!$email->canAccess()) {
+	    return redirect()->route('admin.settings.emails.index')->with('error',  __('messages.generic.access_not_auth'));
+	}
+
 	if ($email->checked_out && $email->checked_out != auth()->user()->id) {
 	    return redirect()->route('admin.settings.emails.index')->with('error',  __('messages.generic.checked_out'));
 	}
@@ -143,6 +147,10 @@ class EmailController extends Controller
     public function update(Request $request, $id)
     {
 	$email = Email::findOrFail($id);
+
+	if (!$email->canEdit()) {
+	    return redirect()->route('admin.settings.emails.edit', array_merge($request->query(), ['group' => $id]))->with('error',  __('messages.generic.edit_not_auth'));
+	}
 
         /*$this->validate($request, [
 	    'name' => [
@@ -209,15 +217,16 @@ class EmailController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function destroy(Request $request, $id, $redirect = true)
+    public function destroy(Request $request, $id)
     {
 	$email = Email::findOrFail($id);
-	$code = $email->code;
-	$email->delete();
 
-	if (!$redirect) {
-	    return;
+	if (!$email->canDelete()) {
+	    return redirect()->route('admin.settings.emails.edit', array_merge($request->query(), ['email' => $id]))->with('error',  __('messages.generic.delete_not_auth'));
 	}
+
+	$code = $email->code;
+	//$email->delete();
 
 	return redirect()->route('admin.settings.emails.index', $request->query())->with('success', __('messages.emails.delete_success', ['name' => $code]));
     }
@@ -230,10 +239,25 @@ class EmailController extends Controller
      */
     public function massDestroy(Request $request)
     {
+        $messages = [];
+	$deleted = 0;
+
         foreach ($request->input('ids') as $id) {
-	    $this->destroy($request, $id, false);
+	    $email = Email::findOrFail($id);
+
+	    if (!$email->canDelete()) {
+		$messages['error'] = __('messages.generic.mass_delete_not_auth'); 
+	    }
+
+	    //$email->delete();
+
+	    $deleted++;
 	}
 
-	return redirect()->route('admin.settings.emails.index', $request->query())->with('success', __('messages.emails.delete_list_success', ['number' => count($request->input('ids'))]));
+	if ($deleted) {
+	    $messages['success'] = __('messages.generic.mass_delete_success', ['number' => $deleted]);
+	}
+
+	return redirect()->route('admin.settings.emails.index', $request->query())->with($messages);
     }
 }

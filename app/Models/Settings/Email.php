@@ -25,6 +25,17 @@ class Email extends Model
         'body_text',
     ];
 
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'checked_out_time'
+    ];
+
 
     /*
      * Override.
@@ -76,6 +87,7 @@ class Email extends Model
         $sortedBy = $request->input('sorted_by', null);
 
 	$query = Email::query();
+	$query->select('emails.*', 'users.name as user_name')->leftJoin('users', 'emails.created_by', '=', 'users.id');
 
 	if ($search !== null) {
 	    $query->where('code', 'like', '%'.$search.'%');
@@ -108,6 +120,56 @@ class Email extends Model
         if ($fieldName == 'format') {
 	    return ($this->plain_text) ? 'plain_text' : 'html';
 	}
+	else {
+	    return $this->{$fieldName};
+	}
+    }
+
+    /*
+     * Checks whether the current user is allowed to access a given email according to their role level.
+     *
+     * @return boolean
+     */
+    public function canAccess()
+    {
+        if ($this->access_level == 'public_ro' || $this->canEdit()) {
+	    return true;
+	}
+
+	return false;
+    }
+
+    /*
+     * Checks whether the current user is allowed to edit a given email according to their role level.
+     *
+     * @return boolean
+     */
+    public function canEdit()
+    {
+        if ($this->access_level == 'public_rw' || $this->role_level < auth()->user()->getRoleLevel() || $this->created_by == auth()->user()->id) {
+	    return true;
+	}
+
+	return false;
+    }
+
+    /*
+     * Checks whether the current user is allowed to delete a given email according to their role level.
+     *
+     * @return boolean
+     */
+    public function canDelete()
+    {
+        if (auth()->user()->hasRole('super-admin')) {
+	    return true;
+	}
+
+	// The owner role level is lower than the current user's or the current user owns the email.
+	if ($this->role_level < auth()->user()->getRoleLevel() || $this->created_by == auth()->user()->id) {
+	    return true;
+	}
+
+	return false;
     }
 
     /*

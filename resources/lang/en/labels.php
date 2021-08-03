@@ -48,6 +48,7 @@ return [
 	'format' => 'Format',
 	'none' => 'None',
 	'unknown' => 'Unknown',
+	'system' => 'System',
 	'select_option' => '- Select -',
     ],
     'filter' => [

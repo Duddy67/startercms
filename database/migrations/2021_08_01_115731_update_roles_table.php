@@ -15,8 +15,12 @@ class UpdateRolesTable extends Migration
     {
         Schema::table('roles', function(Blueprint $table)
 	{
-            $table->unsignedBigInteger('checked_out')->nullable()->after('guard_name');
+            $table->char('access_level', 10)->after('guard_name');
+            $table->tinyInteger('role_level')->nullable()->after('access_level');
+            $table->unsignedBigInteger('checked_out')->nullable()->after('role_level');
             $table->timestamp('checked_out_time')->nullable()->after('checked_out');
+            $table->unsignedBigInteger('created_by')->after('checked_out_time');
+            $table->unsignedBigInteger('updated_by')->nullable()->after('created_by');
 	});
     }
 
@@ -29,8 +33,12 @@ class UpdateRolesTable extends Migration
     {
         Schema::table('roles', function(Blueprint $table)
 	{
+	    $table->dropColumn('access_level');
+	    $table->dropColumn('role_level');
 	    $table->dropColumn('checked_out');
 	    $table->dropColumn('checked_out_time');
+	    $table->dropColumn('created_by');
+	    $table->dropColumn('updated_by');
 	});
     }
 }

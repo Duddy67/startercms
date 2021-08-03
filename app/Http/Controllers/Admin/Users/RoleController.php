@@ -8,12 +8,17 @@ use Illuminate\Validation\Rule;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
 use App\Traits\Admin\RolesPermissions;
-use Spatie\Permission\Models\Role;
+use App\Models\Users\Role;
 use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
 {
     use ItemConfig, RolesPermissions, CheckInCheckOut;
+
+    /*
+     * Instance of the model.
+     */
+    protected $model;
 
     /*
      * Name of the model.
@@ -35,6 +40,7 @@ class RoleController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('admin.users.roles');
+	$this->model = new Role;
     }
 
     /**
@@ -49,8 +55,10 @@ class RoleController extends Controller
         $columns = $this->getColumns();
         $actions = $this->getActions('list');
         $filters = $this->getFilters($request);
-	$items = $this->getItems($request);
+	$items = $this->model->getItems($request);
 	$rows = $this->getRows($columns, $items);
+	$this->setRowValues($rows, $columns, $items);
+
 	$url = ['route' => 'admin.users.roles', 'item_name' => 'role', 'query' => $request->query()];
 	$query = $request->query();
 
@@ -85,18 +93,26 @@ class RoleController extends Controller
     {
         $role = Role::findById($id);
 
+	if (!$role->canAccess()) {
+	    return redirect()->route('admin.users.roles.index')->with('error',  __('messages.generic.access_not_auth'));
+	}
+
 	if ($role->checked_out && $role->checked_out != auth()->user()->id) {
 	    return redirect()->route('admin.users.roles.index')->with('error',  __('messages.generic.checked_out'));
 	}
 
-	$this->checkOut($role);
+	// No need to check out the default roles as they can't be edited or deleted.
+	if (!in_array($role->name, $this->getDefaultRoles())) {
+	    $this->checkOut($role);
+	}
 
         // Gather the needed data to build the form.
-	$except = (in_array($role->name, $this->getDefaultRoles())) ? ['_role_type'] : [];
+	$except = (in_array($role->name, $this->getDefaultRoles())) ? ['_role_type', 'updated_at', 'access_level', 'created_by'] : [];
         $fields = $this->getFields($role, $except);
 	$this->setFieldValues($fields, $role);
 	$board = $this->getPermissionBoard($role);
-        $actions = $this->getActions('form');
+	$except = (in_array($role->name, $this->getDefaultRoles())) ? ['save', 'saveClose', 'destroy'] : [];
+        $actions = $this->getActions('form', $except);
 	// Add the id parameter to the query.
 	$query = array_merge($request->query(), ['role' => $id]);
 
@@ -133,6 +149,10 @@ class RoleController extends Controller
 
 	if (in_array($role->id, $this->getDefaultRoleIds())) {
 	    return redirect()->route('admin.users.roles.edit', $role->id)->with('error', __('messages.roles.cannot_update_default_roles'));
+	}
+
+	if (!$role->canEdit()) {
+	    return redirect()->route('admin.users.roles.edit', array_merge($request->query(), ['role' => $id]))->with('error',  __('messages.generic.edit_not_auth'));
 	}
 
         $this->validate($request, [
@@ -247,22 +267,23 @@ class RoleController extends Controller
     public function destroy(Request $request, $id)
     {
 	$role = Role::findOrFail($id);
-	$query = $request->query();
+
+	if (!$role->canDelete()) {
+	    return redirect()->route('admin.users.roles.edit', array_merge($request->query(), ['role' => $id]))->with('error',  __('messages.generic.delete_not_auth'));
+	}
 
 	if (in_array($role->name, $this->getDefaultRoles())) {
-	    $query['role'] = $role->id;
-	    return redirect()->route('admin.users.roles.edit', $query)->with('error', __('messages.roles.cannot_delete_default_roles'));
+	    return redirect()->route('admin.users.roles.edit', array_merge($request->query(), ['role' => $id]))->with('error', __('messages.roles.cannot_delete_default_roles'));
 	}
 
 	if ($role->users->count()) {
-	    $query['role'] = $role->id;
-	    return redirect()->route('admin.users.roles.edit', $query)->with('error', __('messages.roles.users_assigned_to_roles', ['name' => $role->name]));
+	    return redirect()->route('admin.users.roles.edit', array_merge($request->query(), ['role' => $id]))->with('error', __('messages.roles.users_assigned_to_roles', ['name' => $role->name]));
 	}
 
 	$name = $role->name;
 	$role->delete();
 
-	return redirect()->route('admin.users.roles.index', $query)->with('success', __('messages.roles.delete_success', ['name' => $name]));
+	return redirect()->route('admin.users.roles.index', $request->query())->with('success', __('messages.roles.delete_success', ['name' => $name]));
     }
 
     /**
@@ -273,6 +294,7 @@ class RoleController extends Controller
      */
     public function massDestroy(Request $request)
     {
+	// Check for default roles.
         $roles = Role::whereIn('id', $request->input('ids'))->pluck('name')->toArray();
 	$result = array_intersect($roles, $this->getDefaultRoles());
 
@@ -280,11 +302,16 @@ class RoleController extends Controller
 	    return redirect()->route('admin.users.roles.index', $request->query())->with('error',  __('messages.roles.cannot_delete_roles', ['roles' => implode(',', $result)]));
 	}
 
+	// Check for dependencies and permissions.
 	foreach ($request->input('ids') as $id) {
 	    $role = Role::findOrFail($id);
 
 	    if ($role->users->count()) {
 		return redirect()->route('admin.users.roles.index', $request->query())->with('error', __('messages.roles.users_assigned_to_roles', ['name' => $role->name]));
+	    }
+
+	    if (!$role->canDelete()) {
+		return redirect()->route('admin.users.roles.edit', array_merge($request->query(), ['role' => $id]))->with('error',  __('messages.generic.delete_not_auth'));
 	    }
 	}
 
@@ -374,6 +401,29 @@ class RoleController extends Controller
 	}
 
 	return $list;
+    }
+
+    /*
+     * Sets the row values specific to the Role model.
+     *
+     * @param  Array  $rows
+     * @param  Array of stdClass Objects  $columns
+     * @param  \Illuminate\Pagination\LengthAwarePaginator  $roles
+     * @return void
+     */
+    private function setRowValues(&$rows, $columns, $roles)
+    {
+        foreach ($roles as $key => $role) {
+	    foreach ($columns as $column) {
+	        if ($column->name == 'access_level' && in_array($role->id, $this->getDefaultRoleIds())) {
+		    $rows[$key]->access_level = __('labels.generic.public_ro');
+		}
+
+	        if ($column->name == 'created_by' && in_array($role->id, $this->getDefaultRoleIds())) {
+		    $rows[$key]->created_by = __('labels.generic.system');
+		}
+	    }
+	}
     }
 
     /*

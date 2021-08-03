@@ -57,8 +57,10 @@ return [
         'owner_not_valid' => 'The owner of the item is not valid.',
         'no_item_selected' => 'No item selected.',
         'mass_update_success' => ':number items successfully updated.',
+        'mass_delete_success' => ':number item(s) have been successfully deleted.',
         'check_in_success' => ':number items successfully checked-in.',
-        'check_in_not_auth' => 'You are not authorised to check-in one or more of the selected items.',
-        'mass_update_not_auth' => 'You are not authorised to update one or more of the selected items.',
+        'check_in_not_auth' => 'You are not authorised to check-in some of the selected items.',
+        'mass_update_not_auth' => 'You are not authorised to update some of the selected items.',
+        'mass_delete_not_auth' => 'You are not authorised to delete some of the selected items.',
     ]
 ];

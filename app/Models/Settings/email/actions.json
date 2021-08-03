@@ -9,6 +9,11 @@
 	"id": "massDestroy",
 	"label": "labels.button.delete",
 	"type": "button"
+      },
+      {
+	"id": "checkin",
+	"label": "labels.button.checkin",
+	"type": "button"
       }
   ],
   "form": [
