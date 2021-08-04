@@ -342,8 +342,9 @@ class RoleController extends Controller
 
         $userRoleType = $this->getUserRoleType(auth()->user());
 	$hierarchy = $this->getRoleHierarchy();
+	$isDefault = ($role && in_array($role->id, $this->getDefaultRoleIds())) ? true : false;
 
-	if ($userRoleType == 'admin') {
+	if ($userRoleType == 'admin' && !$isDefault) {
 	    // Restrict permissions for users type admin.
 	    $permList = $this->getPermissionList(['level1']);
 	}

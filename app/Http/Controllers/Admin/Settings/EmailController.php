@@ -149,7 +149,7 @@ class EmailController extends Controller
 	$email = Email::findOrFail($id);
 
 	if (!$email->canEdit()) {
-	    return redirect()->route('admin.settings.emails.edit', array_merge($request->query(), ['group' => $id]))->with('error',  __('messages.generic.edit_not_auth'));
+	    return redirect()->route('admin.settings.emails.edit', array_merge($request->query(), ['email' => $id]))->with('error',  __('messages.generic.edit_not_auth'));
 	}
 
         /*$this->validate($request, [
@@ -247,6 +247,7 @@ class EmailController extends Controller
 
 	    if (!$email->canDelete()) {
 		$messages['error'] = __('messages.generic.mass_delete_not_auth'); 
+		continue;
 	    }
 
 	    //$email->delete();

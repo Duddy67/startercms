@@ -312,6 +312,28 @@ class User extends Authenticatable
     /*
      * Blade directive
      *
+     * @param  \Spatie\Permission\Models\Permission $permission
+     * @return boolean
+     */
+    public function isAllowedToAny($permission)
+    {
+	return $this->hasRole('super-admin') || $this->hasAnyPermission($permission);
+    }
+
+    /*
+     * Blade directive
+     *
+     * @param  \Spatie\Permission\Models\Permission $permission
+     * @return boolean
+     */
+    public function isAllowedToAll($permissions)
+    {
+	return $this->hasRole('super-admin') || $this->hasAllPermissions($permissions);
+    }
+
+    /*
+     * Blade directive
+     *
      * @return boolean
      */
     public function canAccessAdmin()

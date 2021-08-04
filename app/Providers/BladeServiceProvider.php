@@ -32,6 +32,22 @@ class BladeServiceProvider extends ServiceProvider
             return "<?php endif; ?>";
         });
 
+        Blade::directive('allowtoany', function ($expression) {
+	    return "<?php if (auth()->user()->isAllowedToAny($expression)) : ?>";
+        });
+
+	Blade::directive('endallowtoany', function () {
+            return "<?php endif; ?>";
+        });
+
+        Blade::directive('allowtoall', function ($expression) {
+	    return "<?php if (auth()->user()->isAllowedToAll($expression)) : ?>";
+        });
+
+	Blade::directive('endallowtoall', function () {
+            return "<?php endif; ?>";
+        });
+
         Blade::directive('accessadmin', function () {
 	    return "<?php if (auth()->user()->canAccessAdmin()) : ?>";
         });
