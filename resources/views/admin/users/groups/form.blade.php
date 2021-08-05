@@ -9,19 +9,19 @@
 	    @method('put')
 	@endif
 
-        @foreach ($fields as $attribs)
+        @foreach ($fields as $field)
 	    @php if (isset($group)) { 
-		     $value = old($attribs->name, $attribs->value);
+		     $value = old($field->name, $field->value);
 		 }
 		 else {
-                     if ($attribs->name == 'created_at' || $attribs->name == 'updated_at') {
+                     if ($field->name == 'created_at' || $field->name == 'updated_at') {
                          continue;
                      }
 
-		     $value = old($attribs->name);
+		     $value = old($field->name);
 		 }
 	    @endphp
-	    <x-input :attribs="$attribs" :value="$value" />
+	    <x-input :attribs="$field" :value="$value" />
         @endforeach
 
 	<input type="hidden" id="cancelEdit" value="{{ route('admin.users.groups.cancel', $query) }}">

@@ -126,6 +126,9 @@ trait ItemConfig
 		    if ($field->type == 'date') {
 			$fields[$key]->value = $item->{$field->name}->toDateString();
 		    }
+		    elseif ($field->name == 'updated_by') {
+			$fields[$key]->value = $item->updated_by_name;
+		    }
 		    else {
 			$fields[$key]->value = $item->{$field->name};
 		    }

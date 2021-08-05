@@ -88,7 +88,11 @@ class GroupController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        $group = Group::findOrFail($id);
+        //$group = Group::findOrFail($id);
+      $group = Group::select('groups.*', 'users.name as created_by_name', 'users2.name as updated_by_name')
+	              ->leftJoin('users', 'groups.created_by', '=', 'users.id')
+		      ->leftJoin('users as users2', 'groups.updated_by', '=', 'users2.id')
+		      ->findOrFail($id);
 
 	if (!$group->canAccess()) {
 	    return redirect()->route('admin.users.groups.index')->with('error',  __('messages.generic.access_not_auth'));
@@ -101,7 +105,14 @@ class GroupController extends Controller
 	$this->checkOut($group);
 
         // Gather the needed data to build the form.
-        $fields = $this->getFields($group);
+	
+	$except = ($group->role_level > auth()->user()->getRoleLevel()) ? ['created_by'] : ['created_by_name'];
+
+	if ($group->updated_by === null) {
+	    array_push($except, 'updated_by', 'updated_at');
+	}
+
+        $fields = $this->getFields($group, $except);
         $actions = $this->getActions('form');
 	// Add the id parameter to the query.
 	$query = array_merge($request->query(), ['group' => $id]);
@@ -151,17 +162,16 @@ class GroupController extends Controller
 
 	$group->name = $request->input('name');
 	$group->description = $request->input('description');
-	$group->created_by = $request->input('created_by');
 	$group->updated_by = auth()->user()->id;
-	$group->access_level = $request->input('access_level');
-	$owner = User::findOrFail($group->created_by);
 
-	// Ensure the selected owner matches the current user's role level.
-	if (auth()->user()->getUserRoleLevel($owner) >= auth()->user()->getRoleLevel()) {
-	    return redirect()->route('admin.users.groups.edit', array_merge($request->query(), ['group' => $id]))->with('error',  __('messages.generic.owner_not_valid'));
+	// Ensure the current user has a higher role level than the group owner's or the current user is the group owner.
+	if (auth()->user()->getRoleLevel() > $group->role_level || $group->created_by == auth()->user()->id) {
+	    $group->created_by = $request->input('created_by');
+	    $owner = User::findOrFail($group->created_by);
+	    $group->role_level = $owner->getRoleLevel();
+	    $group->access_level = $request->input('access_level');
 	}
 
-	$group->role_level = auth()->user()->getUserRoleLevel($owner);
 	$group->save();
 
         if ($request->input('_close', null)) {
