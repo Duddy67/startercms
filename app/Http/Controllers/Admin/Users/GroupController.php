@@ -88,11 +88,10 @@ class GroupController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        //$group = Group::findOrFail($id);
-      $group = Group::select('groups.*', 'users.name as created_by_name', 'users2.name as updated_by_name')
-	              ->leftJoin('users', 'groups.created_by', '=', 'users.id')
-		      ->leftJoin('users as users2', 'groups.updated_by', '=', 'users2.id')
-		      ->findOrFail($id);
+        $group = Group::select('groups.*', 'users.name as owner_name', 'users2.name as modifier_name')
+			->leftJoin('users', 'groups.created_by', '=', 'users.id')
+			->leftJoin('users as users2', 'groups.updated_by', '=', 'users2.id')
+			->findOrFail($id);
 
 	if (!$group->canAccess()) {
 	    return redirect()->route('admin.users.groups.index')->with('error',  __('messages.generic.access_not_auth'));
@@ -106,7 +105,7 @@ class GroupController extends Controller
 
         // Gather the needed data to build the form.
 	
-	$except = ($group->role_level > auth()->user()->getRoleLevel()) ? ['created_by'] : ['created_by_name'];
+	$except = ($group->role_level > auth()->user()->getRoleLevel()) ? ['created_by'] : ['owner_name'];
 
 	if ($group->updated_by === null) {
 	    array_push($except, 'updated_by', 'updated_at');
@@ -164,7 +163,7 @@ class GroupController extends Controller
 	$group->description = $request->input('description');
 	$group->updated_by = auth()->user()->id;
 
-	// Ensure the current user has a higher role level than the group owner's or the current user is the group owner.
+	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
 	if (auth()->user()->getRoleLevel() > $group->role_level || $group->created_by == auth()->user()->id) {
 	    $group->created_by = $request->input('created_by');
 	    $owner = User::findOrFail($group->created_by);

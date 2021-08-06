@@ -9,6 +9,7 @@ use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
 use App\Traits\Admin\RolesPermissions;
 use App\Models\Users\Role;
+use App\Models\Users\User;
 use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
@@ -91,14 +92,17 @@ class RoleController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        $role = Role::findById($id);
+        $role = Role::select('roles.*', 'users.name as owner_name', 'users2.name as modifier_name')
+		      ->leftJoin('users', 'roles.created_by', '=', 'users.id')
+		      ->leftJoin('users as users2', 'roles.updated_by', '=', 'users2.id')
+		      ->findOrFail($id);
 
 	if (!$role->canAccess()) {
-	    return redirect()->route('admin.users.roles.index')->with('error',  __('messages.generic.access_not_auth'));
+	    return redirect()->route('admin.users.roles.index', $request->query())->with('error',  __('messages.generic.access_not_auth'));
 	}
 
 	if ($role->checked_out && $role->checked_out != auth()->user()->id) {
-	    return redirect()->route('admin.users.roles.index')->with('error',  __('messages.generic.checked_out'));
+	    return redirect()->route('admin.users.roles.index', $request->query())->with('error',  __('messages.generic.checked_out'));
 	}
 
 	// No need to check out the default roles as they can't be edited or deleted.
@@ -107,7 +111,18 @@ class RoleController extends Controller
 	}
 
         // Gather the needed data to build the form.
-	$except = (in_array($role->name, $this->getDefaultRoles())) ? ['_role_type', 'updated_at', 'access_level', 'created_by'] : [];
+
+	// No need access level feature for the default roles.
+	$except = (in_array($role->name, $this->getDefaultRoles())) ? ['_role_type', 'updated_at', 'updated_by', 'owner_name', 'access_level', 'created_by'] : [];
+
+	if (empty($except)) {
+	    $except = ($role->role_level > auth()->user()->getRoleLevel()) ? ['created_by'] : ['owner_name'];
+
+	    if ($role->updated_by === null) {
+		array_push($except, 'updated_by', 'updated_at');
+	    }
+	}
+
         $fields = $this->getFields($role, $except);
 	$this->setFieldValues($fields, $role);
 	$board = $this->getPermissionBoard($role);
@@ -165,6 +180,16 @@ class RoleController extends Controller
 	]);
 
 	$role->name = $request->input('name');
+	$role->updated_by = auth()->user()->id;
+
+	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
+	if (auth()->user()->getRoleLevel() > $role->role_level || $role->created_by == auth()->user()->id) {
+	    $role->created_by = $request->input('created_by');
+	    $owner = User::findOrFail($role->created_by);
+	    $role->role_level = $owner->getRoleLevel();
+	    $role->access_level = $request->input('access_level');
+	}
+
 	$role->save();
 
 	// Set the permission list.

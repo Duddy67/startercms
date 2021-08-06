@@ -15,25 +15,25 @@
 	    @method('put')
 	@endif
 
-        @foreach ($fields as $attribs)
+        @foreach ($fields as $field)
 	    @php if (isset($user)) { 
-		     $value = old($attribs->name, $attribs->value);
+		     $value = old($field->name, $field->value);
                      // Users cannot change their role.
-                     if ($attribs->name == 'role' && auth()->user()->id == $user->id) {
-                         $attribs->extra = ['disabled'];
+                     if ($field->name == 'role' && auth()->user()->id == $user->id) {
+                         $field->extra = ['disabled'];
                      }
 		 }
 		 else {
-                     if ($attribs->name == 'created_at' || $attribs->name == 'updated_at') {
+                     if ($field->name == 'created_at' || $field->name == 'updated_at') {
                          continue;
                      }
 
-		     $value = old($attribs->name);
+		     $value = old($field->name);
 		 }
 	    @endphp
 
 	    <div class="form-group">
-		<x-input :attribs="$attribs" :value="$value" />
+		<x-input :field="$field" :value="$value" />
 	    </div>
         @endforeach
 

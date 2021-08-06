@@ -25,8 +25,8 @@
   {
     "label": "labels.generic.created_by",
     "type": "text",
-    "name": "created_by_name",
-    "id": "created_by_name",
+    "name": "owner_name",
+    "id": "owner_name",
     "extra": ["disabled"]
   },
   {

@@ -6,7 +6,7 @@ use Illuminate\View\Component;
 
 class Input extends Component
 {
-    public $attribs;
+    public $field;
     public $value;
 
 
@@ -15,9 +15,9 @@ class Input extends Component
      *
      * @return void
      */
-    public function __construct($attribs, $value = null)
+    public function __construct($field, $value = null)
     {
-        $this->attribs = $attribs;
+        $this->field = $field;
         $this->value = $value;
     }
 

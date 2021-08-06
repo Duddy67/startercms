@@ -5,15 +5,15 @@
         @csrf
 	@method('patch')
 
-        @foreach ($fields as $attribs)
-	    @php if (isset($data[$attribs->group][$attribs->name])) { 
-		     $value = old($attribs->name, $data[$attribs->group][$attribs->name]);
+        @foreach ($fields as $field)
+	    @php if (isset($data[$field->group][$field->name])) { 
+		     $value = old($field->name, $data[$field->group][$field->name]);
 		 }
 		 else {
-		     $value = old($attribs->name);
+		     $value = old($field->name);
 		 }
 	    @endphp
-	    <x-input :attribs="$attribs" :value="$value" />
+	    <x-input :field="$field" :value="$value" />
         @endforeach
     </form>
 

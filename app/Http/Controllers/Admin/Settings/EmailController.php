@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\Settings\Email;
+use App\Models\Users\User;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
 
@@ -87,7 +88,12 @@ class EmailController extends Controller
     public function edit(Request $request, $id)
     {
         // Gather the needed data to build the form.
-        $email = Email::findOrFail($id);
+        //$email = Email::findOrFail($id);
+        $email = Email::select('emails.*', 'users.name as owner_name', 'users2.name as modifier_name')
+			->leftJoin('users', 'emails.created_by', '=', 'users.id')
+			->leftJoin('users as users2', 'emails.updated_by', '=', 'users2.id')
+			->findOrFail($id);
+
 
 	if (!$email->canAccess()) {
 	    return redirect()->route('admin.settings.emails.index')->with('error',  __('messages.generic.access_not_auth'));
@@ -99,7 +105,15 @@ class EmailController extends Controller
 
 	$this->checkOut($email);
 
-        $fields = $this->getFields($email);
+        // Gather the needed data to build the form.
+	
+	$except = ($email->role_level > auth()->user()->getRoleLevel()) ? ['created_by'] : ['owner_name'];
+
+	if ($email->updated_by === null) {
+	    array_push($except, 'updated_by', 'updated_at');
+	}
+
+        $fields = $this->getFields($email, $except);
         $actions = $this->getActions('form');
 	// Add the id parameter to the query.
 	$query = array_merge($request->query(), ['email' => $id]);
@@ -165,6 +179,16 @@ class EmailController extends Controller
 	$email->body_html = $request->input('body_html');
 	$email->body_text = $request->input('body_text');
 	$email->plain_text = ($request->input('format') == 'plain_text') ? 1 : 0;
+	$email->updated_by = auth()->user()->id;
+
+	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
+	if (auth()->user()->getRoleLevel() > $email->role_level || $email->created_by == auth()->user()->id) {
+	    $email->created_by = $request->input('created_by');
+	    $owner = User::findOrFail($email->created_by);
+	    $email->role_level = $owner->getRoleLevel();
+	    $email->access_level = $request->input('access_level');
+	}
+
 	$email->save();
 
         if ($request->input('_close', null)) {

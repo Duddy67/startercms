@@ -15,10 +15,10 @@
     @csrf
     @method('put')
 
-    @foreach ($fields as $attribs)
+    @foreach ($fields as $field)
 	@php $value = null; @endphp
 	<div class="form-group">
-	    <x-input :attribs="$attribs" :value="$value" />
+	    <x-input :field="$field" :value="$value" />
 	</div>
     @endforeach
 

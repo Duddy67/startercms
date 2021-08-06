@@ -91,7 +91,7 @@ class UserController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::select('users.*', 'users2.name as modifier_name')->leftJoin('users as users2', 'users.updated_by', '=', 'users2.id')->findOrFail($id);
 
 	if (!auth()->user()->canUpdate($user) && auth()->user()->id != $user->id) {
 	    return redirect()->route('admin.users.users.index')->with('error', __('messages.users.edit_user_not_auth'));
@@ -104,7 +104,9 @@ class UserController extends Controller
 	$this->checkOut($user);
 
         // Gather the needed data to build the form.
-        $fields = $this->getFields($user, ['password', 'password_confirmation']);
+	
+	$except = ($user->updated_by === null) ? ['updated_by', 'updated_at'] : [];
+        $fields = $this->getFields($user, $except);
 	// Users cannot delete their own account.
 	$except = (auth()->user()->id == $user->id) ? ['destroy'] : [];
         $actions = $this->getActions('form', $except);
@@ -157,6 +159,7 @@ class UserController extends Controller
 
 	$user->name = $request->input('name');
 	$user->email = $request->input('email');
+	$user->updated_by = auth()->user()->id;
 
 	if ($request->input('password') !== null) {
 	    $user->password = Hash::make($request->input('password'));

@@ -50,6 +50,13 @@
     "id": "created_at"
   },
   {
+    "label": "labels.generic.updated_by",
+    "type": "text",
+    "name": "updated_by",
+    "id": "updated_by",
+    "extra": ["disabled"]
+  },
+  {
     "label": "labels.generic.updated_at",
     "type": "date",
     "name": "updated_at",

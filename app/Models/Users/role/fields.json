@@ -23,6 +23,13 @@
     "options": [] 
   },
   {
+    "label": "labels.generic.created_by",
+    "type": "text",
+    "name": "owner_name",
+    "id": "owner_name",
+    "extra": ["disabled"]
+  },
+  {
     "label": "labels.generic.access_level",
     "type": "select",
     "name": "access_level",
@@ -35,6 +42,13 @@
     "type": "date",
     "name": "created_at",
     "id": "created_at"
+  },
+  {
+    "label": "labels.generic.updated_by",
+    "type": "text",
+    "name": "updated_by",
+    "id": "updated_by",
+    "extra": ["disabled"]
   },
   {
     "label": "labels.generic.updated_at",

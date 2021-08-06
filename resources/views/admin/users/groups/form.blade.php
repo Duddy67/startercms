@@ -12,6 +12,10 @@
         @foreach ($fields as $field)
 	    @php if (isset($group)) { 
 		     $value = old($field->name, $field->value);
+
+                     if ($field->name == 'access_level' && $group->role_level > auth()->user()->getRoleLevel()) {
+                         $field->extra = ['disabled'];
+                     }
 		 }
 		 else {
                      if ($field->name == 'created_at' || $field->name == 'updated_at') {
@@ -21,7 +25,7 @@
 		     $value = old($field->name);
 		 }
 	    @endphp
-	    <x-input :attribs="$field" :value="$value" />
+	    <x-input :field="$field" :value="$value" />
         @endforeach
 
 	<input type="hidden" id="cancelEdit" value="{{ route('admin.users.groups.cancel', $query) }}">

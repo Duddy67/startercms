@@ -9,20 +9,24 @@
 	    @method('put')
 	@endif
 
-        @foreach ($fields as $attribs)
+        @foreach ($fields as $field)
 	    @php if (isset($email)) { 
-		     $value = old($attribs->name, $attribs->value);
+		     $value = old($field->name, $field->value);
+
+                     if ($field->name == 'access_level' && $email->role_level > auth()->user()->getRoleLevel()) {
+                         $field->extra = ['disabled'];
+                     }
 		 }
 		 else {
-                     if ($attribs->name == 'created_at' || $attribs->name == 'updated_at') {
+                     if ($field->name == 'created_at' || $field->name == 'updated_at') {
                          continue;
                      }
 
-		     $value = old($attribs->name);
+		     $value = old($field->name);
 		 }
 	    @endphp
 
-	    @if ($attribs->name == 'body_html')
+	    @if ($field->name == 'body_html')
 	        <ul class="nav nav-tabs" id="myTab" role="tablist">
 		    <li class="nav-item">
 			<a  class="nav-link active" id="html-tab" href="#html" data-toggle="tab" aria-controls="html" aria-selected="true">HTML</a>
@@ -36,17 +40,17 @@
 		    <div class="tab-pane active" id="html" role="tabpanel" aria-labelledby="html-tab">
 	    @endif
 
-	    @if ($attribs->name == 'body_text')
+	    @if ($field->name == 'body_text')
 	        <div class="tab-pane" id="text" role="tabpanel" aria-labelledby="text-tab">
 	    @endif
 
-	    <x-input :attribs="$attribs" :value="$value" />
+	    <x-input :field="$field" :value="$value" />
 
-	    @if ($attribs->name == 'body_html')
+	    @if ($field->name == 'body_html')
 	        </div>
 	    @endif
 
-	    @if ($attribs->name == 'body_text')
+	    @if ($field->name == 'body_text')
 	        </div>
 	        </div>
 	    @endif

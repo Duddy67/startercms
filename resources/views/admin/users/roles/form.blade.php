@@ -9,21 +9,25 @@
 	    @method('put')
 	@endif
 
-        @foreach ($fields as $attribs)
+        @foreach ($fields as $field)
 	    @php if (isset($role)) { 
-		     $value = old($attribs->name, $attribs->value);
+		     $value = old($field->name, $field->value);
+
+                     if ($field->name == 'access_level' && $role->role_level > auth()->user()->getRoleLevel()) {
+                         $field->extra = ['disabled'];
+                     }
 		 }
 		 else {
-                     if ($attribs->name == 'created_at' || $attribs->name == 'updated_at') {
+                     if ($field->name == 'created_at' || $field->name == 'updated_at') {
                          continue;
                      }
 
-		     $value = old($attribs->name);
+		     $value = old($field->name);
 		 }
 	    @endphp
 
 	    <div class="form-group">
-		<x-input :attribs="$attribs" :value="$value" />
+		<x-input :field="$field" :value="$value" />
             </div>
         @endforeach
 
@@ -36,7 +40,7 @@
 			<tr>
 			    <td>
                                 <div class="form-check">
-				    <x-input :attribs="$checkbox" :value="$checkbox->value" />
+				    <x-input :field="$checkbox" :value="$checkbox->value" />
                                 </div>
 			    </td>
                         </tr>

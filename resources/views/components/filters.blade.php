@@ -3,7 +3,7 @@
         @php $total = count($filters) @endphp
 	@foreach ($filters as $key => $filter)
 	    <div class="col-sm mr-4">
-		<x-input :attribs="$filter" :value="$filter->value" />
+		<x-input :field="$filter" :value="$filter->value" />
 
 		@if ($filter->name == 'search') 
 		    <button type="button" id="search-btn" class="btn btn-space btn-secondary">@lang ($filter->label)</button>
