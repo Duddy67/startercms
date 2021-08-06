@@ -4,15 +4,13 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use App\Traits\Admin\RolesPermissions;
+use App\Models\Users\Role;
 use App\Models\Settings\General;
 use Cache;
 
 
 class Admin
 {
-    use RolesPermissions;
-
     /**
      * Handle an incoming request.
      *
@@ -22,7 +20,7 @@ class Admin
      */
     public function handle(Request $request, Closure $next)
     {
-        if (in_array($this->getUserRoleType(auth()->user()), ['super-admin', 'admin', 'manager', 'assistant'])) {
+        if (in_array(Role::getUserRoleType(auth()->user()), ['super-admin', 'admin', 'manager', 'assistant'])) {
 
 	    $settings = Cache::rememberForever('settings', function () {
 	        // Updates the config app parameters.

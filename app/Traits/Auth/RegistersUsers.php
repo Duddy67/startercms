@@ -6,6 +6,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\Admin\RolesPermissions;
+use App\Models\Users\Role;
 
 trait RegistersUsers
 {
@@ -60,7 +61,7 @@ trait RegistersUsers
     {
         // Initialize roles and permissions.
         if ($user->id === 1) {
-	    $this->createRoles();
+	    Role::createDefaultRoles();
 	    // The very first registered user is the super-admin.
 	    $user->assignRole('super-admin');
 	    $this->buildPermissions($request, true);

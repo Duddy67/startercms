@@ -18,7 +18,7 @@ trait RolesPermissions
      *
      * @return Array
      */
-    public function getDefaultRoles()
+    /*public function getDefaultRoles()
     {
         return [
 	    'super-admin',
@@ -27,38 +27,38 @@ trait RolesPermissions
 	    'assistant',
 	    'registered'
 	];
-    }
+    }*/
 
     /*
      * Ids of the Roles that cannot be deleted nor updated.
      *
      * @return Array
      */
-    public function getDefaultRoleIds()
+    /*public function getDefaultRoleIds()
     {
         return [1,2,3,4,5];
-    }
+    }*/
 
     /*
      * Role types which are allowed to create users and modify their roles.
      *
      * @return Array
      */
-    public function getAllowedRoleTypes()
+    /*public function getAllowedRoleTypes()
     {
         return [
 	    'super-admin',
 	    'admin',
 	    'manager'
 	];
-    }
+    }*/
 
     /*
      * The role hierarchy defined numerically. 
      *
      * @return Array
      */
-    public function getRoleHierarchy()
+    /*public function getRoleHierarchy()
     {
 	return [
 	    'registered' => 1, 
@@ -67,7 +67,7 @@ trait RolesPermissions
 	    'admin' => 4, 
 	    'super-admin' => 5
 	];
-    }
+    }*/
 
     /*
      * Validation patterns for permission names.
@@ -147,7 +147,7 @@ trait RolesPermissions
      * @param \App\Models\Users\User  $user 
      * @return string
      */
-    public function getUserRoleType($user)
+    /*public function getUserRoleType($user)
     {
         $roleName = $user->getRoleNames()->toArray()[0];
 
@@ -157,7 +157,7 @@ trait RolesPermissions
 
 	return $this->defineRoleType($roleName);
 
-    }
+    }*/
 
     /*
      * Returns the role level of a given user.
@@ -165,11 +165,11 @@ trait RolesPermissions
      * @param \App\Models\Users\User  $user 
      * @return integer
      */
-    public function getUserRoleLevel($user)
+    /*public function getUserRoleLevel($user)
     {
         $roleType = $this->getUserRoleType($user);
 	return $this->getRoleHierarchy()[$roleType];
-    }
+    }*/
 
     /*
      * Returns the type of a given role according its permissions.
@@ -177,7 +177,7 @@ trait RolesPermissions
      * @param \Spatie\Permission\Models\Role or string  $role
      * @return string
      */
-    public function defineRoleType($role)
+    /*public function defineRoleType($role)
     {
 	$role = (is_string($role)) ? Role::findByName($role) : $role;
 
@@ -193,7 +193,7 @@ trait RolesPermissions
 	else {
 	    return 'registered';
 	}
-    }
+    }*/
 
     /*
      * Returns the roles that a user is allowed to assign to an other user.
@@ -201,7 +201,7 @@ trait RolesPermissions
      * @param  \App\Models\Users\User $user (optional)
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getAssignableRoles($user = null)
+    /*public function getAssignableRoles($user = null)
     {
 	// Check first if the user is editing their own user account.
 	if ($user && auth()->user()->id == $user->id) {
@@ -232,14 +232,14 @@ trait RolesPermissions
 	}
 
 	return $roles;
-    }
+    }*/
 
     /*
      * Returns the users that a user is allowed to assign as owner of an item.
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getAssignableUsers()
+    /*public function getAssignableUsers()
     {
 	$results = $this->getAssignableRoles();
 
@@ -256,7 +256,7 @@ trait RolesPermissions
 	return \App\Models\Users\User::whereHas('roles', function ($query) use($roles) {
 	    $query->whereIn('name', $roles);
 	})->orWhere('id', auth()->user()->id)->get();
-    }
+    }*/
 
     /*
      * Builds or rebuilds the permissions from the permissions.json file. 
@@ -363,25 +363,5 @@ trait RolesPermissions
 	Schema::enableForeignKeyConstraints();
 
 	Artisan::call('cache:clear');
-    }
-
-    /*
-     * Used during the very first registration (the super-user) in the CMS.
-     *
-     * @return void
-     */
-    public function createRoles()
-    {
-        if (Role::whereIn('name', $this->getDefaultRoles())->doesntExist()) {
-	    $date = Carbon::now();
-
-	    Role::insert([
-		['name' => 'super-admin', 'guard_name' => 'web', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
-		['name' => 'admin', 'guard_name' => 'web', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
-		['name' => 'manager', 'guard_name' => 'web', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
-		['name' => 'assistant', 'guard_name' => 'web', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
-		['name' => 'registered', 'guard_name' => 'web', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()]
-	    ]);
-	}
     }
 }

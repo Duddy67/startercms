@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use App\Traits\Admin\RolesPermissions;
-use Spatie\Permission\Models\Role;
+use App\Models\Users\Role;
 use App\Models\Users\Group;
 use App\Models\Cms\Document;
 use App\Models\Settings\General;
@@ -137,7 +137,7 @@ class User extends Authenticatable
      */
     public function getRoleOptions($user = null)
     {
-	$roles = auth()->user()->getAssignableRoles($user);
+	$roles = Role::getAssignableRoles($user);
 	$options = [];
 
 	foreach ($roles as $role) {
@@ -226,9 +226,9 @@ class User extends Authenticatable
 	    $user = User::findOrFail($user);
 	}
 
-	$hierarchy = $this->getRoleHierarchy();
+	$hierarchy = Role::getRoleHierarchy();
         // Users can only update users lower in the hierarchy.
-	if ($hierarchy[$this->getRoleType()] > $hierarchy[$this->getUserRoleType($user)]) {
+	if ($hierarchy[$this->getRoleType()] > $hierarchy[Role::getUserRoleType($user)]) {
 	    return true;
 	}
 
@@ -252,9 +252,9 @@ class User extends Authenticatable
 	    return false;
 	}
 
-	$hierarchy = $this->getRoleHierarchy();
+	$hierarchy = Role::getRoleHierarchy();
         // Users can only delete users lower in the hierarchy.
-	if ($hierarchy[$this->getRoleType()] > $hierarchy[$this->getUserRoleType($user)]) {
+	if ($hierarchy[$this->getRoleType()] > $hierarchy[Role::getUserRoleType($user)]) {
 	    return true;
 	}
 
@@ -280,7 +280,7 @@ class User extends Authenticatable
     {
         $roleType = $this->getRoleType();
 
-	return $this->getRoleHierarchy()[$roleType];
+	return Role::getRoleHierarchy()[$roleType];
     }
 
     /*
@@ -290,11 +290,11 @@ class User extends Authenticatable
      */
     public function getRoleType()
     {
-        if (in_array($this->getRoleName(), $this->getDefaultRoles())) {
+        if (in_array($this->getRoleName(), Role::getDefaultRoles())) {
 	    return $this->getRoleName();
 	}
 	else {
-	    return $this->defineRoleType($this->getRoleName());
+	    return Role::defineRoleType($this->getRoleName());
 	}
     }
 
