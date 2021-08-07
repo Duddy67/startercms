@@ -75,8 +75,8 @@ class UserController extends Controller
     public function create(Request $request)
     {
         // Gather the needed data to build the form.
-        $fields = $this->getFields();
-        $actions = $this->getActions('form');
+        $fields = $this->getFields(null, ['updated_by']);
+        $actions = $this->getActions('form', ['destroy']);
 	$query = $request->query();
 
         return view('admin.users.users.form', compact('fields', 'actions', 'query'));

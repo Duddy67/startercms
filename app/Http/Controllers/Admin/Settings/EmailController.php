@@ -71,7 +71,7 @@ class EmailController extends Controller
     public function create(Request $request)
     {
         // Gather the needed data to build the form.
-        $fields = $this->getFields();
+        $fields = $this->getFields(null, ['updated_by', 'owner_name']);
         $actions = $this->getActions('form', ['destroy']);
 	$query = $request->query();
 
