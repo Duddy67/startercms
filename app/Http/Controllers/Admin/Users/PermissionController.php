@@ -6,13 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Traits\Admin\ItemConfig;
-use App\Traits\Admin\RolesPermissions;
-use Spatie\Permission\Models\Permission;
+use App\Models\Users\Permission;
 
 
 class PermissionController extends Controller
 {
-    use ItemConfig, RolesPermissions;
+    use ItemConfig;
 
     /*
      * Name of the model.
@@ -58,7 +57,7 @@ class PermissionController extends Controller
      */
     public function build(Request $request)
     {
-	$this->buildPermissions($request);
+	Permission::buildPermissions($request);
 	return redirect()->route('admin.users.permissions.index');
     }
 
@@ -70,7 +69,7 @@ class PermissionController extends Controller
      */
     public function rebuild(Request $request)
     {
-	$this->buildPermissions($request, true);
+	Permission::buildPermissions($request, true);
 	return redirect()->route('admin.users.permissions.index');
     }
 
@@ -81,7 +80,7 @@ class PermissionController extends Controller
      */
     private function getList()
     {
-	$permList = $this->getPermissionList();
+	$permList = Permission::getPermissionList();
 
 	$list = [];
 

@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
-use App\Traits\Admin\RolesPermissions;
 use App\Models\Users\Role;
 use App\Models\Users\Group;
 use App\Models\Cms\Document;
@@ -16,7 +15,7 @@ use App\Models\Settings\General;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles, RolesPermissions;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -296,6 +295,30 @@ class User extends Authenticatable
 	else {
 	    return Role::defineRoleType($this->getRoleName());
 	}
+    }
+
+    /*
+     * Returns the users that a user is allowed to assign as owner of an item.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getAssignableUsers()
+    {
+	$results = Role::getAssignableRoles();
+
+	if ($results->isEmpty()) {
+	    return $results;
+	}
+
+        $roles = [];
+
+	foreach ($results as $role) {
+	    $roles[] = $role->name;
+	}
+
+	return User::whereHas('roles', function ($query) use($roles) {
+	    $query->whereIn('name', $roles);
+	})->orWhere('id', auth()->user()->id)->get();
     }
 
     /*

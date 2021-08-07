@@ -7,14 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
-use App\Traits\Admin\RolesPermissions;
 use App\Models\Users\Role;
+use App\Models\Users\Permission;
 use App\Models\Users\User;
-use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
 {
-    use ItemConfig, RolesPermissions, CheckInCheckOut;
+    use ItemConfig, CheckInCheckOut;
 
     /*
      * Instance of the model.
@@ -197,7 +196,7 @@ class RoleController extends Controller
         if ($request->input('permissions') !== null) {
 
 	    // Ensure an admin doesn't use any level1 permissions. 
-	    $level1Perms = $this->getPermissionNameList(['level2', 'level3']);
+	    $level1Perms = Permission::getPermissionNameList(['level2', 'level3']);
 	    $count = array_intersect($request->input('permissions'), $level1Perms);
 
 	    if (Role::getUserRoleType(auth()->user()) == 'admin' && $count) {
@@ -259,7 +258,7 @@ class RoleController extends Controller
         if ($request->input('permissions') !== null) {
 
 	    // Ensure an admin doesn't use any level1 permissions. 
-	    $level1Perms = $this->getPermissionNameList(['level2', 'level3']);
+	    $level1Perms = Permission::getPermissionNameList(['level2', 'level3']);
 	    $count = array_intersect($request->input('permissions'), $level1Perms);
 
 	    if (Role::getUserRoleType(auth()->user()) == 'admin' && $count) {
@@ -371,11 +370,11 @@ class RoleController extends Controller
 
 	if ($userRoleType == 'admin' && !$isDefault) {
 	    // Restrict permissions for users type admin.
-	    $permList = $this->getPermissionList(['level1']);
+	    $permList = Permission::getPermissionList(['level1']);
 	}
 	// super-admin
 	else {
-	    $permList = $this->getPermissionList();
+	    $permList = Permission::getPermissionList();
 	}
 
 	$list = [];

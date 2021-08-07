@@ -5,12 +5,12 @@ namespace App\Traits\Auth;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Traits\Admin\RolesPermissions;
 use App\Models\Users\Role;
+use App\Models\Users\Permission;
 
 trait RegistersUsers
 {
-    use RedirectsUsers, RolesPermissions;
+    use RedirectsUsers;
 
     /**
      * Show the application registration form.
@@ -64,7 +64,7 @@ trait RegistersUsers
 	    Role::createDefaultRoles();
 	    // The very first registered user is the super-admin.
 	    $user->assignRole('super-admin');
-	    $this->buildPermissions($request, true);
+	    Permission::buildPermissions($request, true);
 	}
 	else {
 	    $user->assignRole('registered');
