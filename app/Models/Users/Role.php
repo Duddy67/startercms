@@ -135,45 +135,6 @@ class Role extends SpatieRole
     }
 
     /*
-     * Returns the roles that the current user is allowed to assign to an other user.
-     *
-     * @param  \App\Models\Users\User $user (optional)
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public static function getAssignableRoles($user = null)
-    {
-	// Check first if the current user is editing their own user account.
-	if ($user && auth()->user()->id == $user->id) {
-	    // Only display the user's role as users cannot change their own role.
-	    return Role::where('name', $user->getRoleNames()->toArray()[0])->get();
-	}
-
-	// Get the current user's role type.
-        $roleType = self::getUserRoleType(auth()->user());
-
-	if (!in_array($roleType, self::getAllowedRoleTypes())) {
-	    // Returns an empty collection.
-	    return new \Illuminate\Database\Eloquent\Collection();
-	}
-
-	if ($roleType == 'manager') {
-	  $roles = Role::whereDoesntHave('permissions', function ($query) {
-	      $query->whereIn('name', ['create-role', 'create-user']);
-	  })->where('name', '!=', 'super-admin')->get();
-	}
-	elseif ($roleType == 'admin') {
-	  $roles = Role::whereDoesntHave('permissions', function ($query) {
-	      $query->whereIn('name', ['create-role']);
-	  })->where('name', '!=', 'super-admin')->get();
-	}
-	elseif ($roleType == 'super-admin') {
-	    $roles = Role::whereNotIn('name', ['super-admin'])->get();
-	}
-
-	return $roles;
-    }
-
-    /*
      * Used only during the very first registration (the super-user) in the CMS.
      *
      * @return void

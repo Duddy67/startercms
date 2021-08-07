@@ -136,7 +136,7 @@ class User extends Authenticatable
      */
     public function getRoleOptions($user = null)
     {
-	$roles = Role::getAssignableRoles($user);
+	$roles = auth()->user()->getAssignableRoles($user);
 	$options = [];
 
 	foreach ($roles as $role) {
@@ -304,7 +304,7 @@ class User extends Authenticatable
      */
     public function getAssignableUsers()
     {
-	$results = Role::getAssignableRoles();
+	$results = $this->getAssignableRoles();
 
 	if ($results->isEmpty()) {
 	    return $results;
@@ -319,6 +319,45 @@ class User extends Authenticatable
 	return User::whereHas('roles', function ($query) use($roles) {
 	    $query->whereIn('name', $roles);
 	})->orWhere('id', auth()->user()->id)->get();
+    }
+
+    /*
+     * Returns the roles that the current user is allowed to assign to an other user.
+     *
+     * @param  \App\Models\Users\User $user (optional)
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    private function getAssignableRoles($user = null)
+    {
+	// Check first if the current user is editing their own user account.
+	if ($user && $this->id == $user->id) {
+	    // Only display the user's role as users cannot change their own role.
+	    return Role::where('name', $user->getRoleNames()->toArray()[0])->get();
+	}
+
+	// Get the current user's role type.
+        $roleType = Role::getUserRoleType($this);
+
+	if (!in_array($roleType, Role::getAllowedRoleTypes())) {
+	    // Returns an empty collection.
+	    return new \Illuminate\Database\Eloquent\Collection();
+	}
+
+	if ($roleType == 'manager') {
+	  $roles = Role::whereDoesntHave('permissions', function ($query) {
+	      $query->whereIn('name', ['create-role', 'create-user']);
+	  })->where('name', '!=', 'super-admin')->get();
+	}
+	elseif ($roleType == 'admin') {
+	  $roles = Role::whereDoesntHave('permissions', function ($query) {
+	      $query->whereIn('name', ['create-role']);
+	  })->where('name', '!=', 'super-admin')->get();
+	}
+	elseif ($roleType == 'super-admin') {
+	    $roles = Role::whereNotIn('name', ['super-admin'])->get();
+	}
+
+	return $roles;
     }
 
     /*
