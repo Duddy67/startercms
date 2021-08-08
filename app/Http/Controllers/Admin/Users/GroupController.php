@@ -9,6 +9,8 @@ use App\Models\Users\Group;
 use App\Models\Users\User;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
+use App\Http\Requests\Users\Group\StoreRequest;
+use App\Http\Requests\Users\Group\UpdateRequest;
 
 
 class GroupController extends Controller
@@ -123,14 +125,13 @@ class GroupController extends Controller
      * Checks the record back in.
      *
      * @param  Request  $request
-     * @param  int  $id (optional)
+     * @param  \App\Models\Users\Group $group (optional)
      * @return Response
      */
-    public function cancel(Request $request, $id = null)
+    public function cancel(Request $request, Group $group = null)
     {
-        if ($id) {
-	    $record = Group::findOrFail($id);
-	    $this->checkIn($record);
+        if ($group) {
+	    $this->checkIn($group);
 	}
 
 	return redirect()->route('admin.users.groups.index', $request->query());
@@ -139,25 +140,15 @@ class GroupController extends Controller
     /**
      * Update the specified group.
      *
-     * @param  Request  $request
-     * @param  int  $id
+     * @param  \App\Http\Requests\Users\Group\UpdateRequest  $request
+     * @param  \App\Models\Users\Group $group
      * @return Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, Group $group)
     {
-	$group = Group::findOrFail($id);
-
 	if (!$group->canEdit()) {
-	    return redirect()->route('admin.users.groups.edit', array_merge($request->query(), ['group' => $id]))->with('error',  __('messages.generic.edit_not_auth'));
+	    return redirect()->route('admin.users.groups.edit', array_merge($request->query(), ['group' => $group->id]))->with('error',  __('messages.generic.edit_not_auth'));
 	}
-
-        $this->validate($request, [
-	    'name' => [
-		'required',
-		'regex:/^[a-z0-9-]{3,}$/',
-		Rule::unique('groups')->ignore($id)
-	    ],
-	]);
 
 	$group->name = $request->input('name');
 	$group->description = $request->input('description');
@@ -179,30 +170,22 @@ class GroupController extends Controller
 	    return redirect()->route('admin.users.groups.index', $request->query())->with('success', __('messages.groups.update_success'));
 	}
 
-	return redirect()->route('admin.users.groups.edit', array_merge($request->query(), ['group' => $id]))->with('success', __('messages.groups.update_success'));
+	return redirect()->route('admin.users.groups.edit', array_merge($request->query(), ['group' => $group->id]))->with('success', __('messages.groups.update_success'));
     }
 
     /**
      * Store a new group.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\Users\Group\StoreRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        $this->validate($request, [
-	    'name' => [
-		'required',
-		'regex:/^[a-z0-9-]{3,}$/',
-		'unique:groups'
-	    ],
-	]);
-
 	$group = Group::create([
 	  'name' => $request->input('name'), 
 	  'description' => $request->input('description'), 
 	  'access_level' => $request->input('access_level'), 
-	  'created_by' => auth()->user()->id
+	  'created_by' => $request->input('created_by')
 	]);
 
 	$group->role_level = auth()->user()->getRoleLevel();
@@ -219,20 +202,19 @@ class GroupController extends Controller
      * Remove the specified group from storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\Models\Users\Group $group
      * @return Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, Group $group)
     {
-	$group = Group::findOrFail($id);
-
 	if (!$group->canDelete()) {
-	    return redirect()->route('admin.users.groups.edit', array_merge($request->query(), ['group' => $id]))->with('error',  __('messages.generic.delete_not_auth'));
+	    return redirect()->route('admin.users.groups.edit', array_merge($request->query(), ['group' => $group->id]))->with('error',  __('messages.generic.delete_not_auth'));
 	}
 
-	//$group->users()->detach();
 	$name = $group->name;
-	//$group->delete();
+
+	$group->users()->detach();
+	$group->delete();
 
 	return redirect()->route('admin.users.groups.index', $request->query())->with('success', __('messages.groups.delete_success', ['name' => $name]));
     }
@@ -245,6 +227,7 @@ class GroupController extends Controller
      */
     public function massDestroy(Request $request)
     {
+        $deleted = 0;
         // Remove the groups selected from the list.
         foreach ($request->input('ids') as $id) {
 	    $group = Group::findOrFail($id);
@@ -253,15 +236,17 @@ class GroupController extends Controller
 	      return redirect()->route('admin.users.groups.index', $request->query())->with(
 		  [
 		      'error' => __('messages.generic.delete_not_auth'), 
-		      'success' => __('messages.groups.delete_list_success', ['number' => count($request->input('ids'))])
+		      'success' => __('messages.groups.delete_list_success', ['number' => $deleted)])
 		  ]);
 	    }
 
-	    //$group->users()->detach();
-	    //$group->delete();
+	    $group->users()->detach();
+	    $group->delete();
+
+	    $deleted++;
 	}
 
-	return redirect()->route('admin.users.groups.index', $request->query())->with('success', __('messages.groups.delete_list_success', ['number' => count($request->input('ids'))]));
+	return redirect()->route('admin.users.groups.index', $request->query())->with('success', __('messages.groups.delete_list_success', ['number' => $deleted]));
     }
 
     /**
