@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Users\Role;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Users\Role;
+
 
 class StoreRequest extends FormRequest
 {
@@ -13,7 +15,7 @@ class StoreRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +26,12 @@ class StoreRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+	    'name' => [
+		'required',
+		'not_regex:/^('.implode('|', Role::getDefaultRoles()).')$/i',
+		'regex:/^[a-z0-9-]{3,}$/',
+		'unique:roles'
+	    ],
         ];
     }
 }

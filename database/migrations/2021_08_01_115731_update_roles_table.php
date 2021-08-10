@@ -17,7 +17,8 @@ class UpdateRolesTable extends Migration
 	{
             $table->char('access_level', 10)->after('guard_name');
             $table->tinyInteger('role_level')->nullable()->after('access_level');
-            $table->unsignedBigInteger('checked_out')->nullable()->after('role_level');
+            $table->char('role_type', 10)->nullable()->after('role_level');
+            $table->unsignedBigInteger('checked_out')->nullable()->after('role_type');
             $table->timestamp('checked_out_time')->nullable()->after('checked_out');
             $table->unsignedBigInteger('created_by')->after('checked_out_time');
             $table->unsignedBigInteger('updated_by')->nullable()->after('created_by');
@@ -35,6 +36,7 @@ class UpdateRolesTable extends Migration
 	{
 	    $table->dropColumn('access_level');
 	    $table->dropColumn('role_level');
+	    $table->dropColumn('role_type');
 	    $table->dropColumn('checked_out');
 	    $table->dropColumn('checked_out_time');
 	    $table->dropColumn('created_by');

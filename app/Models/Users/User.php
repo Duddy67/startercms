@@ -136,7 +136,15 @@ class User extends Authenticatable
      */
     public function getRoleOptions($user = null)
     {
-	$roles = auth()->user()->getAssignableRoles($user);
+	// Check first if the current user is editing their own user account.
+	if ($user && auth()->user()->id == $user->id) {
+	    // Only display the user's role as users cannot change their own role.
+	    $roles = Role::where('name', $user->getRoleNames()->toArray()[0])->get();
+	}
+	else {
+	    $roles = auth()->user()->getAssignableRoles();
+	}
+
 	$options = [];
 
 	foreach ($roles as $role) {
@@ -227,7 +235,7 @@ class User extends Authenticatable
 
 	$hierarchy = Role::getRoleHierarchy();
         // Users can only update users lower in the hierarchy.
-	if ($hierarchy[$this->getRoleType()] > $hierarchy[Role::getUserRoleType($user)]) {
+	if ($hierarchy[$this->getRoleType()] > $hierarchy[$user->getRoleType()]) {
 	    return true;
 	}
 
@@ -253,7 +261,7 @@ class User extends Authenticatable
 
 	$hierarchy = Role::getRoleHierarchy();
         // Users can only delete users lower in the hierarchy.
-	if ($hierarchy[$this->getRoleType()] > $hierarchy[Role::getUserRoleType($user)]) {
+	if ($hierarchy[$this->getRoleType()] > $hierarchy[$user->getRoleType()]) {
 	    return true;
 	}
 
@@ -277,9 +285,9 @@ class User extends Authenticatable
      */
     public function getRoleLevel()
     {
-        $roleType = $this->getRoleType();
+	$role = Role::where('name', $this->getRoleName())->first();
 
-	return Role::getRoleHierarchy()[$roleType];
+	return Role::getRoleHierarchy()[$role->role_type];
     }
 
     /*
@@ -289,12 +297,9 @@ class User extends Authenticatable
      */
     public function getRoleType()
     {
-        if (in_array($this->getRoleName(), Role::getDefaultRoles())) {
-	    return $this->getRoleName();
-	}
-	else {
-	    return Role::defineRoleType($this->getRoleName());
-	}
+	$role = Role::where('name', $this->getRoleName())->first();
+
+	return $role->role_type;
     }
 
     /*
@@ -324,37 +329,58 @@ class User extends Authenticatable
     /*
      * Returns the roles that the current user is allowed to assign to an other user.
      *
-     * @param  \App\Models\Users\User $user (optional)
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    private function getAssignableRoles($user = null)
+    private function getAssignableRoles()
     {
-	// Check first if the current user is editing their own user account.
-	if ($user && $this->id == $user->id) {
-	    // Only display the user's role as users cannot change their own role.
-	    return Role::where('name', $user->getRoleNames()->toArray()[0])->get();
-	}
-
 	// Get the current user's role type.
-        $roleType = Role::getUserRoleType($this);
+        $roleType = $this->getRoleType();
 
-	if (!in_array($roleType, Role::getAllowedRoleTypes())) {
+	//if (!in_array($roleType, Role::getAllowedRoleTypes())) {
+	if (!in_array($roleType, ['super-admin', 'admin', 'manager'])) {
 	    // Returns an empty collection.
 	    return new \Illuminate\Database\Eloquent\Collection();
 	}
 
 	if ($roleType == 'manager') {
-	  $roles = Role::whereDoesntHave('permissions', function ($query) {
-	      $query->whereIn('name', ['create-role', 'create-user']);
-	  })->where('name', '!=', 'super-admin')->get();
+	    $roles = Role::whereIn('role_type', ['registered', 'assistant'])->get();
+	    /*$roles = Role::whereDoesntHave('permissions', function ($query) {
+		$query->whereIn('name', ['create-role', 'create-user']);
+	    })->where('name', '!=', 'super-admin')->get();*/
 	}
 	elseif ($roleType == 'admin') {
-	  $roles = Role::whereDoesntHave('permissions', function ($query) {
-	      $query->whereIn('name', ['create-role']);
-	  })->where('name', '!=', 'super-admin')->get();
+	    $roles = Role::whereIn('role_type', ['manager', 'registered', 'assistant'])->get();
+	    /*$roles = Role::whereDoesntHave('permissions', function ($query) {
+		$query->whereIn('name', ['create-role']);
+	    })->where('name', '!=', 'super-admin')->get();*/
 	}
 	elseif ($roleType == 'super-admin') {
-	    $roles = Role::whereNotIn('name', ['super-admin'])->get();
+	    $roles = Role::whereIn('role_type', ['admin', 'manager', 'registered', 'assistant'])->get();
+	    //$roles = Role::whereNotIn('name', ['super-admin'])->get();
+	}
+
+	return $roles;
+    }
+
+    /*
+     * Returns the roles able to create users and groups that the current user is allowed to assign to an other user.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    private function getAssignableUserManagementRoles()
+    {
+        $roleType = $this->getRoleType();
+
+	if (!in_array($roleType, ['super-admin', 'admin'])) {
+	    // Returns an empty collection.
+	    return new \Illuminate\Database\Eloquent\Collection();
+	}
+
+	if ($roleType == 'admin') {
+	    $roles = Role::whereIn('role_type', ['manager'])->get();
+	}
+	elseif ($roleType == 'super-admin') {
+	    $roles = Role::whereIn('role_type', ['admin', 'manager'])->get();
 	}
 
 	return $roles;

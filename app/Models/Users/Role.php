@@ -51,7 +51,7 @@ class Role extends SpatieRole
     }
 
     /*
-     * Role types which are allowed to create users and modify their roles.
+     * Role types which are allowed to create users (and groups) and modify their roles.
      *
      * @return Array
      */
@@ -81,52 +81,19 @@ class Role extends SpatieRole
     }
 
     /*
-     * Returns the role type of a given user.
+     * Returns the type of a role according to its permissions.
      *
-     * @param \App\Models\Users\User  $user 
      * @return string
      */
-    public static function getUserRoleType($user)
+    public function defineRoleType()
     {
-        $roleName = $user->getRoleNames()->toArray()[0];
-
-	if (in_array($roleName, self::getDefaultRoles())) {
-	    return $roleName;
-	}
-
-	return self::defineRoleType($roleName);
-
-    }
-
-    /*
-     * Returns the role level of a given user.
-     *
-     * @param \App\Models\Users\User  $user 
-     * @return integer
-     */
-    public static function getUserRoleLevel($user)
-    {
-        $roleType = self::getUserRoleType($user);
-	return self::getRoleHierarchy()[$roleType];
-    }
-
-    /*
-     * Returns the type of a given role according its permissions.
-     *
-     * @param \Spatie\Permission\Models\Role or string  $role
-     * @return string
-     */
-    public static function defineRoleType($role)
-    {
-	$role = (is_string($role)) ? SpatieRole::findByName($role) : $role;
-
-	if ($role->hasPermissionTo('create-role')) {
+	if ($this->hasPermissionTo('create-role')) {
 	    return 'admin';
 	}
-	elseif ($role->hasPermissionTo('create-user')) {
+	elseif ($this->hasPermissionTo('create-user')) {
 	    return 'manager';
 	}
-	elseif ($role->hasPermissionTo('access-admin')) {
+	elseif ($this->hasPermissionTo('access-admin')) {
 	    return 'assistant';
 	}
 	else {
@@ -176,6 +143,26 @@ class Role extends SpatieRole
     }
 
     /*
+     * Returns only the users with a super-admin or admin role or admin role type.
+     *
+     * @return array
+     */
+    public static function getCreatedByOptions()
+    {
+	$users = \App\Models\Users\User::whereHas('roles', function ($query) {
+	    $query->whereIn('name', ['super-admin', 'admin'])->orWhere('role_type', 'admin');
+	})->get();
+
+	$options = [];
+
+	foreach ($users as $user) {
+	    $options[] = ['value' => $user->id, 'text' => $user->name];
+	}
+
+	return $options;
+    }
+
+    /*
      * Generic function that returns model values which are handled by select inputs. 
      */
     public function getSelectedValue($fieldName)
@@ -218,10 +205,6 @@ class Role extends SpatieRole
      */
     public function canDelete()
     {
-        if (auth()->user()->hasRole('super-admin')) {
-	    return true;
-	}
-
 	// The owner role level is lower than the current user's or the current user owns the role.
 	if ($this->role_level < auth()->user()->getRoleLevel() || $this->created_by == auth()->user()->id) {
 	    return true;

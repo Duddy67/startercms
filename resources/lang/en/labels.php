@@ -19,6 +19,13 @@ return [
 	'password' => 'Password',
 	'confirm_password' => 'Confirm password',
     ],
+    'roles' => [
+	'super-admin' => 'Super Administrator',
+	'admin' => 'Administrator',
+	'manager' => 'Manager',
+	'assistant' => 'Assistant',
+	'registered' => 'Registered',
+    ],
     'emails' => [
 	'subject' => 'Subject',
 	'html' => 'HTML',

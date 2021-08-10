@@ -9,8 +9,8 @@
   {
     "label": "labels.generic.type",
     "type": "text",
-    "name": "_role_type",
-    "id": "_role_type",
+    "name": "role_type",
+    "id": "role_type",
     "extra": ["disabled"],
     "placeholder": "labels.generic.unknown"
   },

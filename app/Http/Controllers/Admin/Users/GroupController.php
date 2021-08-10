@@ -236,7 +236,7 @@ class GroupController extends Controller
 	      return redirect()->route('admin.users.groups.index', $request->query())->with(
 		  [
 		      'error' => __('messages.generic.delete_not_auth'), 
-		      'success' => __('messages.groups.delete_list_success', ['number' => $deleted)])
+		      'success' => __('messages.groups.delete_list_success', ['number' => $deleted])
 		  ]);
 	    }
 
