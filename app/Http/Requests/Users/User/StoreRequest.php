@@ -4,6 +4,7 @@ namespace App\Http\Requests\Users\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+
 class StoreRequest extends FormRequest
 {
     /**
@@ -13,7 +14,7 @@ class StoreRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +25,10 @@ class StoreRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+	    'name' => 'bail|required|between:5,25|regex:/^[\pL\s\-]+$/u',
+	    'email' => 'bail|required|email|unique:users',
+	    'password' => 'required|confirmed|min:8',
+	    'role' => 'required'
         ];
     }
 }

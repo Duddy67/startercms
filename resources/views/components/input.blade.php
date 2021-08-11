@@ -54,7 +54,9 @@
 		@php $selected = ($option['value'] == $value) ? 'selected="selected"' : '' @endphp
 	    @endif
 
-	    <option value="{{ $option['value'] }}" {{ $selected }}>{{ $option['text'] }}</option>
+	    @php $disabled = (isset($option['extra']) && in_array('disabled', $option['extra'])) ? 'disabled' : '' @endphp
+
+	    <option value="{{ $option['value'] }}" {{ $disabled }} {{ $selected }}>{{ $option['text'] }}</option>
         @endforeach
     </select> 
 @elseif ($field->type == 'checkbox')

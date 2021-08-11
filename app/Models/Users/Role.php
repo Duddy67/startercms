@@ -51,20 +51,6 @@ class Role extends SpatieRole
     }
 
     /*
-     * Role types which are allowed to create users (and groups) and modify their roles.
-     *
-     * @return Array
-     */
-    public static function getAllowedRoleTypes()
-    {
-        return [
-	    'super-admin',
-	    'admin',
-	    'manager'
-	];
-    }
-
-    /*
      * The role hierarchy defined numerically. 
      *
      * @return Array
@@ -143,16 +129,13 @@ class Role extends SpatieRole
     }
 
     /*
-     * Returns only the users with a super-admin or admin role or admin role type.
+     * Returns only the users with a super-admin or admin role type.
      *
      * @return array
      */
     public static function getCreatedByOptions()
     {
-	$users = \App\Models\Users\User::whereHas('roles', function ($query) {
-	    $query->whereIn('name', ['super-admin', 'admin'])->orWhere('role_type', 'admin');
-	})->get();
-
+	$users = auth()->user()->getAssignableUsers(['manager', 'assistant', 'registered']);
 	$options = [];
 
 	foreach ($users as $user) {

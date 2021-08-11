@@ -160,13 +160,19 @@ class User extends Authenticatable
      * @param  \App\Models\Users\User $user (optional)
      * @return Array
      */
-    public function getGroupsOptions($user = null)
+    public function getGroupsOptions()
     {
         $groups = Group::all();
 	$options = [];
 
 	foreach ($groups as $group) {
-	    $options[] = ['value' => $group->id, 'text' => $group->name];
+	    $extra = [];
+
+	    if ($group->access_level == 'private' && $group->role_level > auth()->user()->getRoleLevel() && $group->created_by != auth()->user()->id) {
+	        $extra = ['disabled'];
+	    }
+
+	    $options[] = ['value' => $group->id, 'text' => $group->name, 'extra' => $extra];
 	}
 
 	return $options;
@@ -305,25 +311,36 @@ class User extends Authenticatable
     /*
      * Returns the users that a user is allowed to assign as owner of an item.
      *
+     * @param  Array  $exceptRoleTypes (optional)
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getAssignableUsers()
+    public function getAssignableUsers($exceptRoleTypes = [])
     {
-	$results = $this->getAssignableRoles();
+        $roleType = $this->getRoleType();
+	$roleTypes = [];
 
-	if ($results->isEmpty()) {
-	    return $results;
+	if ($roleType == 'assistant') {
+	    $roleTypes = ['registered'];
+	}
+	elseif ($roleType == 'manager') {
+	    $roleTypes = ['assistant', 'registered'];
+	}
+	elseif ($roleType == 'admin') {
+	    $roleTypes = ['manager', 'assistant', 'registered'];
+	}
+	elseif ($roleType == 'super-admin') {
+	    $roleTypes = ['admin', 'manager', 'assistant', 'registered'];
 	}
 
-        $roles = [];
+	$roleTypes = array_diff($roleTypes, $exceptRoleTypes);
 
-	foreach ($results as $role) {
-	    $roles[] = $role->name;
+	if ($roleType == 'registered' || empty($roleTypes)) {
+	    return new \Illuminate\Database\Eloquent\Collection();
 	}
 
-	return User::whereHas('roles', function ($query) use($roles) {
-	    $query->whereIn('name', $roles);
-	})->orWhere('id', auth()->user()->id)->get();
+	return User::whereHas('roles', function ($query) use($roleTypes) {
+	    $query->whereIn('role_type', $roleTypes);
+	})->orWhere('id', $this->id)->get();
     }
 
     /*
@@ -336,7 +353,7 @@ class User extends Authenticatable
 	// Get the current user's role type.
         $roleType = $this->getRoleType();
 
-	//if (!in_array($roleType, Role::getAllowedRoleTypes())) {
+	// Proceed only with role types able to create users and groups 
 	if (!in_array($roleType, ['super-admin', 'admin', 'manager'])) {
 	    // Returns an empty collection.
 	    return new \Illuminate\Database\Eloquent\Collection();
@@ -344,43 +361,12 @@ class User extends Authenticatable
 
 	if ($roleType == 'manager') {
 	    $roles = Role::whereIn('role_type', ['registered', 'assistant'])->get();
-	    /*$roles = Role::whereDoesntHave('permissions', function ($query) {
-		$query->whereIn('name', ['create-role', 'create-user']);
-	    })->where('name', '!=', 'super-admin')->get();*/
 	}
 	elseif ($roleType == 'admin') {
 	    $roles = Role::whereIn('role_type', ['manager', 'registered', 'assistant'])->get();
-	    /*$roles = Role::whereDoesntHave('permissions', function ($query) {
-		$query->whereIn('name', ['create-role']);
-	    })->where('name', '!=', 'super-admin')->get();*/
 	}
 	elseif ($roleType == 'super-admin') {
 	    $roles = Role::whereIn('role_type', ['admin', 'manager', 'registered', 'assistant'])->get();
-	    //$roles = Role::whereNotIn('name', ['super-admin'])->get();
-	}
-
-	return $roles;
-    }
-
-    /*
-     * Returns the roles able to create users and groups that the current user is allowed to assign to an other user.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    private function getAssignableUserManagementRoles()
-    {
-        $roleType = $this->getRoleType();
-
-	if (!in_array($roleType, ['super-admin', 'admin'])) {
-	    // Returns an empty collection.
-	    return new \Illuminate\Database\Eloquent\Collection();
-	}
-
-	if ($roleType == 'admin') {
-	    $roles = Role::whereIn('role_type', ['manager'])->get();
-	}
-	elseif ($roleType == 'super-admin') {
-	    $roles = Role::whereIn('role_type', ['admin', 'manager'])->get();
 	}
 
 	return $roles;

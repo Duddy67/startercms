@@ -99,12 +99,12 @@ trait ItemConfig
 	        // Build the function name.
 		$function = 'get'.str_replace('_', '', ucwords($field->name, '_')).'Options';
 
-		if ($field->name == 'access_level' || ($field->name == 'created_by' && $this->modelName != 'role')) {
+		if ($field->name == 'access_level') {
 		    // Common options.
 		    $options = General::$function();
 		}
 		else {
-		    $options = $this->model->$function($item);
+		    $options = $this->model->$function();
 		}
 
 		$fields[$key]->options = $options;

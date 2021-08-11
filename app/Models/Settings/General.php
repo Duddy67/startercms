@@ -86,18 +86,6 @@ class General extends Model
       ];
     }
 
-    public static function getCreatedByOptions()
-    {
-	$users = auth()->user()->getAssignableUsers();
-	$options = [];
-
-	foreach ($users as $user) {
-	    $options[] = ['value' => $user->id, 'text' => $user->name];
-	}
-
-	return $options;
-    }
-
     public static function getSortedByOptions($pluginName, $modelName)
     {
 	$json = file_get_contents(app_path().'/Models/'.ucfirst($pluginName).'/'.$modelName.'/columns.json', true);

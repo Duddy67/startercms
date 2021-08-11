@@ -72,7 +72,7 @@ class Group extends Model
 
     public function getCreatedByOptions()
     {
-	$users = auth()->user()->getAssignableUsers();
+	$users = auth()->user()->getAssignableUsers(['assistant', 'registered']);
 	$options = [];
 
 	foreach ($users as $user) {

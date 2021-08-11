@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Users\User;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
 
 class UpdateRequest extends FormRequest
 {
@@ -13,7 +15,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +26,12 @@ class UpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+	    'name' => 'bail|required|between:5,25|regex:/^[\pL\s\-]+$/u',
+	    'email' => ['bail', 'required', 'email',
+			Rule::unique('users')->ignore($this->user->id)
+	    ],
+	    'password' => 'nullable|confirmed|min:8',
+	    'role' => 'required'
         ];
     }
 }

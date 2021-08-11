@@ -11,6 +11,8 @@ use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
 use App\Models\Settings\Email;
 use App\Models\Cms\Document;
+use App\Http\Requests\Users\User\StoreRequest;
+use App\Http\Requests\Users\User\UpdateRequest;
 
 
 class UserController extends Controller
@@ -121,14 +123,13 @@ class UserController extends Controller
      * Checks the record back in.
      *
      * @param  Request  $request
-     * @param  int  $id (optional)
+     * @param  \App\Models\Users\User $user (optional)
      * @return Response
      */
-    public function cancel(Request $request, $id = null)
+    public function cancel(Request $request, User $user = null)
     {
-        if ($id) {
-	    $record = User::findOrFail($id);
-	    $this->checkIn($record);
+        if ($user) {
+	    $this->checkIn($user);
 	}
 
 	return redirect()->route('admin.users.users.index', $request->query());
@@ -137,25 +138,15 @@ class UserController extends Controller
     /**
      * Update the specified user.
      *
-     * @param  Request  $request
-     * @param  int  $id
+     * @param  \App\Http\Requests\Users\User\UpdateRequest  $request
+     * @param  \App\Models\Users\User $user
      * @return Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, User $user)
     {
-	$user = User::findOrFail($id);
-
 	if (!auth()->user()->canUpdate($user) && auth()->user()->id != $user->id) {
 	    return redirect()->route('admin.users.users.edit', $user->id)->with('error',  __('messages.users.update_user_not_auth'));
 	}
-
-        $this->validate($request, [
-	    'name' => 'bail|required|between:5,25|regex:/^[\pL\s\-]+$/u',
-	    'email' => ['bail', 'required', 'email',
-			Rule::unique('users')->ignore($id)
-	    ],
-	    'password' => 'nullable|confirmed|min:8'
-	]);
 
 	$user->name = $request->input('name');
 	$user->email = $request->input('email');
@@ -189,23 +180,23 @@ class UserController extends Controller
 	    return redirect()->route('admin.users.users.index', $request->query())->with('success', __('messages.users.update_success'));
 	}
 
-	return redirect()->route('admin.users.users.edit', array_merge($request->query(), ['user' => $id]))->with('success', __('messages.users.update_success'));
+	return redirect()->route('admin.users.users.edit', array_merge($request->query(), ['user' => $user->id]))->with('success', __('messages.users.update_success'));
     }
 
     /**
      * Store a new user.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\Users\User\StoreRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        $this->validate($request, [
+        /*$this->validate($request, [
 	    'name' => 'bail|required|between:5,25|regex:/^[\pL\s\-]+$/u',
 	    'email' => 'bail|required|email|unique:users',
 	    'password' => 'required|confirmed|min:8',
 	    'role' => 'required'
-	]);
+	]);*/
 
 	$user = User::create([
 	    'name' => $request->input('name'),
@@ -240,13 +231,11 @@ class UserController extends Controller
      * Remove the specified user from storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\Models\Users\User $user
      * @return Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, User $user)
     {
-	$user = User::findOrFail($id);
-
 	if (!auth()->user()->canDelete($user)) {
 	    return redirect()->route('admin.users.users.edit', $user->id)->with('error', __('messages.users.delete_user_not_auth'));
 	}
