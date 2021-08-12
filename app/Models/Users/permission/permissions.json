@@ -64,21 +64,6 @@
 	"name": "delete-role",
 	"type": "level1",
 	"default": "admin"
-      },
-      {
-	"name": "create-email",
-	"type": "level1",
-	"default": "admin"
-      },
-      {
-	"name": "update-email",
-	"type": "level1",
-	"default": "admin"
-      },
-      {
-	"name": "delete-email",
-	"type": "level1",
-	"default": "admin"
       }
   ],
   "blog": [
@@ -123,16 +108,31 @@
 	"default": "admin|manager"
       }
   ],
-  "access": [
+  "settings": [
       {
 	"name": "global-settings",
 	"type": "level1",
 	"default": ""
       },
       {
-	"name": "access-admin",
-	"type": "level2",
-	"default": "assistant"
+	"name": "blog-settings",
+	"type": "level1",
+	"default": ""
+      },
+      {
+	"name": "create-email",
+	"type": "level1",
+	"default": ""
+      },
+      {
+	"name": "update-email",
+	"type": "level1",
+	"default": ""
+      },
+      {
+	"name": "delete-email",
+	"type": "level1",
+	"default": ""
       }
   ]
 }

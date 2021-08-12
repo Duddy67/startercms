@@ -191,13 +191,6 @@ class UserController extends Controller
      */
     public function store(StoreRequest $request)
     {
-        /*$this->validate($request, [
-	    'name' => 'bail|required|between:5,25|regex:/^[\pL\s\-]+$/u',
-	    'email' => 'bail|required|email|unique:users',
-	    'password' => 'required|confirmed|min:8',
-	    'role' => 'required'
-	]);*/
-
 	$user = User::create([
 	    'name' => $request->input('name'),
 	    'email' => $request->input('email'),

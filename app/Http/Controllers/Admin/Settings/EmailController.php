@@ -9,6 +9,9 @@ use App\Models\Settings\Email;
 use App\Models\Users\User;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
+use App\Http\Requests\Settings\Email\StoreRequest;
+use App\Http\Requests\Settings\Email\UpdateRequest;
+
 
 class EmailController extends Controller
 {
@@ -125,14 +128,13 @@ class EmailController extends Controller
      * Checks the record back in.
      *
      * @param  Request  $request
-     * @param  int  $id (optional)
+     * @param  \App\Models\Settings\Email  $email
      * @return Response
      */
-    public function cancel(Request $request, $id = null)
+    public function cancel(Request $request, Email $email = null)
     {
-        if ($id) {
-	    $record = Email::findOrFail($id);
-	    $this->checkIn($record);
+        if ($email) {
+	    $this->checkIn($email);
 	}
 
 	return redirect()->route('admin.settings.emails.index', $request->query());
@@ -154,25 +156,15 @@ class EmailController extends Controller
     /**
      * Update the specified email.
      *
-     * @param  Request  $request
-     * @param  int  $id
+     * @param  \App\Http\Requests\Settings\Email\UpdateRequest  $request
+     * @param  \App\Models\Settings\Email  $email
      * @return Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, Email $email)
     {
-	$email = Email::findOrFail($id);
-
 	if (!$email->canEdit()) {
-	    return redirect()->route('admin.settings.emails.edit', array_merge($request->query(), ['email' => $id]))->with('error',  __('messages.generic.edit_not_auth'));
+	    return redirect()->route('admin.settings.emails.edit', array_merge($request->query(), ['email' => $email->id]))->with('error',  __('messages.generic.edit_not_auth'));
 	}
-
-        /*$this->validate($request, [
-	    'name' => [
-		'required',
-		'regex:/^[a-z0-9-]{3,}$/',
-		Rule::unique('emails')->ignore($id)
-	    ],
-	]);*/
 
 	$email->code = $request->input('code');
 	$email->subject = $request->input('subject');
@@ -195,25 +187,17 @@ class EmailController extends Controller
 	    return redirect()->route('admin.settings.emails.index', $request->query())->with('success', __('messages.emails.update_success'));
 	}
 
-	return redirect()->route('admin.settings.emails.edit', array_merge($request->query(), ['email' => $id]))->with('success', __('messages.emails.update_success'));
+	return redirect()->route('admin.settings.emails.edit', array_merge($request->query(), ['email' => $email->id]))->with('success', __('messages.emails.update_success'));
     }
 
     /**
      * Store a new email.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\Settings\Email\StoreRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        /*$this->validate($request, [
-	    'name' => [
-		'required',
-		'regex:/^[a-z0-9-]{3,}$/',
-		'unique:emails'
-	    ],
-	]);*/
-
 	$plainText = ($request->input('format') == 'plain_text') ? 1 : 0;
 
 	$email = Email::create(['code' => $request->input('code'),
@@ -223,34 +207,28 @@ class EmailController extends Controller
 				'plain_text' => $plainText,
 	]);
 
-	$query = $request->query();
-
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.settings.emails.index', $query)->with('success', __('messages.emails.create_success'));
+	    return redirect()->route('admin.settings.emails.index', $request->query())->with('success', __('messages.emails.create_success'));
 	}
 
-	$query['email'] = $email->id;
-
-	return redirect()->route('admin.settings.emails.edit', $query)->with('success', __('messages.emails.create_success'));
+	return redirect()->route('admin.settings.emails.edit', array_merge($request->query(), ['email' => $email->id]))->with('success', __('messages.emails.create_success'));
     }
 
     /**
      * Remove the specified email from storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\Models\Settings\Email  $email
      * @return Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, Email $email)
     {
-	$email = Email::findOrFail($id);
-
 	if (!$email->canDelete()) {
-	    return redirect()->route('admin.settings.emails.edit', array_merge($request->query(), ['email' => $id]))->with('error',  __('messages.generic.delete_not_auth'));
+	    return redirect()->route('admin.settings.emails.edit', array_merge($request->query(), ['email' => $email->id]))->with('error',  __('messages.generic.delete_not_auth'));
 	}
 
 	$code = $email->code;
-	//$email->delete();
+	$email->delete();
 
 	return redirect()->route('admin.settings.emails.index', $request->query())->with('success', __('messages.emails.delete_success', ['name' => $code]));
     }
