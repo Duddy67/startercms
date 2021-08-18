@@ -8,10 +8,9 @@
   },
   {
     "label": "labels.generic.type",
-    "type": "text",
+    "type": "select",
     "name": "role_type",
     "id": "role_type",
-    "extra": ["disabled"],
     "placeholder": "labels.generic.unknown"
   },
   {

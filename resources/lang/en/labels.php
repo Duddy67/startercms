@@ -3,6 +3,7 @@
 return [
 
     'title' => [
+	'dashboard' => 'Dashboard',
 	'users' => 'Users',
 	'groups' => 'Groups',
 	'roles' => 'Roles',

@@ -16,6 +16,10 @@
                      if ($field->name == 'access_level' && $role->role_level > auth()->user()->getRoleLevel()) {
                          $field->extra = ['disabled'];
                      }
+
+                     if ($field->name == 'role_type') {
+                         $field->extra = ['disabled'];
+                     }
 		 }
 		 else {
                      if ($field->name == 'created_at' || $field->name == 'updated_at') {
@@ -51,6 +55,10 @@
 
 	<input type="hidden" id="cancelEdit" value="{{ route('admin.users.roles.cancel', $query) }}">
 	<input type="hidden" id="close" name="_close" value="0">
+
+	@if (!isset($role))
+	    <input type="hidden" id="permissions" name="_permissions" value="{{ $permissions }}">
+        @endif
     </form>
 
     <div class="form-group">
@@ -70,5 +78,6 @@
     <link rel="stylesheet" href="{{ url('/') }}/vendor/adminlte/plugins/jquery-ui/jquery-ui.min.css"></script>
     <script type="text/javascript" src="{{ url('/') }}/js/admin/datepicker.js"></script>
     <script type="text/javascript" src="{{ url('/') }}/js/admin/form.js"></script>
+    <script type="text/javascript" src="{{ url('/') }}/js/admin/roles/settings.js"></script>
     <script type="text/javascript" src="{{ url('/') }}/js/admin/disable.toolbars.js"></script>
 @endpush

@@ -9,6 +9,14 @@
 @php $name = ($name && isset($field->group)) ? $field->group.'['.$name.']' : $name @endphp
 @php $multiple = (isset($field->extra) && in_array('multiple', $field->extra)) ? 'multiple' : '' @endphp
 @php $multi = ($multiple) ? '[]' : '' @endphp
+@php
+    $dataset = ''; 
+    if (isset($field->dataset)) {
+        foreach($field->dataset as $key => $val) {
+            $dataset .= $key.'='.$val.' ';
+        }
+    }
+@endphp
 
 @if ($field->type == 'text' || $field->type == 'password' || $field->type == 'date' || $field->type == 'file')
     <input  id="{{ $field->id }}" {{ $disabled }} {{ $multiple }} 
@@ -64,7 +72,7 @@
 	<label class="form-check-label" for="{{ $field->id }}">{{ $field->label }}</label>
     @endif
 
-    <input type="checkbox" id="{{ $field->id }}" class="form-check-input"
+    <input type="checkbox" id="{{ $field->id }}" class="form-check-input" {{ $dataset }}
 
     @if ($name)
 	name="{{ $name }}"

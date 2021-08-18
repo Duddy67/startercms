@@ -8,22 +8,13 @@
       {
 	"name": "update-user",
 	"type": "level2",
-	"default": "admin"
+	"default": "admin|manager"
       },
       {
 	"name": "delete-user",
 	"type": "level2",
-	"default": "admin"
-      },
-      {
-	"name": "update-own-user",
-	"type": "level2",
-	"default": "manager"
-      },
-      {
-	"name": "delete-own-user",
-	"type": "level2",
-	"default": "manager"
+	"default": "admin|manager",
+	"optional": "manager"
       },
       {
 	"name": "create-group",
@@ -33,22 +24,13 @@
       {
 	"name": "update-group",
 	"type": "level2",
-	"default": "admin"
+	"default": "admin|manager"
       },
       {
 	"name": "delete-group",
 	"type": "level2",
-	"default": "admin"
-      },
-      {
-	"name": "update-own-group",
-	"type": "level2",
-	"default": "manager"
-      },
-      {
-	"name": "delete-own-group",
-	"type": "level2",
-	"default": "manager"
+	"default": "admin|manager",
+	"optional": "manager"
       },
       {
 	"name": "create-role",
@@ -63,7 +45,8 @@
       {
 	"name": "delete-role",
 	"type": "level1",
-	"default": "admin"
+	"default": "admin",
+	"optional": "admin"
       }
   ],
   "blog": [
@@ -74,65 +57,71 @@
       },
       {
 	"name": "update-post",
-	"type": "level2",
-	"default": "admin|manager|assistant"
+	"type": "level3",
+	"default": "admin|manager|assistant|registered"
       },
       {
 	"name": "delete-post",
-	"type": "level2",
-	"default": "admin|manager|assistant"
-      },
-      {
-	"name": "update-own-post",
 	"type": "level3",
-	"default": "registered"
-      },
-      {
-	"name": "delete-own-post",
-	"type": "level3",
-	"default": "registered"
+	"default": "admin|manager|assistant|registered",
+	"optional": "assistant|registered"
       },
       {
 	"name": "create-post-category",
 	"type": "level2",
-	"default": "admin|manager"
+	"default": "admin",
+	"optional": "manager"
       },
       {
 	"name": "update-post-category",
 	"type": "level2",
-	"default": "admin|manager"
+	"default": "admin",
+	"optional": "manager"
       },
       {
 	"name": "delete-post-category",
 	"type": "level2",
-	"default": "admin|manager"
+	"default": "admin",
+	"optional": "manager"
       }
   ],
   "settings": [
       {
 	"name": "global-settings",
 	"type": "level1",
-	"default": ""
+	"default": "",
+	"optional": "admin"
       },
       {
 	"name": "blog-settings",
 	"type": "level1",
-	"default": ""
+	"default": "",
+	"optional": "admin"
       },
       {
 	"name": "create-email",
 	"type": "level1",
-	"default": ""
+	"default": "",
+	"optional": "admin"
       },
       {
 	"name": "update-email",
 	"type": "level1",
-	"default": ""
+	"default": "",
+	"optional": "admin"
       },
       {
 	"name": "delete-email",
 	"type": "level1",
-	"default": ""
+	"default": "",
+	"optional": "admin"
+      }
+  ],
+  "cms": [
+      {
+	"name": "access-dashboard",
+	"type": "level2",
+	"default": "admin|manager|assistant"
       }
   ]
 }

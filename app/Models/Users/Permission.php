@@ -26,10 +26,10 @@ class Permission extends SpatiePermission
 	    'create-[0-9-a-z\-]+',
 	    'update-[0-9-a-z\-]+',
 	    'delete-[0-9-a-z\-]+',
+	    'access-[0-9-a-z\-]+',
 	    'update-own-[0-9-a-z\-]+',
 	    'delete-own-[0-9-a-z\-]+',
 	    '[0-9-a-z\-]+-settings',
-	    'access-admin'
 	];
     }
 
@@ -65,6 +65,26 @@ class Permission extends SpatiePermission
 	}
 
 	return $list;
+    }
+
+    /*
+     * Removes the sections from the permission list.
+     *
+     * @param Array  $except (optional)
+     * @return Array of stdClass Objects.
+     */
+    public static function getPermissionsWithoutSections($except = [])
+    {
+        $list = self::getPermissionList($except);
+	$results = [];
+
+	foreach ($list as $permissions) {
+	    foreach ($permissions as $permission) {
+	        $results[] = $permission;
+	    }
+	}
+
+	return $results;
     }
 
     /*

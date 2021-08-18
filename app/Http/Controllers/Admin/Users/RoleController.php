@@ -78,7 +78,7 @@ class RoleController extends Controller
     {
         // Gather the needed data to build the form.
 
-        $except = ['updated_by', 'owner_name', 'role_type'];
+        $except = ['updated_by', 'owner_name'];
 
 	if (auth()->user()->getRoleName() != 'super-admin') {
 	    $except[] = 'created_by';
@@ -86,10 +86,11 @@ class RoleController extends Controller
 
         $fields = $this->getFields(null, $except);
         $actions = $this->getActions('form', ['destroy']);
-	$board = $this->getPermissionBoard();
+	$board = $this->getPermissionBoard($request);
 	$query = $request->query();
+	$permissions = file_get_contents(app_path().'/Models/Users/permission/permissions.json', true);
 
-        return view('admin.users.roles.form', compact('fields', 'actions', 'board', 'query'));
+        return view('admin.users.roles.form', compact('fields', 'actions', 'board', 'query', 'permissions'));
     }
 
     /**
@@ -134,8 +135,7 @@ class RoleController extends Controller
 	}
 
         $fields = $this->getFields($role, $except);
-	$this->setFieldValues($fields, $role);
-	$board = $this->getPermissionBoard($role);
+	$board = $this->getPermissionBoard($request, $role);
 	$except = (in_array($role->name, Role::getDefaultRoles())) ? ['save', 'saveClose', 'destroy'] : [];
         $actions = $this->getActions('form', $except);
 	// Add the id parameter to the query.
@@ -196,40 +196,22 @@ class RoleController extends Controller
 
 	// Set the permission list.
 	
-        if ($request->input('permissions') !== null) {
+	$permissions = Permission::getPermissionsWithoutSections();
 
-	    // Ensure an admin doesn't use any level1 permissions. 
-	    $level1Perms = Permission::getPermissionNameList(['level2', 'level3']);
-	    $count = array_intersect($request->input('permissions'), $level1Perms);
-
-	    if (auth()->user()->getRoleType() == 'admin' && $count) {
-		return redirect()->route('admin.users.roles.edit', $role->id)->with('error', __('messages.roles.permission_not_auth'));
-	    }
-
-	    // Get the unselected permissions.
-	    $permissions = Permission::whereNotIn('name', $request->input('permissions'))->pluck('name')->toArray();
-
-	    // Give the selected permissions.
-	    foreach ($request->input('permissions') as $permission) {
-	        if (!$role->hasPermissionTo($permission)) {
-		    $role->givePermissionTo($permission);
-		}
-	    }
-	}
-	else {
-	    // Get all of the permissions.
-	    $permissions = Permission::all()->pluck('name')->toArray();
-	}
-
-	// Revoke the unselected permissions.
 	foreach ($permissions as $permission) {
-	    if ($role->hasPermissionTo($permission)) {
-		$role->revokePermissionTo($permission);
+
+	    $optional = (isset($permission->optional) && preg_match('#'.$role->role_type.'#', $permission->optional)) ? true : false;
+
+	    // Check the optional permissions.
+	    // Note: No need to check the default permissions since they have been set during the storing process and cannot be modified anymore.
+
+	    if ($optional && in_array($permission->name, $request->input('permissions', [])) && !$role->hasPermissionTo($permission->name)) {
+		  $role->givePermissionTo($permission->name);
+	    }
+	    elseif ($optional && !in_array($permission->name, $request->input('permissions', [])) && $role->hasPermissionTo($permission->name)) {
+		 $role->revokePermissionTo($permission->name);
 	    }
 	}
-
-	$role->role_type = $role->defineRoleType();
-	$role->save();
 
         if ($request->input('_close', null)) {
 	    $this->checkIn($role);
@@ -248,26 +230,42 @@ class RoleController extends Controller
      */
     public function store(StoreRequest $request)
     {
-	$role = Role::create(['name' => $request->input('name')]);
+	// Ensure first that an admin doesn't use any level1 permissions. 
+	$level1Perms = Permission::getPermissionNameList(['level2', 'level3']);
+	$count = array_intersect($request->input('permissions', []), $level1Perms);
 
-	// Set the permission list.
-	
-        if ($request->input('permissions') !== null) {
+	if (auth()->user()->getRoleType() == 'admin' && $count) {
+	    return redirect()->route('admin.users.roles.edit', $role->id)->with('error', __('messages.roles.permission_not_auth'));
+	}
 
-	    // Ensure an admin doesn't use any level1 permissions. 
-	    $level1Perms = Permission::getPermissionNameList(['level2', 'level3']);
-	    $count = array_intersect($request->input('permissions'), $level1Perms);
 
-	    if (auth()->user()->getRoleType() == 'admin' && $count) {
-		return redirect()->route('admin.users.roles.edit', $role->id)->with('error', __('messages.roles.permission_not_auth'));
+	$permissions = Permission::getPermissionsWithoutSections();
+	$toGiveTo = [];
+
+	foreach ($permissions as $permission) {
+
+	    $default = (preg_match('#'.$request->input('role_type').'#', $permission->default)) ? true : false;
+	    $optional = (isset($permission->optional) && preg_match('#'.$request->input('role_type').'#', $permission->optional)) ? true : false;
+
+	    if ($default && !$optional) {
+		 $toGiveTo[] = $permission;
 	    }
-
-	    foreach ($request->input('permissions') as $permission) {
-		$role->givePermissionTo($permission);
+	    elseif ($optional && in_array($permission->name, $request->input('permissions', []))) {
+		 $toGiveTo[] = $permission;
 	    }
 	}
 
-	$role->role_type = $role->defineRoleType();
+	$role = Role::create([
+	    'name' => $request->input('name'),
+	    'access_level' => $request->input('access_level'),
+	    'created_by' => $request->input('created_by', auth()->user()->id)
+	]);
+
+        foreach ($toGiveTo as $permission) {
+	    $role->givePermissionTo($permission->name);
+	}
+
+	$role->role_type = $request->input('role_type');
 	$role->save();
 
         if ($request->input('_close', null)) {
@@ -361,7 +359,7 @@ class RoleController extends Controller
     /*
      * Builds the permission board.
      */
-    private function getPermissionBoard($role = null)
+    private function getPermissionBoard($request, $role = null)
     {
         // N.B: Only super-admin and users type admin are allowed to manage roles.
 
@@ -391,6 +389,7 @@ class RoleController extends Controller
 		$checkbox->id = $permission->name;
 		$checkbox->name = 'permissions[]';
 		$checkbox->value = $permission->name;
+		$checkbox->dataset = ['data-section' => $section];
 		$checkbox->checked = false;
 
 		if ($role) {
@@ -398,6 +397,10 @@ class RoleController extends Controller
 			if ($role->hasPermissionTo($permission->name)) {
 			    $checkbox->checked = true;
 			}
+
+			$default = explode('|', $permission->default);
+			$optional = (isset($permission->optional)) ? explode('|', $permission->optional) : [];
+			$checkbox->disabled = (in_array($role->role_type, $optional)) ? false : true;
 		    }
 		    catch (\Exception $e) {
 			$checkbox->label = $permission->name.' (missing !)';
@@ -459,17 +462,6 @@ class RoleController extends Controller
      */
     private function setFieldValues(&$fields, $role)
     {
-        $defaultRole = (in_array($role->name, Role::getDefaultRoles())) ? true : false;
-
-        foreach ($fields as $field) {
-	    if ($defaultRole) {
-	        // Disable all field.
-	        $field->extra = ['disabled'];
-	    }
-
-	    if ($field->name == 'role_type') {
-	        $field->value = __('labels.roles.'.$role->role_type);
-	    }
-	}
+        // Code 
     }
 }

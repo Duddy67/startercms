@@ -79,7 +79,7 @@ class Role extends SpatieRole
 	elseif ($this->hasPermissionTo('create-user')) {
 	    return 'manager';
 	}
-	elseif ($this->hasPermissionTo('access-admin')) {
+	elseif ($this->hasPermissionTo('access-dashboard')) {
 	    return 'assistant';
 	}
 	else {
@@ -135,6 +135,7 @@ class Role extends SpatieRole
      */
     public static function getCreatedByOptions()
     {
+        // Get only users with admin role types.
 	$users = auth()->user()->getAssignableUsers(['manager', 'assistant', 'registered']);
 	$options = [];
 
@@ -143,6 +144,21 @@ class Role extends SpatieRole
 	}
 
 	return $options;
+    }
+
+    public static function getRoleTypeOptions()
+    {
+        $roles = [
+            ['value' => 'registered', 'text' => __('labels.roles.registered')],
+            ['value' => 'assistant', 'text' => __('labels.roles.assistant')],
+            ['value' => 'manager', 'text' => __('labels.roles.manager')]
+	];
+
+	if (auth()->user()->getRoleName() == 'super-admin') {
+	    $roles[] = ['value' => 'admin', 'text' => __('labels.roles.admin')];
+	}
+
+	return $roles;
     }
 
     /*

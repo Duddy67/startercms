@@ -24,6 +24,7 @@ class AdminController extends Controller
      */
     public function index()
     {
+        //echo 'Dashboard';
         return view('admin.index');
     }
 }
