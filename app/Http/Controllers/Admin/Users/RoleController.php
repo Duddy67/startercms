@@ -86,7 +86,7 @@ class RoleController extends Controller
 
         $fields = $this->getFields(null, $except);
         $actions = $this->getActions('form', ['destroy']);
-	$board = $this->getPermissionBoard($request);
+	$board = $this->getPermissionBoard();
 	$query = $request->query();
 	$permissions = file_get_contents(app_path().'/Models/Users/permission/permissions.json', true);
 
@@ -135,7 +135,7 @@ class RoleController extends Controller
 	}
 
         $fields = $this->getFields($role, $except);
-	$board = $this->getPermissionBoard($request, $role);
+	$board = $this->getPermissionBoard($role);
 	$except = (in_array($role->name, Role::getDefaultRoles())) ? ['save', 'saveClose', 'destroy'] : [];
         $actions = $this->getActions('form', $except);
 	// Add the id parameter to the query.
@@ -244,10 +244,10 @@ class RoleController extends Controller
 
 	foreach ($permissions as $permission) {
 
-	    $default = (preg_match('#'.$request->input('role_type').'#', $permission->default)) ? true : false;
+	    $roles = (preg_match('#'.$request->input('role_type').'#', $permission->roles)) ? true : false;
 	    $optional = (isset($permission->optional) && preg_match('#'.$request->input('role_type').'#', $permission->optional)) ? true : false;
 
-	    if ($default && !$optional) {
+	    if ($roles && !$optional) {
 		 $toGiveTo[] = $permission;
 	    }
 	    elseif ($optional && in_array($permission->name, $request->input('permissions', []))) {
@@ -359,7 +359,7 @@ class RoleController extends Controller
     /*
      * Builds the permission board.
      */
-    private function getPermissionBoard($request, $role = null)
+    private function getPermissionBoard($role = null)
     {
         // N.B: Only super-admin and users type admin are allowed to manage roles.
 
@@ -398,7 +398,6 @@ class RoleController extends Controller
 			    $checkbox->checked = true;
 			}
 
-			$default = explode('|', $permission->default);
 			$optional = (isset($permission->optional)) ? explode('|', $permission->optional) : [];
 			$checkbox->disabled = (in_array($role->role_type, $optional)) ? false : true;
 		    }

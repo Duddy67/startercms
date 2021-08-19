@@ -148,7 +148,13 @@ class User extends Authenticatable
 	$options = [];
 
 	foreach ($roles as $role) {
-	    $options[] = ['value' => $role->name, 'text' => $role->name];
+	    $extra = [];
+
+	    if ($role->access_level == 'private' && $role->role_level >= auth()->user()->getRoleLevel() && $role->created_by != auth()->user()->id) {
+	        $extra = ['disabled'];
+	    }
+
+	    $options[] = ['value' => $role->name, 'text' => $role->name, 'extra' => $extra];
 	}
 
 	return $options;
@@ -168,7 +174,7 @@ class User extends Authenticatable
 	foreach ($groups as $group) {
 	    $extra = [];
 
-	    if ($group->access_level == 'private' && $group->role_level > auth()->user()->getRoleLevel() && $group->created_by != auth()->user()->id) {
+	    if ($group->access_level == 'private' && $group->role_level >= auth()->user()->getRoleLevel() && $group->created_by != auth()->user()->id) {
 	        $extra = ['disabled'];
 	    }
 
@@ -208,6 +214,25 @@ class User extends Authenticatable
 	}
 
 	return null;
+    }
+
+    /*
+     * Checks whether this user has any private groups that the current user
+     * is not allowed to add or remove. 
+     *
+     * @return array
+     */
+    public function getPrivateGroups()
+    {
+	return $this->groups()->where([
+	    ['access_level', '=', 'private'], 
+	    ['role_level', '>=', auth()->user()->getRoleLevel()],
+	    ['created_by', '!=', auth()->user()->id]
+	])->pluck('id')->toArray();
+    }
+
+    public function isRolePrivate()
+    {
     }
 
     /*

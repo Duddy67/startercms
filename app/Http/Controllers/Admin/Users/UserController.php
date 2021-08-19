@@ -156,13 +156,17 @@ class UserController extends Controller
 	    $user->password = Hash::make($request->input('password'));
 	}
 
-	// Users cannot modify the role attribute in their own account.
-	if (auth()->user()->id != $user->id) {
+	$private = ($user->roles[0]->access_level == 'private' && $user->roles[0]->role_level >= auth()->user()->getRoleLevel() && $user->roles[0]->created_by != auth()->user()->id) ? true : false;
+
+	// Users cannot modify their own role and they cannot select or deselect a private role.
+	if (auth()->user()->id != $user->id && !$private) {
 	    $user->syncRoles($request->input('role'));
 	}
 
-	if ($request->input('groups') !== null) {
-	    $user->groups()->sync($request->input('groups'));
+	$groups = array_merge($request->input('groups', []), $user->getPrivateGroups());
+
+	if (!empty($groups)) {
+	    $user->groups()->sync($groups);
 	}
 	else {
 	    // Remove all groups for this user.

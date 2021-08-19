@@ -74,7 +74,7 @@
 	      if (permissions[section][i].name == name) {
 
 		  let regex = new RegExp($('#role_type').val());
-		  if (regex.test(permissions[section][i].default)) {
+		  if (regex.test(permissions[section][i].roles)) {
 		      $('#'+name).prop('checked', true);
 		  }
 		  else {

@@ -3,49 +3,49 @@
       {
 	"name": "create-user",
 	"type": "level2",
-	"default": "admin|manager"
+	"roles": "admin|manager"
       },
       {
 	"name": "update-user",
 	"type": "level2",
-	"default": "admin|manager"
+	"roles": "admin|manager"
       },
       {
 	"name": "delete-user",
 	"type": "level2",
-	"default": "admin|manager",
+	"roles": "admin|manager",
 	"optional": "manager"
       },
       {
 	"name": "create-group",
 	"type": "level2",
-	"default": "admin|manager"
+	"roles": "admin|manager"
       },
       {
 	"name": "update-group",
 	"type": "level2",
-	"default": "admin|manager"
+	"roles": "admin|manager"
       },
       {
 	"name": "delete-group",
 	"type": "level2",
-	"default": "admin|manager",
+	"roles": "admin|manager",
 	"optional": "manager"
       },
       {
 	"name": "create-role",
 	"type": "level1",
-	"default": "admin"
+	"roles": "admin"
       },
       {
 	"name": "update-role",
 	"type": "level1",
-	"default": "admin"
+	"roles": "admin"
       },
       {
 	"name": "delete-role",
 	"type": "level1",
-	"default": "admin",
+	"roles": "admin",
 	"optional": "admin"
       }
   ],
@@ -53,35 +53,35 @@
       {
 	"name": "create-post",
 	"type": "level3",
-	"default": "admin|manager|assistant|registered"
+	"roles": "admin|manager|assistant|registered"
       },
       {
 	"name": "update-post",
 	"type": "level3",
-	"default": "admin|manager|assistant|registered"
+	"roles": "admin|manager|assistant|registered"
       },
       {
 	"name": "delete-post",
 	"type": "level3",
-	"default": "admin|manager|assistant|registered",
+	"roles": "admin|manager|assistant|registered",
 	"optional": "assistant|registered"
       },
       {
 	"name": "create-post-category",
 	"type": "level2",
-	"default": "admin",
+	"roles": "admin",
 	"optional": "manager"
       },
       {
 	"name": "update-post-category",
 	"type": "level2",
-	"default": "admin",
+	"roles": "admin",
 	"optional": "manager"
       },
       {
 	"name": "delete-post-category",
 	"type": "level2",
-	"default": "admin",
+	"roles": "admin",
 	"optional": "manager"
       }
   ],
@@ -89,31 +89,31 @@
       {
 	"name": "global-settings",
 	"type": "level1",
-	"default": "",
+	"roles": "",
 	"optional": "admin"
       },
       {
 	"name": "blog-settings",
 	"type": "level1",
-	"default": "",
+	"roles": "",
 	"optional": "admin"
       },
       {
 	"name": "create-email",
 	"type": "level1",
-	"default": "",
+	"roles": "",
 	"optional": "admin"
       },
       {
 	"name": "update-email",
 	"type": "level1",
-	"default": "",
+	"roles": "",
 	"optional": "admin"
       },
       {
 	"name": "delete-email",
 	"type": "level1",
-	"default": "",
+	"roles": "",
 	"optional": "admin"
       }
   ],
@@ -121,7 +121,7 @@
       {
 	"name": "access-dashboard",
 	"type": "level2",
-	"default": "admin|manager|assistant"
+	"roles": "admin|manager|assistant"
       }
   ]
 }
