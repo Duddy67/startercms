@@ -18,8 +18,8 @@
         @foreach ($fields as $field)
 	    @php if (isset($user)) { 
 		     $value = old($field->name, $field->value);
-                     // Users cannot change their role.
-                     if ($field->name == 'role' && auth()->user()->id == $user->id) {
+                     // The current user is editing their own account or the role is private.
+                     if ($field->name == 'role' && (auth()->user()->id == $user->id || $user->isRolePrivate())) {
                          $field->extra = ['disabled'];
                      }
 		 }

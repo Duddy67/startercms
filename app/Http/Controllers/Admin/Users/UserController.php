@@ -156,10 +156,8 @@ class UserController extends Controller
 	    $user->password = Hash::make($request->input('password'));
 	}
 
-	$private = ($user->roles[0]->access_level == 'private' && $user->roles[0]->role_level >= auth()->user()->getRoleLevel() && $user->roles[0]->created_by != auth()->user()->id) ? true : false;
-
 	// Users cannot modify their own role and they cannot select or deselect a private role.
-	if (auth()->user()->id != $user->id && !$private) {
+	if (auth()->user()->id != $user->id && !$user->isRolePrivate()) {
 	    $user->syncRoles($request->input('role'));
 	}
 

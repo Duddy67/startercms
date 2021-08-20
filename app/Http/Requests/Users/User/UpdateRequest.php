@@ -25,13 +25,18 @@ class UpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        $rules = [
 	    'name' => 'bail|required|between:5,25|regex:/^[\pL\s\-]+$/u',
 	    'email' => ['bail', 'required', 'email',
 			Rule::unique('users')->ignore($this->user->id)
 	    ],
-	    'password' => 'nullable|confirmed|min:8',
-	    'role' => 'required'
+	    'password' => 'nullable|confirmed|min:8'
         ];
+
+	if (auth()->user()->id != $this->user->id && !$this->user->isRolePrivate()) {
+	    $rules['role'] = 'required';
+	}
+
+	return $rules;
     }
 }

@@ -231,8 +231,16 @@ class User extends Authenticatable
 	])->pluck('id')->toArray();
     }
 
+    /*
+     * Checks whether this user's role is private and whether the current user
+     * is allowed to select it or unselect it. 
+     *
+     * @return boolean
+     */
     public function isRolePrivate()
     {
+        $role = $this->roles[0];
+	return ($role->access_level == 'private' && $role->role_level >= auth()->user()->getRoleLevel() && $role->created_by != auth()->user()->id) ? true : false;
     }
 
     /*
