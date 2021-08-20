@@ -54,8 +54,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <aside class="main-sidebar sidebar-dark-primary elevation-4" id="layout-sidebar">
     <!-- Brand Logo -->
     <a href="index3.html" class="brand-link">
-      <img src="{{ url('/') }}/vendor/adminlte/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3</span>
+      <!--<img src="{{ url('/') }}/vendor/adminlte/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">-->
+      <img src="{{ url('/') }}//images/starter-cms-logo.png" alt="StarterCMS Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <span class="brand-text font-weight-light">Starter CMS</span>
     </a>
 
     <!-- Sidebar -->
@@ -100,7 +101,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		  @php $active = (request()->is('admin/users*')) ? 'active' : '' @endphp
 		  <a href="#" class="nav-link {{ $active }}">
 		    <i class="nav-icon fas fa-users"></i>
-		    <p>@lang ('labels.title.users')<i class="right fas fa-angle-left"></i></p>
+		    <p>@lang ('labels.title.user_management')<i class="right fas fa-angle-left"></i></p>
 		  </a>
 		  <ul class="nav nav-treeview">
 			@php $active = (request()->is('admin/users/users*')) ? true : false @endphp

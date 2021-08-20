@@ -5,7 +5,7 @@
 
     <div class="d-flex justify-content-center">
 	<span>
-	    Showing {{ $items->firstItem() }} to {{ $items->lastItem() }} of {{ $items->total() }} results.
+            {{ __('labels.pagination.results', ['first' => $items->firstItem(), 'last' => $items->lastItem(), 'total' => $items->total()]) }}
 	</span>
     </div>
 @endif

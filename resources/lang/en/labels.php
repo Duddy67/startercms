@@ -5,6 +5,7 @@ return [
     'title' => [
 	'dashboard' => 'Dashboard',
 	'users' => 'Users',
+	'user_management' => 'User management',
 	'groups' => 'Groups',
 	'roles' => 'Roles',
 	'permissions' => 'Permissions',
@@ -19,6 +20,8 @@ return [
 	'groups' => 'Groups',
 	'password' => 'Password',
 	'confirm_password' => 'Confirm password',
+	'create_user' => 'Create a user',
+	'edit_user' => 'Edit a user',
     ],
     'roles' => [
 	'super-admin' => 'Super Administrator',
@@ -26,11 +29,19 @@ return [
 	'manager' => 'Manager',
 	'assistant' => 'Assistant',
 	'registered' => 'Registered',
+	'create_role' => 'Create a role',
+	'edit_role' => 'Edit a role',
+    ],
+    'groups' => [
+	'create_group' => 'Create a group',
+	'edit_group' => 'Edit a group',
     ],
     'emails' => [
 	'subject' => 'Subject',
 	'html' => 'HTML',
 	'plain_text' => 'Plain text',
+	'create_email' => 'Create an email',
+	'edit_email' => 'Edit an email',
     ],
     'generic' => [
 	'title' => 'Title',
@@ -78,6 +89,9 @@ return [
 	'rebuild' => 'Rebuild',
 	'batch' => 'Batch',
 	'checkin' => 'Check-in',
+    ],
+    'pagination' => [
+	'results' => 'Showing :first to :last of :total results',
     ],
 ];
 

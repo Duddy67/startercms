@@ -2,6 +2,8 @@
 
 @section ('main')
 
+    <h3>@php echo (isset($user)) ? __('labels.users.edit_user') : __('labels.users.create_user'); @endphp</h3>
+
     @php $action = (isset($user)) ? route('admin.users.users.update', $query) : route('admin.users.users.store', $query) @endphp
 
     @if (isset($user) && $photo) 

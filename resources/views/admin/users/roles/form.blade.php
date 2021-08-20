@@ -1,6 +1,8 @@
 @extends ('layouts.admin')
 
 @section ('main')
+    <h3>@php echo (isset($role)) ? __('labels.roles.edit_role') : __('labels.roles.create_role'); @endphp</h3>
+
     @php $action = (isset($role)) ? route('admin.users.roles.update', $query) : route('admin.users.roles.store', $query) @endphp
     <form method="post" action="{{ $action }}" id="itemForm">
         @csrf

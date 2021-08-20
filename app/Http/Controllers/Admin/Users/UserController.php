@@ -109,6 +109,7 @@ class UserController extends Controller
 	
 	$except = ($user->updated_by === null) ? ['updated_by', 'updated_at'] : [];
         $fields = $this->getFields($user, $except);
+	$this->setFieldValues($fields, $user);
 	// Users cannot delete their own account.
 	$except = (auth()->user()->id == $user->id) ? ['destroy'] : [];
         $actions = $this->getActions('form', $except);
@@ -399,6 +400,12 @@ class UserController extends Controller
      */
     private function setFieldValues(&$fields, $user)
     {
-	// Specific operations here...
+        foreach ($fields as $field) {
+	    // The current user is editing their own account.
+	    if ($field->name == 'role' && $user->id == auth()->user()->id) {
+                // Add the current user's role to the select list.
+	        $field->options[] = ['value' => $user->getRoleName(), 'text' => $user->getRoleName()];
+	    }
+	}
     }
 }
