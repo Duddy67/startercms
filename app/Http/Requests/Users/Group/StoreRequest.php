@@ -31,7 +31,7 @@ class StoreRequest extends FormRequest
 		'unique:groups'
 	    ],
 	    'access_level' => 'required',
-	    'created_by' => 'required',
+	    'created_by' => 'required'
         ];
     }
 }

@@ -98,21 +98,27 @@ class Group extends Model
     }
 
     /*
-     * Checks whether the current user is allowed to access a given group according to their role level.
+     * Checks whether the current user is allowed to to change the access level of a given group.
+     *
+     * @return boolean
+     */
+    public function canChangeAccessLevel()
+    {
+	return ($this->created_by == auth()->user()->id || auth()->user()->getRoleLevel() > $this->role_level) ? true: false;
+    }
+
+    /*
+     * Checks whether the current user is allowed to access a given group.
      *
      * @return boolean
      */
     public function canAccess()
     {
-        if ($this->access_level == 'public_ro' || $this->canEdit()) {
-	    return true;
-	}
-
-	return false;
+        return ($this->access_level == 'public_ro' || $this->canEdit()) ? true : false;
     }
 
     /*
-     * Checks whether the current user is allowed to edit a given group according to their role level.
+     * Checks whether the current user is allowed to edit a given group.
      *
      * @return boolean
      */

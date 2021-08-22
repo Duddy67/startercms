@@ -108,34 +108,35 @@ trait ItemConfig
 		}
 
 		$fields[$key]->options = $options;
+	    }
 
-		if ($item) {
+	    if ($item) {
+
+		if ($field->type == 'select') {
 		    $fields[$key]->value = $item->getSelectedValue($field->name);
 		}
-	    }
-	}
-
-	if ($item) {
-	    foreach ($fields as $key => $field) {
-		if (isset($field->name)) {
-		    // Skip the fields which are already set.
-		    if ($field->type == 'select') {
-		        continue;
-		    }
-
-		    if ($field->type == 'date') {
-			$fields[$key]->value = $item->{$field->name}->toDateString();
-		    }
-		    elseif ($field->name == 'updated_by') {
-			$fields[$key]->value = $item->modifier_name;
-		    }
-		    else {
-			$fields[$key]->value = $item->{$field->name};
-		    }
+		elseif ($field->type == 'date') {
+		    $fields[$key]->value = $item->{$field->name}->toDateString();
+		}
+		elseif ($field->name == 'updated_by') {
+		    $fields[$key]->value = $item->modifier_name;
 		}
 		else {
-		    $fields[$key]->value = null;
+		    $fields[$key]->value = $item->{$field->name};
 		}
+
+		if (method_exists($item, 'canEdit') && !$item->canEdit()) {
+		    $field = $this->setExtraAttributes($field, ['disabled']);
+		}
+
+		if ($field->name == 'access_level' && method_exists($item, 'canChangeAccessLevel') && !$item->canChangeAccessLevel()) {
+		    $field = $this->setExtraAttributes($field, ['disabled']);
+		}
+	    }
+
+	    if ($field->name == 'created_by' && count($field->options) == 1) {
+	        // The current user is the only owner possible so let's get rid of the empty option.
+		unset($fields[$key]->blank);
 	    }
 	}
 
@@ -209,6 +210,27 @@ trait ItemConfig
 	}
 
 	return $actions->{$section};
+    }
+
+    /*
+     * Adds one or more extra attributes to a given field.
+     *
+     * @param  stdClass $field
+     * @param  Array  $attributes
+     * @return stdClass Object
+     */  
+    public function setExtraAttributes($field, $attributes)
+    {
+	if (!isset($field->extra)) {
+            $field->extra = $attributes;
+	}
+	elseif (!in_array('disabled', $field->extra)) {
+	    foreach ($attributes as $attribute) {
+		$field->extra[] = $attribute;
+	    }
+	}
+
+	return $field;
     }
 
     /*

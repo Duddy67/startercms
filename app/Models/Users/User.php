@@ -365,15 +365,12 @@ class User extends Authenticatable
 	    $roleTypes = ['admin', 'manager', 'assistant', 'registered'];
 	}
 
+	// Remove possible role types from the list.
 	$roleTypes = array_diff($roleTypes, $exceptRoleTypes);
-
-	if ($roleType == 'registered' || empty($roleTypes)) {
-	    return new \Illuminate\Database\Eloquent\Collection();
-	}
 
 	return User::whereHas('roles', function ($query) use($roleTypes) {
 	    $query->whereIn('role_type', $roleTypes);
-	})->orWhere('id', $this->id)->get();
+	})->orWhere('id', $this->id)->get(); // Get the user himself as well.
     }
 
     /*

@@ -74,7 +74,8 @@ class GroupController extends Controller
     public function create(Request $request)
     {
         // Gather the needed data to build the form.
-        $fields = $this->getFields(null, ['updated_by', 'owner_name']);
+
+        $fields = $this->getFields(null, ['updated_by', 'created_at', 'updated_at', 'owner_name']);
         $actions = $this->getActions('form', ['destroy']);
 	$query = $request->query();
 
@@ -107,14 +108,15 @@ class GroupController extends Controller
 
         // Gather the needed data to build the form.
 	
-	$except = ($group->role_level > auth()->user()->getRoleLevel()) ? ['created_by'] : ['owner_name'];
+	$except = (auth()->user()->getRoleLevel() > $group->role_level || $group->created_by == auth()->user()->id) ? ['owner_name'] : ['created_by'];
 
 	if ($group->updated_by === null) {
 	    array_push($except, 'updated_by', 'updated_at');
 	}
 
         $fields = $this->getFields($group, $except);
-        $actions = $this->getActions('form');
+	$except = (!$group->canEdit()) ? ['destroy', 'save', 'saveClose'] : [];
+        $actions = $this->getActions('form', $except);
 	// Add the id parameter to the query.
 	$query = array_merge($request->query(), ['group' => $id]);
 
@@ -185,7 +187,7 @@ class GroupController extends Controller
 	  'name' => $request->input('name'), 
 	  'description' => $request->input('description'), 
 	  'access_level' => $request->input('access_level'), 
-	  'created_by' => $request->input('created_by')
+	  'created_by' => $request->input('created_by'),
 	]);
 
 	$group->role_level = auth()->user()->getRoleLevel();
@@ -260,5 +262,17 @@ class GroupController extends Controller
         $messages = $this->checkInMultiple($request->input('ids'), '\\App\\Models\\Users\\Group');
 
 	return redirect()->route('admin.users.groups.index', $request->query())->with($messages);
+    }
+
+    /*
+     * Sets field values specific to the Group model.
+     *
+     * @param  Array of stdClass Objects  $fields
+     * @param  \App\Models\Users\Group $group
+     * @return void
+     */
+    private function setFieldValues(&$fields, $group)
+    {
+        // code...
     }
 }
