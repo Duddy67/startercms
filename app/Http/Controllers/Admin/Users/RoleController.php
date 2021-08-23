@@ -78,13 +78,7 @@ class RoleController extends Controller
     {
         // Gather the needed data to build the form.
 
-        $except = ['updated_by', 'owner_name'];
-
-	if (auth()->user()->getRoleName() != 'super-admin') {
-	    $except[] = 'created_by';
-	}
-
-        $fields = $this->getFields(null, $except);
+        $fields = $this->getFields(null, ['updated_by', 'created_at', 'updated_at', 'owner_name']);
         $actions = $this->getActions('form', ['destroy']);
 	$board = $this->getPermissionBoard();
 	$query = $request->query();
@@ -115,19 +109,18 @@ class RoleController extends Controller
 	    return redirect()->route('admin.users.roles.index', $request->query())->with('error',  __('messages.generic.checked_out'));
 	}
 
-	// No need to check out the default roles as they can't be edited or deleted.
-	if (!in_array($role->name, Role::getDefaultRoles())) {
-	    $this->checkOut($role);
+	if (in_array($role->name, Role::getDefaultRoles())) {
+	    // Remove the irrelevant fields.
+	    $except = ['updated_by', 'updated_by', 'owner_name', 'created_by', 'access_level'];
+	    // No need to check out the default roles as they can't be edited or deleted.
 	}
+	// Regular roles.
+	else {
+	    $this->checkOut($role);
 
-        // Gather the needed data to build the form.
+	    // Gather the needed data to build the form.
 
-	// No need access level feature for the default roles.
-	$except = (in_array($role->name, Role::getDefaultRoles())) ? ['role_type', 'updated_at', 'updated_by', 'owner_name', 'access_level', 'created_by'] : [];
-
-	if (empty($except)) {
-	    // Only the super-admin is allowed to select users.
-	    $except = (auth()->user()->getRoleName() != 'super-admin') ? ['created_by'] : ['owner_name'];
+	    $except = (auth()->user()->getRoleLevel() > $role->role_level || $role->created_by == auth()->user()->id) ? ['owner_name'] : ['created_by'];
 
 	    if ($role->updated_by === null) {
 		array_push($except, 'updated_by', 'updated_at');
@@ -135,8 +128,9 @@ class RoleController extends Controller
 	}
 
         $fields = $this->getFields($role, $except);
+        $this->setFieldValues($fields, $role);
 	$board = $this->getPermissionBoard($role);
-	$except = (in_array($role->name, Role::getDefaultRoles())) ? ['save', 'saveClose', 'destroy'] : [];
+	$except = (in_array($role->name, Role::getDefaultRoles()) || !$role->canEdit()) ? ['save', 'saveClose', 'destroy'] : [];
         $actions = $this->getActions('form', $except);
 	// Add the id parameter to the query.
 	$query = array_merge($request->query(), ['role' => $id]);
@@ -182,11 +176,7 @@ class RoleController extends Controller
 
 	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
 	if (auth()->user()->getRoleLevel() > $role->role_level || $role->created_by == auth()->user()->id) {
-
-	    if (auth()->user()->getRoleName() == 'super-admin') {
-		$role->created_by = $request->input('created_by');
-	    }
-
+	    $role->created_by = $request->input('created_by');
 	    $owner = User::findOrFail($role->created_by);
 	    $role->role_level = $owner->getRoleLevel();
 	    $role->access_level = $request->input('access_level');
@@ -203,7 +193,7 @@ class RoleController extends Controller
 	    $optional = (isset($permission->optional) && preg_match('#'.$role->role_type.'#', $permission->optional)) ? true : false;
 
 	    // Check the optional permissions.
-	    // Note: No need to check the default permissions since they have been set during the storing process and cannot be modified anymore.
+	    // Note: No need to check the default role permissions since they have been set during the storing process and cannot be modified anymore.
 
 	    if ($optional && in_array($permission->name, $request->input('permissions', [])) && !$role->hasPermissionTo($permission->name)) {
 		  $role->givePermissionTo($permission->name);
@@ -237,7 +227,6 @@ class RoleController extends Controller
 	if (auth()->user()->getRoleType() == 'admin' && $count) {
 	    return redirect()->route('admin.users.roles.edit', $role->id)->with('error', __('messages.roles.permission_not_auth'));
 	}
-
 
 	$permissions = Permission::getPermissionsWithoutSections();
 	$toGiveTo = [];
@@ -361,13 +350,13 @@ class RoleController extends Controller
      */
     private function getPermissionBoard($role = null)
     {
-        // N.B: Only super-admin and users type admin are allowed to manage roles.
+        // N.B: Only the super-admin and the users type admin are allowed to manage roles.
 
-        $userRoleType = auth()->user()->getRoleType();
+        $userRoleLevel = auth()->user()->getRoleLevel();
 	$hierarchy = Role::getRoleHierarchy();
 	$isDefault = ($role && in_array($role->id, Role::getDefaultRoleIds())) ? true : false;
 
-	if ($userRoleType == 'admin' && !$isDefault) {
+	if (auth()->user()->getRoleType() == 'admin' && !$isDefault) {
 	    // Restrict permissions for users type admin.
 	    $permList = Permission::getPermissionList(['level1']);
 	}
@@ -417,7 +406,7 @@ class RoleController extends Controller
 			$role->role_type = 'super-admin';
 		    }
 
-		    if ($hierarchy[$role->role_type] >= $hierarchy[$userRoleType] || in_array($role->name, Role::getDefaultRoles())) {
+		    if (($role->role_level >= $userRoleLevel && $role->access_level != 'public_rw') || in_array($role->name, Role::getDefaultRoles())) {
 			$checkbox->disabled = true;
 		    }
 		}
@@ -461,6 +450,15 @@ class RoleController extends Controller
      */
     private function setFieldValues(&$fields, $role)
     {
-        // Code 
+        foreach ($fields as $field) {
+	    if ($field->name == 'role_type') {
+		// Role type value cannot be changed again.
+		$field = $this->setExtraAttributes($field, ['disabled']);
+	    }
+
+	    if ($field->name == 'name' && in_array($role->name, Role::getDefaultRoles())) {
+		$field = $this->setExtraAttributes($field, ['disabled']);
+	    }
+	}
     }
 }

@@ -12,25 +12,7 @@
 	@endif
 
         @foreach ($fields as $field)
-	    @php if (isset($role)) { 
-		     $value = old($field->name, $field->value);
-
-                     if ($field->name == 'access_level' && $role->role_level > auth()->user()->getRoleLevel()) {
-                         $field->extra = ['disabled'];
-                     }
-
-                     if ($field->name == 'role_type') {
-                         $field->extra = ['disabled'];
-                     }
-		 }
-		 else {
-                     if ($field->name == 'created_at' || $field->name == 'updated_at') {
-                         continue;
-                     }
-
-		     $value = old($field->name);
-		 }
-	    @endphp
+	    @php $value = (isset($role)) ? old($field->name, $field->value) : old($field->name); @endphp
 
 	    <div class="form-group">
 		<x-input :field="$field" :value="$value" />
