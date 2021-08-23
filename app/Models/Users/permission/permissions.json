@@ -101,8 +101,7 @@
       {
 	"name": "create-email",
 	"type": "level1",
-	"roles": "",
-	"optional": "admin"
+	"roles": ""
       },
       {
 	"name": "update-email",
@@ -113,8 +112,7 @@
       {
 	"name": "delete-email",
 	"type": "level1",
-	"roles": "",
-	"optional": "admin"
+	"roles": ""
       }
   ],
   "cms": [

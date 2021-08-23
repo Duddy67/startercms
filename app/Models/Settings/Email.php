@@ -119,7 +119,7 @@ class Email extends Model
      */
     public static function getCreatedByOptions()
     {
-	$users = auth()->user()->getAssignableUsers(['manager', 'assistant', 'registered']);
+	$users = auth()->user()->getAssignableUsers(['admin', 'manager', 'assistant', 'registered']);
 	$options = [];
 
 	foreach ($users as $user) {
