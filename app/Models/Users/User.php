@@ -403,6 +403,16 @@ class User extends Authenticatable
     }
 
     /*
+     * Checks whether the user is the super administrator.
+     *
+     * @return boolean
+     */
+    public function isSuperAdmin()
+    {
+        return ($this->getRoleName() == 'super-admin') ? true : false;
+    }
+
+    /*
      * Blade directive
      *
      * @param  \Spatie\Permission\Models\Permission $permission

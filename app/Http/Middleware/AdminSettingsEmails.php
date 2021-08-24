@@ -18,11 +18,19 @@ class AdminSettingsEmails
     {
 	$routeName = $request->route()->getName();
 
-        $create = ['admin.settings.emails.index', 'admin.settings.emails.create', 'admin.settings.emails.store'];
+        $access = ['admin.settings.emails.index'];
+        $create = ['admin.settings.emails.create', 'admin.settings.emails.store'];
         $update = ['admin.settings.emails.update', 'admin.settings.emails.edit'];
         $delete = ['admin.settings.emails.destroy', 'admin.settings.emails.massDestroy'];
 
-	if (in_array($routeName, $create) && !auth()->user()->isAllowedTo('create-email')) {
+	// N.B: Some admin type users might be allowed to only update email subjects and bodies. 
+	//      To allow them to access the email list the update-email permission is used  
+	//      as the access-email permission doesn't exists. 
+	if (in_array($routeName, $access) && !auth()->user()->isAllowedTo('update-email')) {
+	    return redirect()->route('admin')->with('error', __('messages.generic.access_not_auth'));
+	}
+
+	if (in_array($routeName, $create) && !auth()->user()->isSuperAdmin()) {
 	    return redirect()->route('admin')->with('error', __('messages.generic.access_not_auth'));
 	}
 
@@ -30,7 +38,7 @@ class AdminSettingsEmails
 	    return redirect()->route('admin.settings.emails.index')->with('error', __('messages.emails.edit_not_auth'));
 	}
 
-	if (in_array($routeName, $delete) && !auth()->user()->isAllowedTo('delete-email')) {
+	if (in_array($routeName, $delete) &&  !auth()->user()->isSuperAdmin()) {
 	    return redirect()->route('admin.settings.emails.index')->with('error', __('messages.emails.delete_not_auth'));
 	}
 

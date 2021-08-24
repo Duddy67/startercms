@@ -25,16 +25,20 @@ class UpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-	    'code' => [
-		'required',
-		'regex:/^[a-z0-9_]{3,}$/',
-		Rule::unique('emails')->ignore($this->email->id)
-	    ],
-	    'subject' => 'required',
-	    'access_level' => 'required',
-	    'body_html' => 'required_if:format,html',
-	    'body_text' => 'required_if:format,plain_text',
-        ];
+        $rules = ['subject' => 'required']; 
+
+	if (auth()->user()->isSuperAdmin()) {
+	    $rules = array_merge($rules, [
+		'code' => [
+		    'required',
+		    'regex:/^[a-z0-9_]{3,}$/',
+		    Rule::unique('emails')->ignore($this->email->id)
+		],
+		'body_html' => 'required_if:format,html',
+		'body_text' => 'required_if:format,plain_text',
+	    ]);
+	}
+
+	return $rules;
     }
 }

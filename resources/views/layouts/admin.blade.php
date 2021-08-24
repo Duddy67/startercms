@@ -148,7 +148,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 	      </li>
 	  @endallowto
 
-	  @allowtoany (['global-settings', 'blog-settings', 'create-email'])
+	  @allowtoany (['global-settings', 'blog-settings', 'update-email'])
 	      @php $open = (request()->is('admin/settings*')) ? 'menu-open' : '' @endphp
 	      <li class="nav-item {{ $open }}">
 		  @php $active = (request()->is('admin/settings*')) ? 'active' : '' @endphp
@@ -168,7 +168,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			      Blog
 			    </x-menu-item>
 			@endallowto
-			@allowto ('create-email')
+			@allowto ('update-email')
 			    @php $active = (request()->is('admin/settings/emails*')) ? true : false @endphp
 			    <x-menu-item href="{{ route('admin.settings.emails.index') }}" :sub=true :active="$active">
 			      @lang ('labels.title.emails')

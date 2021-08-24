@@ -91,16 +91,9 @@ class EmailController extends Controller
     public function edit(Request $request, $id)
     {
         // Gather the needed data to build the form.
-        //$email = Email::findOrFail($id);
-        $email = Email::select('emails.*', 'users.name as owner_name', 'users2.name as modifier_name')
-			->leftJoin('users', 'emails.created_by', '=', 'users.id')
-			->leftJoin('users as users2', 'emails.updated_by', '=', 'users2.id')
+        $email = Email::select('emails.*', 'users.name as modifier_name')
+			->leftJoin('users', 'emails.updated_by', '=', 'users.id')
 			->findOrFail($id);
-
-
-	if (!$email->canAccess()) {
-	    return redirect()->route('admin.settings.emails.index')->with('error',  __('messages.generic.access_not_auth'));
-	}
 
 	if ($email->checked_out && $email->checked_out != auth()->user()->id) {
 	    return redirect()->route('admin.settings.emails.index')->with('error',  __('messages.generic.checked_out'));
@@ -110,14 +103,12 @@ class EmailController extends Controller
 
         // Gather the needed data to build the form.
 	
-	$except = ($email->role_level > auth()->user()->getRoleLevel()) ? ['created_by'] : ['owner_name'];
-
-	if ($email->updated_by === null) {
-	    array_push($except, 'updated_by', 'updated_at');
-	}
+	$except = ($email->updated_by === null) ? ['updated_by', 'updated_at'] : [];
 
         $fields = $this->getFields($email, $except);
-        $actions = $this->getActions('form');
+	$this->setFieldValues($fields, $email);
+	$except = (!auth()->user()->isSuperAdmin()) ? ['destroy'] : [];
+        $actions = $this->getActions('form', $except);
 	// Add the id parameter to the query.
 	$query = array_merge($request->query(), ['email' => $id]);
 
@@ -162,23 +153,14 @@ class EmailController extends Controller
      */
     public function update(UpdateRequest $request, Email $email)
     {
-	if (!$email->canEdit()) {
-	    return redirect()->route('admin.settings.emails.edit', array_merge($request->query(), ['email' => $email->id]))->with('error',  __('messages.generic.edit_not_auth'));
-	}
-
-	$email->code = $request->input('code');
 	$email->subject = $request->input('subject');
 	$email->body_html = $request->input('body_html');
 	$email->body_text = $request->input('body_text');
-	$email->plain_text = ($request->input('format') == 'plain_text') ? 1 : 0;
 	$email->updated_by = auth()->user()->id;
 
-	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
-	if (auth()->user()->getRoleLevel() > $email->role_level || $email->created_by == auth()->user()->id) {
-	    $email->created_by = $request->input('created_by');
-	    $owner = User::findOrFail($email->created_by);
-	    $email->role_level = $owner->getRoleLevel();
-	    $email->access_level = $request->input('access_level');
+	if (auth()->user()->isSuperAdmin()) {
+	    $email->code = $request->input('code');
+	    $email->plain_text = ($request->input('format') == 'plain_text') ? 1 : 0;
 	}
 
 	$email->save();
@@ -223,10 +205,6 @@ class EmailController extends Controller
      */
     public function destroy(Request $request, Email $email)
     {
-	if (!$email->canDelete()) {
-	    return redirect()->route('admin.settings.emails.edit', array_merge($request->query(), ['email' => $email->id]))->with('error',  __('messages.generic.delete_not_auth'));
-	}
-
 	$code = $email->code;
 	$email->delete();
 
@@ -246,14 +224,7 @@ class EmailController extends Controller
 
         foreach ($request->input('ids') as $id) {
 	    $email = Email::findOrFail($id);
-
-	    if (!$email->canDelete()) {
-		$messages['error'] = __('messages.generic.mass_delete_not_auth'); 
-		continue;
-	    }
-
-	    //$email->delete();
-
+	    $email->delete();
 	    $deleted++;
 	}
 
@@ -262,5 +233,23 @@ class EmailController extends Controller
 	}
 
 	return redirect()->route('admin.settings.emails.index', $request->query())->with($messages);
+    }
+
+    /*
+     * Sets field values specific to the Email model.
+     *
+     * @param  Array of stdClass Objects  $fields
+     * @param  \App\Models\Settings\Email  $email
+     * @return void
+     */
+    private function setFieldValues(&$fields, $email)
+    {
+        $restricted = (auth()->user()->isSuperAdmin()) ? false : true;
+
+        foreach ($fields as $field) {
+	    if ($restricted && $field->name != 'subject' && $field->name != 'body_html' && $field->name != 'body_text') {
+		$field = $this->setExtraAttributes($field, ['disabled']);
+	    }
+	}
     }
 }

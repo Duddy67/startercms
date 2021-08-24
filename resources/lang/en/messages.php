@@ -43,6 +43,14 @@ return [
         'edit_not_auth' => 'You are not authorised to edit groups.',
         'delete_not_auth' => 'You are not authorised to delete groups.',
     ],
+    'emails' => [
+        'create_success' => 'Email successfully created.',
+        'update_success' => 'Email successfully updated.',
+        'delete_success' => 'The email ":name" has been successfully deleted.',
+        'delete_list_success' => ':number emails have been successfully deleted.',
+        'edit_not_auth' => 'You are not authorised to edit emails.',
+        'delete_not_auth' => 'You are not authorised to delete emails.',
+    ],
     'documents' => [
         'create_success' => 'Document successfully created.',
         'delete_success' => 'The document ":name" has been successfully deleted.',

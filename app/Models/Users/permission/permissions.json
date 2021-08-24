@@ -99,20 +99,10 @@
 	"optional": "admin"
       },
       {
-	"name": "create-email",
-	"type": "level1",
-	"roles": ""
-      },
-      {
 	"name": "update-email",
 	"type": "level1",
 	"roles": "",
 	"optional": "admin"
-      },
-      {
-	"name": "delete-email",
-	"type": "level1",
-	"roles": ""
       }
   ],
   "cms": [
