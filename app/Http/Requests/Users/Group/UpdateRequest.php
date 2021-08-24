@@ -33,9 +33,9 @@ class UpdateRequest extends FormRequest
 	    ],
         ];
 
-	if (auth()->user()->getRoleLevel() > $this->group->role_level || $this->group->created_by == auth()->user()->id) {
+	if (auth()->user()->getRoleLevel() > $this->group->role_level || $this->group->owned_by == auth()->user()->id) {
 	    $rules['access_level'] = 'required';
-	    $rules['created_by'] = 'required';
+	    $rules['owned_by'] = 'required';
 	}
 
 	return $rules;

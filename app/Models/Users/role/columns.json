@@ -18,8 +18,8 @@
     "type": "string"
   },
   {
-    "label": "labels.generic.created_by",
-    "name": "created_by",
+    "label": "labels.generic.owned_by",
+    "name": "owned_by",
     "type": "string"
   },
   {

@@ -92,7 +92,7 @@ class GroupController extends Controller
     public function edit(Request $request, $id)
     {
         $group = Group::select('groups.*', 'users.name as owner_name', 'users2.name as modifier_name')
-			->leftJoin('users', 'groups.created_by', '=', 'users.id')
+			->leftJoin('users', 'groups.owned_by', '=', 'users.id')
 			->leftJoin('users as users2', 'groups.updated_by', '=', 'users2.id')
 			->findOrFail($id);
 
@@ -108,7 +108,7 @@ class GroupController extends Controller
 
         // Gather the needed data to build the form.
 	
-	$except = (auth()->user()->getRoleLevel() > $group->role_level || $group->created_by == auth()->user()->id) ? ['owner_name'] : ['created_by'];
+	$except = (auth()->user()->getRoleLevel() > $group->role_level || $group->owned_by == auth()->user()->id) ? ['owner_name'] : ['owned_by'];
 
 	if ($group->updated_by === null) {
 	    array_push($except, 'updated_by', 'updated_at');
@@ -157,9 +157,9 @@ class GroupController extends Controller
 	$group->updated_by = auth()->user()->id;
 
 	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
-	if (auth()->user()->getRoleLevel() > $group->role_level || $group->created_by == auth()->user()->id) {
-	    $group->created_by = $request->input('created_by');
-	    $owner = User::findOrFail($group->created_by);
+	if (auth()->user()->getRoleLevel() > $group->role_level || $group->owned_by == auth()->user()->id) {
+	    $group->owned_by = $request->input('owned_by');
+	    $owner = User::findOrFail($group->owned_by);
 	    $group->role_level = $owner->getRoleLevel();
 	    $group->access_level = $request->input('access_level');
 	}
@@ -187,7 +187,7 @@ class GroupController extends Controller
 	  'name' => $request->input('name'), 
 	  'description' => $request->input('description'), 
 	  'access_level' => $request->input('access_level'), 
-	  'created_by' => $request->input('created_by'),
+	  'owned_by' => $request->input('owned_by'),
 	]);
 
 	$group->role_level = auth()->user()->getRoleLevel();

@@ -98,11 +98,11 @@ class Role extends SpatieRole
 	    $date = Carbon::now();
 
 	    Role::insert([
-		['name' => 'super-admin', 'guard_name' => 'web', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
-		['name' => 'admin', 'guard_name' => 'web', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
-		['name' => 'manager', 'guard_name' => 'web', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
-		['name' => 'assistant', 'guard_name' => 'web', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
-		['name' => 'registered', 'guard_name' => 'web', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()]
+		['name' => 'super-admin', 'guard_name' => 'web', 'role_type' => 'super-admin', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
+		['name' => 'admin', 'guard_name' => 'web', 'role_type' => 'admin', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
+		['name' => 'manager', 'guard_name' => 'web', 'role_type' => 'manager', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
+		['name' => 'assistant', 'guard_name' => 'web', 'role_type' => 'assistant', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
+		['name' => 'registered', 'guard_name' => 'web', 'role_type' => 'registered', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()]
 	    ]);
 	}
     }
@@ -119,7 +119,7 @@ class Role extends SpatieRole
         $search = $request->input('search', null);
 
 	$query = Role::query();
-	$query->select('roles.*', 'users.name as user_name')->leftJoin('users', 'roles.created_by', '=', 'users.id');
+	$query->select('roles.*', 'users.name as user_name')->leftJoin('users', 'roles.owned_by', '=', 'users.id');
 
 	if ($search !== null) {
 	    $query->where('name', 'like', '%'.$search.'%');
@@ -133,7 +133,7 @@ class Role extends SpatieRole
      *
      * @return array
      */
-    public static function getCreatedByOptions()
+    public static function getOwnedByOptions()
     {
         // Get only users with admin role types.
 	$users = auth()->user()->getAssignableUsers(['manager', 'assistant', 'registered']);
@@ -176,7 +176,7 @@ class Role extends SpatieRole
      */
     public function canChangeAccessLevel()
     {
-	return ($this->created_by == auth()->user()->id || auth()->user()->getRoleLevel() > $this->role_level) ? true: false;
+	return ($this->owned_by == auth()->user()->id || auth()->user()->getRoleLevel() > $this->role_level) ? true: false;
     }
 
     /*
@@ -196,7 +196,7 @@ class Role extends SpatieRole
      */
     public function canEdit()
     {
-        if ($this->access_level == 'public_rw' || $this->role_level < auth()->user()->getRoleLevel() || $this->created_by == auth()->user()->id) {
+        if ($this->access_level == 'public_rw' || $this->role_level < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id) {
 	    return true;
 	}
 
@@ -211,7 +211,7 @@ class Role extends SpatieRole
     public function canDelete()
     {
 	// The owner role level is lower than the current user's or the current user owns the role.
-	if ($this->role_level < auth()->user()->getRoleLevel() || $this->created_by == auth()->user()->id) {
+	if ($this->role_level < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id) {
 	    return true;
 	}
 

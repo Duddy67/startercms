@@ -21,7 +21,7 @@ class CreateGroupsTable extends Migration
             $table->tinyInteger('role_level')->nullable();
             $table->unsignedBigInteger('checked_out')->nullable();
             $table->timestamp('checked_out_time')->nullable();
-            $table->unsignedBigInteger('created_by');
+            $table->unsignedBigInteger('owned_by');
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
         });

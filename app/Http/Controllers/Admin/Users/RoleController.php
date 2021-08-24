@@ -97,7 +97,7 @@ class RoleController extends Controller
     public function edit(Request $request, $id)
     {
         $role = Role::select('roles.*', 'users.name as owner_name', 'users2.name as modifier_name')
-		      ->leftJoin('users', 'roles.created_by', '=', 'users.id')
+		      ->leftJoin('users', 'roles.owned_by', '=', 'users.id')
 		      ->leftJoin('users as users2', 'roles.updated_by', '=', 'users2.id')
 		      ->findOrFail($id);
 
@@ -111,7 +111,7 @@ class RoleController extends Controller
 
 	if (in_array($role->name, Role::getDefaultRoles())) {
 	    // Remove the irrelevant fields.
-	    $except = ['updated_by', 'updated_by', 'owner_name', 'created_by', 'access_level'];
+	    $except = ['updated_by', 'updated_by', 'owner_name', 'owned_by', 'access_level'];
 	    // No need to check out the default roles as they can't be edited or deleted.
 	}
 	// Regular roles.
@@ -120,7 +120,7 @@ class RoleController extends Controller
 
 	    // Gather the needed data to build the form.
 
-	    $except = (auth()->user()->getRoleLevel() > $role->role_level || $role->created_by == auth()->user()->id) ? ['owner_name'] : ['created_by'];
+	    $except = (auth()->user()->getRoleLevel() > $role->role_level || $role->owned_by == auth()->user()->id) ? ['owner_name'] : ['owned_by'];
 
 	    if ($role->updated_by === null) {
 		array_push($except, 'updated_by', 'updated_at');
@@ -175,9 +175,9 @@ class RoleController extends Controller
 	$role->updated_by = auth()->user()->id;
 
 	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
-	if (auth()->user()->getRoleLevel() > $role->role_level || $role->created_by == auth()->user()->id) {
-	    $role->created_by = $request->input('created_by');
-	    $owner = User::findOrFail($role->created_by);
+	if (auth()->user()->getRoleLevel() > $role->role_level || $role->owned_by == auth()->user()->id) {
+	    $role->owned_by = $request->input('owned_by');
+	    $owner = User::findOrFail($role->owned_by);
 	    $role->role_level = $owner->getRoleLevel();
 	    $role->access_level = $request->input('access_level');
 	}
@@ -247,7 +247,7 @@ class RoleController extends Controller
 	$role = Role::create([
 	    'name' => $request->input('name'),
 	    'access_level' => $request->input('access_level'),
-	    'created_by' => $request->input('created_by', auth()->user()->id)
+	    'owned_by' => $request->input('owned_by', auth()->user()->id)
 	]);
 
         foreach ($toGiveTo as $permission) {
@@ -434,8 +434,8 @@ class RoleController extends Controller
 		    $rows[$key]->access_level = __('labels.generic.public_ro');
 		}
 
-	        if ($column->name == 'created_by' && in_array($role->id, Role::getDefaultRoleIds())) {
-		    $rows[$key]->created_by = __('labels.generic.system');
+	        if ($column->name == 'owned_by' && in_array($role->id, Role::getDefaultRoleIds())) {
+		    $rows[$key]->owned_by = __('labels.generic.system');
 		}
 	    }
 	}

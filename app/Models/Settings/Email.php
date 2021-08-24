@@ -112,23 +112,6 @@ class Email extends Model
     }
 
     /*
-     * Returns only the users with a super-admin or admin role type.
-     *
-     * @return array
-     */
-    public static function getCreatedByOptions()
-    {
-	$users = auth()->user()->getAssignableUsers(['admin', 'manager', 'assistant', 'registered']);
-	$options = [];
-
-	foreach ($users as $user) {
-	    $options[] = ['value' => $user->id, 'text' => $user->name];
-	}
-
-	return $options;
-    }
-
-    /*
      * Generic function that returns model values which are handled by select inputs. 
      */
     public function getSelectedValue($fieldName)

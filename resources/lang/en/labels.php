@@ -51,7 +51,7 @@ return [
 	'id' => 'ID',
 	'description' => 'Description',
 	'created_at' => 'Created at',
-	'created_by' => 'Created by',
+	'owned_by' => 'Owned by',
 	'updated_at' => 'Updated at',
 	'updated_by' => 'Updated by',
 	'access_level' => 'Access level',

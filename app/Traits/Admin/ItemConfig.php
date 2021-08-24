@@ -56,8 +56,8 @@ trait ItemConfig
 		    if ($column->type == 'date') {
 			$row->{$column->name} = $item->{$column->name}->toFormattedDateString();
 		    }
-		    elseif ($column->name == 'created_by') {
-		        $row->created_by = $item->user_name;
+		    elseif ($column->name == 'owned_by') {
+		        $row->owned_by = $item->user_name;
 		    }
 		    elseif ($column->name == 'access_level') {
 		        $row->access_level = __('labels.generic.'.$item->access_level);
@@ -134,7 +134,7 @@ trait ItemConfig
 		}
 	    }
 
-	    if ($field->name == 'created_by' && count($field->options) == 1) {
+	    if ($field->name == 'owned_by' && count($field->options) == 1) {
 	        // The current user is the only owner possible so let's get rid of the empty option.
 		unset($fields[$key]->blank);
 	    }

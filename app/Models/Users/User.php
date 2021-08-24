@@ -150,7 +150,7 @@ class User extends Authenticatable
 	foreach ($roles as $role) {
 	    $extra = [];
 
-	    if ($role->access_level == 'private' && $role->role_level >= auth()->user()->getRoleLevel() && $role->created_by != auth()->user()->id) {
+	    if ($role->access_level == 'private' && $role->role_level >= auth()->user()->getRoleLevel() && $role->owned_by != auth()->user()->id) {
 	        $extra = ['disabled'];
 	    }
 
@@ -174,7 +174,7 @@ class User extends Authenticatable
 	foreach ($groups as $group) {
 	    $extra = [];
 
-	    if ($group->access_level == 'private' && $group->role_level >= auth()->user()->getRoleLevel() && $group->created_by != auth()->user()->id) {
+	    if ($group->access_level == 'private' && $group->role_level >= auth()->user()->getRoleLevel() && $group->owned_by != auth()->user()->id) {
 	        $extra = ['disabled'];
 	    }
 
@@ -227,7 +227,7 @@ class User extends Authenticatable
 	return $this->groups()->where([
 	    ['access_level', '=', 'private'], 
 	    ['role_level', '>=', auth()->user()->getRoleLevel()],
-	    ['created_by', '!=', auth()->user()->id]
+	    ['owned_by', '!=', auth()->user()->id]
 	])->pluck('id')->toArray();
     }
 
@@ -240,7 +240,7 @@ class User extends Authenticatable
     public function isRolePrivate()
     {
         $role = $this->roles[0];
-	return ($role->access_level == 'private' && $role->role_level >= auth()->user()->getRoleLevel() && $role->created_by != auth()->user()->id) ? true : false;
+	return ($role->access_level == 'private' && $role->role_level >= auth()->user()->getRoleLevel() && $role->owned_by != auth()->user()->id) ? true : false;
     }
 
     /*

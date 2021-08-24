@@ -18,7 +18,7 @@ class Group extends Model
      */
     protected $fillable = [
         'name',
-        'created_by',
+        'owned_by',
         'description',
         'access_level',
     ];
@@ -52,7 +52,7 @@ class Group extends Model
         $sortedBy = $request->input('sorted_by', null);
 
 	$query = Group::query();
-	$query->select('groups.*', 'users.name as user_name')->leftJoin('users', 'groups.created_by', '=', 'users.id');
+	$query->select('groups.*', 'users.name as user_name')->leftJoin('users', 'groups.owned_by', '=', 'users.id');
 
 	if ($search !== null) {
 	    $query->where('name', 'like', '%'.$search.'%');
@@ -65,12 +65,12 @@ class Group extends Model
 
 	$query->where('role_level', '<', auth()->user()->getRoleLevel())
 	      ->orWhereIn('access_level', ['public_ro', 'public_rw'])
-	      ->orWhere('created_by', auth()->user()->id);
+	      ->orWhere('owned_by', auth()->user()->id);
 
         return $query->paginate($perPage);
     }
 
-    public function getCreatedByOptions()
+    public function getOwnedByOptions()
     {
 	$users = auth()->user()->getAssignableUsers(['assistant', 'registered']);
 	$options = [];
@@ -87,8 +87,8 @@ class Group extends Model
      */
     public function getSelectedValue($fieldName)
     {
-        if ($fieldName == 'created_by') {
-	    return $this->created_by;
+        if ($fieldName == 'owned_by') {
+	    return $this->owned_by;
 	}
 	elseif ($fieldName == 'access_level') {
 	    return $this->access_level;
@@ -104,7 +104,7 @@ class Group extends Model
      */
     public function canChangeAccessLevel()
     {
-	return ($this->created_by == auth()->user()->id || auth()->user()->getRoleLevel() > $this->role_level) ? true: false;
+	return ($this->owned_by == auth()->user()->id || auth()->user()->getRoleLevel() > $this->role_level) ? true: false;
     }
 
     /*
@@ -124,7 +124,7 @@ class Group extends Model
      */
     public function canEdit()
     {
-        if ($this->access_level == 'public_rw' || $this->role_level < auth()->user()->getRoleLevel() || $this->created_by == auth()->user()->id) {
+        if ($this->access_level == 'public_rw' || $this->role_level < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id) {
 	    return true;
 	}
 
@@ -143,7 +143,7 @@ class Group extends Model
 	}
 
 	// The owner role level is lower than the current user's or the current user owns the group.
-	if ($this->role_level < auth()->user()->getRoleLevel() || $this->created_by == auth()->user()->id) {
+	if ($this->role_level < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id) {
 	    return true;
 	}
 

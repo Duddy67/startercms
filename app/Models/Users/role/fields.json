@@ -14,15 +14,15 @@
     "placeholder": "labels.generic.unknown"
   },
   {
-    "label": "labels.generic.created_by",
+    "label": "labels.generic.owned_by",
     "type": "select",
-    "name": "created_by",
-    "id": "created_by",
+    "name": "owned_by",
+    "id": "owned_by",
     "blank": "labels.generic.select_option",
     "options": [] 
   },
   {
-    "label": "labels.generic.created_by",
+    "label": "labels.generic.owned_by",
     "type": "text",
     "name": "owner_name",
     "id": "owner_name",

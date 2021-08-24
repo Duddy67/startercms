@@ -20,8 +20,8 @@ class UpdateRolesTable extends Migration
             $table->char('role_type', 10)->nullable()->after('role_level');
             $table->unsignedBigInteger('checked_out')->nullable()->after('role_type');
             $table->timestamp('checked_out_time')->nullable()->after('checked_out');
-            $table->unsignedBigInteger('created_by')->after('checked_out_time');
-            $table->unsignedBigInteger('updated_by')->nullable()->after('created_by');
+            $table->unsignedBigInteger('owned_by')->after('checked_out_time');
+            $table->unsignedBigInteger('updated_by')->nullable()->after('owned_by');
 	});
     }
 
@@ -39,7 +39,7 @@ class UpdateRolesTable extends Migration
 	    $table->dropColumn('role_type');
 	    $table->dropColumn('checked_out');
 	    $table->dropColumn('checked_out_time');
-	    $table->dropColumn('created_by');
+	    $table->dropColumn('owned_by');
 	    $table->dropColumn('updated_by');
 	});
     }
