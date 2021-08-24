@@ -56,5 +56,12 @@ class BladeServiceProvider extends ServiceProvider
             return "<?php endif; ?>";
         });
 
+        Blade::directive('superadmin', function () {
+	    return "<?php if (auth()->user()->isSuperAdmin()) : ?>";
+        });
+
+	Blade::directive('endsuperadmin', function () {
+            return "<?php endif; ?>";
+        });
     }
 }

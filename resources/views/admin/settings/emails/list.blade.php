@@ -1,15 +1,17 @@
 @extends ('layouts.admin')
 
 @section ('header')
-    <p class="h3">Emails</p>
+    <p class="h3">@php echo __('labels.title.emails'); @endphp</p>
 @endsection
 
 @section ('main')
-    <div class="card">
-	<div class="card-body">
-	    <x-toolbar :items=$actions />
+    @superadmin ()
+	<div class="card">
+	    <div class="card-body">
+		<x-toolbar :items=$actions />
+	    </div>
 	</div>
-    </div>
+    @endsuperadmin
 
     <div class="card">
 	<div class="card-body">

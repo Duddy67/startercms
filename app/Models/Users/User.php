@@ -403,7 +403,7 @@ class User extends Authenticatable
     }
 
     /*
-     * Checks whether the user is the super administrator.
+     * Blade directive
      *
      * @return boolean
      */
