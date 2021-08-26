@@ -67,19 +67,19 @@
 	"optional": "assistant|registered"
       },
       {
-	"name": "create-post-category",
+	"name": "create-blog-category",
 	"type": "level2",
 	"roles": "admin",
 	"optional": "manager"
       },
       {
-	"name": "update-post-category",
+	"name": "update-blog-category",
 	"type": "level2",
 	"roles": "admin",
 	"optional": "manager"
       },
       {
-	"name": "delete-post-category",
+	"name": "delete-blog-category",
 	"type": "level2",
 	"roles": "admin",
 	"optional": "manager"

@@ -1,0 +1,28 @@
+[
+  {
+    "label": "Name",
+    "name": "file_name",
+    "id": "file_name",
+    "extra": ["sortable"],
+    "type": "string"
+  },
+  {
+    "label": "Type",
+    "name": "content_type",
+    "id": "content_type",
+    "extra": ["sortable"],
+    "type": "string"
+  },
+  {
+    "label": "Size",
+    "name": "file_size",
+    "id": "file_size",
+    "type": "string"
+  },
+  {
+    "label": "Uploaded at",
+    "name": "created_at",
+    "id": "created_at",
+    "type": "date"
+  }
+]

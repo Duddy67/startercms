@@ -12,6 +12,9 @@ return [
 	'general' => 'General',
 	'settings' => 'Settings',
 	'emails' => 'Emails',
+	'blog' => 'Blog',
+	'posts' => 'Posts',
+	'categories' => 'Categories',
     ],
     'users' => [
 	'email' => 'Email',

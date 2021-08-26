@@ -14,6 +14,8 @@ use App\Http\Controllers\Admin\Users\GroupController;
 use App\Http\Controllers\Admin\Settings\GeneralController;
 use App\Http\Controllers\Admin\Settings\EmailController;
 use App\Http\Controllers\Cms\DocumentController;
+use App\Http\Controllers\Admin\Blog\PostController;
+use App\Http\Controllers\Admin\Blog\CategoryController as BlogCategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -79,6 +81,19 @@ Route::prefix('admin')->group(function () {
 	    Route::get('/permissions', [PermissionController::class, 'index'])->name('admin.users.permissions.index');
 	    Route::patch('/permissions', [PermissionController::class, 'build'])->name('admin.users.permissions.build');
 	    Route::put('/permissions', [PermissionController::class, 'rebuild'])->name('admin.users.permissions.rebuild');
+	});
+
+	Route::prefix('blog')->group(function () {
+	    // Posts
+	    Route::delete('/posts', [PostController::class, 'massDestroy'])->name('admin.blog.posts.massDestroy');
+	    Route::get('/posts/cancel/{post?}', [PostController::class, 'cancel'])->name('admin.blog.posts.cancel');
+	    Route::put('/posts/checkin', [PostController::class, 'massCheckIn'])->name('admin.blog.posts.massCheckIn');
+	    Route::resource('posts', PostController::class, ['as' => 'admin.blog'])->except(['show']);
+	    // Categories
+	    Route::delete('/categories', [BlogCategoryController::class, 'massDestroy'])->name('admin.blog.categories.massDestroy');
+	    Route::get('/categories/cancel/{category?}', [BlogCategoryController::class, 'cancel'])->name('admin.blog.categories.cancel');
+	    Route::put('/categories/checkin', [BlogCategoryController::class, 'massCheckIn'])->name('admin.blog.categories.massCheckIn');
+	    Route::resource('categories', BlogCategoryController::class, ['as' => 'admin.blog'])->except(['show']);
 	});
 
 	Route::prefix('settings')->group(function () {

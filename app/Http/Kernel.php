@@ -70,5 +70,7 @@ class Kernel extends HttpKernel
 	'admin.users.permissions' => \App\Http\Middleware\AdminUsersPermissions::class,
 	'admin.settings.general' => \App\Http\Middleware\AdminSettingsGeneral::class,
 	'admin.settings.emails' => \App\Http\Middleware\AdminSettingsEmails::class,
+	'admin.blog.posts' => \App\Http\Middleware\AdminBlogPosts::class,
+	'admin.blog.categories' => \App\Http\Middleware\AdminBlogCategories::class,
     ];
 }
