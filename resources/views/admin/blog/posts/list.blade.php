@@ -1,7 +1,7 @@
 @extends ('layouts.admin')
 
 @section ('header')
-    <p class="h3">User groups</p>
+    <p class="h3">Posts</p>
 @endsection
 
 @section ('main')
@@ -27,11 +27,11 @@
 
     <x-pagination :items=$items />
 
-    <input type="hidden" id="createItem" value="{{ route('admin.users.groups.create', $query) }}">
-    <input type="hidden" id="destroyItems" value="{{ route('admin.users.groups.index', $query) }}">
-    <input type="hidden" id="checkinItems" value="{{ route('admin.users.groups.massCheckIn', $query) }}">
+    <input type="hidden" id="createItem" value="{{ route('admin.blog.posts.create', $query) }}">
+    <input type="hidden" id="destroyItems" value="{{ route('admin.blog.posts.index', $query) }}">
+    <input type="hidden" id="checkinItems" value="{{ route('admin.blog.posts.massCheckIn', $query) }}">
 
-    <form id="selectedItems" action="{{ route('admin.users.groups.index', $query) }}" method="post">
+    <form id="selectedItems" action="{{ route('admin.blog.posts.index', $query) }}" method="post">
 	@method('delete')
 	@csrf
     </form>

@@ -177,7 +177,7 @@ class RoleController extends Controller
 	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
 	if (auth()->user()->getRoleLevel() > $role->role_level || $role->owned_by == auth()->user()->id) {
 	    $role->owned_by = $request->input('owned_by');
-	    $owner = User::findOrFail($role->owned_by);
+	    $owner = ($role->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($role->owned_by);
 	    $role->role_level = $owner->getRoleLevel();
 	    $role->access_level = $request->input('access_level');
 	}
@@ -255,6 +255,9 @@ class RoleController extends Controller
 	}
 
 	$role->role_type = $request->input('role_type');
+	$owner = ($role->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($role->owned_by);
+	$role->role_level = $owner->getRoleLevel();
+
 	$role->save();
 
         if ($request->input('_close', null)) {

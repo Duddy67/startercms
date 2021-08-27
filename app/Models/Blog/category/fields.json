@@ -7,6 +7,29 @@
     "placeholder": "labels.generic.name"
   },
   {
+    "label": "labels.generic.slug",
+    "type": "text",
+    "name": "slug",
+    "id": "slug",
+    "placeholder": "labels.generic.slug"
+  },
+  {
+    "label": "labels.categories.parent_category",
+    "type": "select",
+    "name": "parent_id",
+    "id": "parent_id",
+    "blank": "labels.generic.none",
+    "options": [] 
+  },
+  {
+    "label": "labels.generic.status",
+    "type": "select",
+    "name": "status",
+    "id": "status",
+    "blank": "labels.generic.select_option",
+    "options": [] 
+  },
+  {
     "label": "labels.generic.access_level",
     "type": "select",
     "name": "access_level",

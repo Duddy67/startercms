@@ -9,6 +9,9 @@ use App\Models\Blog\Category;
 use App\Models\Users\User;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
+use App\Http\Requests\Blog\Category\StoreRequest;
+use App\Http\Requests\Blog\Category\UpdateRequest;
+use Illuminate\Support\Str;
 
 
 class CategoryController extends Controller
@@ -151,13 +154,14 @@ class CategoryController extends Controller
 	}
 
 	$category->name = $request->input('name');
+	$category->slug = ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('name'), '-');
 	$category->description = $request->input('description');
 	$category->updated_by = auth()->user()->id;
 
 	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
 	if (auth()->user()->getRoleLevel() > $category->role_level || $category->owned_by == auth()->user()->id) {
 	    $category->owned_by = $request->input('owned_by');
-	    $owner = User::findOrFail($category->owned_by);
+	    $owner = ($category->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($category->owned_by);
 	    $category->role_level = $owner->getRoleLevel();
 	    $category->access_level = $request->input('access_level');
 	}
@@ -183,13 +187,22 @@ class CategoryController extends Controller
     {
 	$category = Category::create([
 	    'name' => $request->input('name'), 
+	    'slug' => ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('name'), '-'),
+	    'status' => $request->input('status'), 
 	    'description' => $request->input('description'), 
 	    'access_level' => $request->input('access_level'), 
 	    'owned_by' => $request->input('owned_by'),
+	    'parent_id' => (empty($request->input('parent_id'))) ? null : $request->input('parent_id'),
 	]);
 
-	$category->role_level = auth()->user()->getRoleLevel();
+	$owner = ($category->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($category->owned_by);
+	$category->role_level = $owner->getRoleLevel();
 	$category->save();
+
+        if ($category->parent_id) {
+	    $parent = Category::findOrFail($category->parent_id);
+	    $parent->appendNode($category);
+	}
 
         if ($request->input('_close', null)) {
 	    return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.create_success'));

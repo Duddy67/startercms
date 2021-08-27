@@ -39,6 +39,17 @@ return [
 	'create_group' => 'Create a group',
 	'edit_group' => 'Edit a group',
     ],
+    'posts' => [
+	'create_post' => 'Create a post',
+	'edit_post' => 'Edit a post',
+	'slug' => 'Slug',
+	'content' => 'Content',
+    ],
+    'categories' => [
+	'create_category' => 'Create a category',
+	'edit_category' => 'Edit a category',
+	'parent_category' => 'Parent category',
+    ],
     'emails' => [
 	'subject' => 'Subject',
 	'html' => 'HTML',
@@ -62,6 +73,8 @@ return [
 	'public_ro' => 'Public read only',
 	'public_rw' => 'Public read / write',
 	'status' => 'Status',
+	'published' => 'Published',
+	'unpublished' => 'Unpublished',
 	'published_up' => 'Start publishing',
 	'published_down' => 'Finish publishing',
 	'access' => 'Access',

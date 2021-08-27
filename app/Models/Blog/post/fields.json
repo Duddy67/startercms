@@ -1,10 +1,17 @@
 [
   {
-    "label": "labels.generic.name",
+    "label": "labels.generic.title",
     "type": "text",
-    "name": "name",
-    "id": "name",
-    "placeholder": "labels.generic.name"
+    "name": "title",
+    "id": "title",
+    "placeholder": "labels.generic.title"
+  },
+  {
+    "label": "labels.posts.slug",
+    "type": "text",
+    "name": "slug",
+    "id": "slug",
+    "placeholder": "labels.posts.slug"
   },
   {
     "label": "labels.generic.access_level",
@@ -49,9 +56,9 @@
     "id": "updated_at"
   },
   {
-    "label": "labels.generic.description",
+    "label": "labels.posts.content",
     "type": "textarea",
-    "name": "description",
-    "id": "description"
+    "name": "content",
+    "id": "texteditor"
   }
 ]

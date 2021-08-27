@@ -6,8 +6,8 @@
     "type": "string"
   },
   {
-    "label": "labels.generic.name",
-    "name": "name",
+    "label": "labels.generic.title",
+    "name": "title",
     "extra": ["sortable"],
     "type": "string"
   },

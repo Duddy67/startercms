@@ -159,7 +159,7 @@ class GroupController extends Controller
 	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
 	if (auth()->user()->getRoleLevel() > $group->role_level || $group->owned_by == auth()->user()->id) {
 	    $group->owned_by = $request->input('owned_by');
-	    $owner = User::findOrFail($group->owned_by);
+	    $owner = ($group->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($group->owned_by);
 	    $group->role_level = $owner->getRoleLevel();
 	    $group->access_level = $request->input('access_level');
 	}
@@ -190,7 +190,9 @@ class GroupController extends Controller
 	  'owned_by' => $request->input('owned_by'),
 	]);
 
-	$group->role_level = auth()->user()->getRoleLevel();
+	$owner = ($group->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($group->owned_by);
+	$group->role_level = $owner->getRoleLevel();
+
 	$group->save();
 
         if ($request->input('_close', null)) {
