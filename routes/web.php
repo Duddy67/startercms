@@ -93,6 +93,8 @@ Route::prefix('admin')->group(function () {
 	    Route::delete('/categories', [BlogCategoryController::class, 'massDestroy'])->name('admin.blog.categories.massDestroy');
 	    Route::get('/categories/cancel/{category?}', [BlogCategoryController::class, 'cancel'])->name('admin.blog.categories.cancel');
 	    Route::put('/categories/checkin', [BlogCategoryController::class, 'massCheckIn'])->name('admin.blog.categories.massCheckIn');
+	    Route::get('/categories/up/{category}', [BlogCategoryController::class, 'up'])->name('admin.blog.categories.up');
+	    Route::get('/categories/down/{category}', [BlogCategoryController::class, 'down'])->name('admin.blog.categories.down');
 	    Route::resource('categories', BlogCategoryController::class, ['as' => 'admin.blog'])->except(['show']);
 	});
 

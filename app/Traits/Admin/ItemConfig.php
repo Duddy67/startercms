@@ -5,6 +5,7 @@ namespace App\Traits\Admin;
 use App\Models\Settings\General;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 
 trait ItemConfig
@@ -106,8 +107,25 @@ trait ItemConfig
 		elseif ($column->name == 'access_level') {
 		    $row->access_level = __('labels.generic.'.$item->access_level);
 		}
+		elseif ($column->name == 'status') {
+		    $row->status = __('labels.generic.'.$item->status);
+		}
 		elseif ($column->name == 'name' && !empty($prefix)) {
 		    $row->name = $prefix.' '.$item->name;
+		}
+		// Sets the ordering links according to the position of the item/node.
+		elseif ($column->name == 'ordering') {
+		    $ordering = [];
+
+		    if ($item->getPrevSibling()) { 
+		        $ordering['up'] = route('admin.'.$this->pluginName.'.'.Str::plural($this->modelName).'.up', $item->id);
+		    }
+
+		    if ($item->getNextSibling()) { 
+		        $ordering['down'] = route('admin.'.$this->pluginName.'.'.Str::plural($this->modelName).'.down', $item->id);
+		    }
+
+		    $row->ordering = $ordering;
 		}
 		else {
 		    $row->{$column->name} = $item->{$column->name};

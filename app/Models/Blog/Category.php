@@ -66,7 +66,7 @@ class Category extends Model
 	    return Category::where('name', 'like', '%'.$search.'%')->get();
 	}
 	else {
-	    return Category::select('blog_categories.*', 'users.name as user_name')->leftJoin('users', 'blog_categories.owned_by', '=', 'users.id')->get()->toTree();
+	    return Category::select('blog_categories.*', 'users.name as user_name')->leftJoin('users', 'blog_categories.owned_by', '=', 'users.id')->defaultOrder()->get()->toTree();
 	}
     }
 

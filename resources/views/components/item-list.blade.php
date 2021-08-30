@@ -15,7 +15,7 @@
 	         $query = $url['query'];
                  $query[$url['item_name']] = $row->item_id;
             @endphp
-	    <tr class="clickable-row" data-href="{{ route($url['route'].'.edit', $query) }}">
+	    <tr>
 		<td>
 		    <div class="form-check">
 			<input type="checkbox" class="form-check-input" data-item-id={{ $row->item_id }} data-index="{{ $i }}">
@@ -28,8 +28,24 @@
 		    </div>
 		</td>
 		@foreach ($columns as $column)
-		     @php $indent = ($column->name == 'name' && preg_match('#^(-{1,}) #', $row->name, $matches)) ? strlen($matches[1]) : 0; @endphp
-		    <td><span class="indent-{{ $indent }}"></span>{{ $row->{$column->name} }}</td>
+		    @if ($column->name == 'ordering')
+			<td>
+			    @if (isset($row->ordering['up']))
+				<a href="{{ $row->ordering['up'] }}">up</a>
+			    @endif
+
+			    @if (isset($row->ordering['down']))
+				<a href="{{ $row->ordering['down'] }}">down</a>
+			    @endif
+			</td>
+		    @else
+			@php $indent = ($column->name == 'name' && preg_match('#^(-{1,}) #', $row->name, $matches)) ? strlen($matches[1]) : 0; @endphp
+			<td>
+			    @php echo (in_array($column->name, ['name', 'title'])) ? '<a href="'.route($url['route'].'.edit', $query).'">' : ''; @endphp
+			    <span class="indent-{{ $indent }}"></span>{{ $row->{$column->name} }}
+			    @php echo (in_array($column->name, ['name', 'title'])) ? '</a>' : ''; @endphp
+			</td>
+		    @endif
 		@endforeach
 	    </tr>
         @endforeach

@@ -79,6 +79,7 @@ return [
 	'published_down' => 'Finish publishing',
 	'access' => 'Access',
 	'category' => 'Category',
+	'ordering' => 'Ordering',
 	'type' => 'Type',
 	'format' => 'Format',
 	'none' => 'None',

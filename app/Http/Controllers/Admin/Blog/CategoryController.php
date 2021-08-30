@@ -158,6 +158,8 @@ class CategoryController extends Controller
 	$category->slug = ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('name'), '-');
 	$category->description = $request->input('description');
 	$category->updated_by = auth()->user()->id;
+	// N.B The nested set model is updated automatically.
+	$category->parent_id = $request->input('parent_id');
 
 	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
 	if (auth()->user()->getRoleLevel() > $category->role_level || $category->owned_by == auth()->user()->id) {
@@ -165,12 +167,6 @@ class CategoryController extends Controller
 	    $owner = ($category->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($category->owned_by);
 	    $category->role_level = $owner->getRoleLevel();
 	    $category->access_level = $request->input('access_level');
-	}
-
-        if ($category->parent_id != $request->input('parent_id')) {
-	    $category->parent_id = $request->input('parent_id');
-	    $parent = Category::findOrFail($category->parent_id);
-	    $parent->appendNode($category);
 	}
 
 	$category->save();
@@ -280,6 +276,32 @@ class CategoryController extends Controller
         $messages = $this->checkInMultiple($request->input('ids'), '\\App\\Models\\Blog\\Category');
 
 	return redirect()->route('admin.blog.categories.index', $request->query())->with($messages);
+    }
+
+    /**
+     * Reorders a given category a level above.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Blog\Category $category
+     * @return Response
+     */
+    public function up(Request $request, Category $category)
+    {
+	$category->up();
+	return redirect()->route('admin.blog.categories.index', $request->query());
+    }
+
+    /**
+     * Reorders a given category a level below.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Blog\Category $category
+     * @return Response
+     */
+    public function down(Request $request, Category $category)
+    {
+	$category->down();
+	return redirect()->route('admin.blog.categories.index', $request->query());
     }
 
     /*

@@ -12,6 +12,16 @@
     "type": "string"
   },
   {
+    "label": "labels.generic.ordering",
+    "name": "ordering",
+    "type": "array"
+  },
+  {
+    "label": "labels.generic.status",
+    "name": "status",
+    "type": "string"
+  },
+  {
     "label": "labels.generic.access_level",
     "name": "access_level",
     "extra": ["sortable"],
