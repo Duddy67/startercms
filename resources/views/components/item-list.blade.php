@@ -28,7 +28,8 @@
 		    </div>
 		</td>
 		@foreach ($columns as $column)
-		    <td>{{ $row->{$column->name} }}</td>
+		     @php $indent = ($column->name == 'name' && preg_match('#^(-{1,}) #', $row->name, $matches)) ? strlen($matches[1]) : 0; @endphp
+		    <td><span class="indent-{{ $indent }}"></span>{{ $row->{$column->name} }}</td>
 		@endforeach
 	    </tr>
         @endforeach

@@ -13,7 +13,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,8 +23,17 @@ class UpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            //
+        $rules = [
+	    'name' => [
+		'required',
+	    ],
         ];
+
+	if (auth()->user()->getRoleLevel() > $this->category->role_level || $this->category->owned_by == auth()->user()->id) {
+	    $rules['access_level'] = 'required';
+	    $rules['owned_by'] = 'required';
+	}
+
+	return $rules;
     }
 }

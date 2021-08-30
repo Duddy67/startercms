@@ -24,7 +24,7 @@ trait ItemConfig
     }
 
     /*
-     * Sets the values for each item row.
+     * Returns a row list.
      *
      * @param Array of stdClass Objects  $columns
      * @param \Illuminate\Pagination\LengthAwarePaginator  $items
@@ -36,45 +36,89 @@ trait ItemConfig
         $rows = [];
 
         foreach ($items as $item) {
-	    $row = new \stdClass();
-	    $row->item_id = $item->id;
-
-	    if ($item->checked_out !== null) {
-	        $row->checked_out = DB::table('users')->where('id', $item->checked_out)->pluck('name')->first();
-
-		if (is_string($item->checked_out_time)) {
-		    // Converts the string date into Carbon object.
-		    $item->checked_out_time = Carbon::parse($item->checked_out_time);
-		}
-
-		$row->checked_out_time = $item->checked_out_time->toFormattedDateString();
-	    }
-
-	    foreach ($columns as $column) {
-	        if (!in_array($column->name, $except)) {
-
-		    if ($column->type == 'date') {
-			$row->{$column->name} = $item->{$column->name}->toFormattedDateString();
-		    }
-		    elseif ($column->name == 'owned_by') {
-		        $row->owned_by = $item->user_name;
-		    }
-		    elseif ($column->name == 'access_level') {
-		        $row->access_level = __('labels.generic.'.$item->access_level);
-		    }
-		    else {
-			$row->{$column->name} = $item->{$column->name};
-		    }
-		}
-		else {
-		    $row->{$column->name} = null;
-		}
-	    }
-
+	    $row = $this->getRow($columns, $item, $except);
 	    $rows[] = $row;
 	}
 
 	return $rows;
+    }
+
+    /*
+     * Returns a row tree list.
+     *
+     * @param Array of stdClass Objects  $columns
+     * @param \Illuminate\Pagination\LengthAwarePaginator  $nodes
+     * @param Array  $except 
+     * @return Array of stdClass Objects
+     */  
+    public function getRowTree($columns, $nodes, $except = [])
+    {
+        $rows = [];
+
+	$traverse = function ($items, $prefix = '-') use (&$traverse, &$rows, $columns, $except) {
+	    foreach ($items as $item) {
+		$row = $this->getRow($columns, $item, $except, $prefix);
+		$rows[] = $row;
+
+		$traverse($item->children, $prefix.'-');
+	    }
+	};
+
+	$traverse($nodes);
+
+	return $rows;
+    }
+
+    /*
+     * Sets the values for a given item row.
+     *
+     * @param Array of stdClass Objects  $columns
+     * @param Object  $item
+     * @param Array   $except 
+     * @param string  $prefix
+     * @return stdClass Object
+     */  
+    private function getRow($columns, $item, $except = [], $prefix = '')
+    {
+	$row = new \stdClass();
+	$row->item_id = $item->id;
+
+	if ($item->checked_out !== null) {
+	    $row->checked_out = DB::table('users')->where('id', $item->checked_out)->pluck('name')->first();
+
+	    if (is_string($item->checked_out_time)) {
+		// Converts the string date into Carbon object.
+		$item->checked_out_time = Carbon::parse($item->checked_out_time);
+	    }
+
+	    $row->checked_out_time = $item->checked_out_time->toFormattedDateString();
+	}
+
+	foreach ($columns as $column) {
+	    if (!in_array($column->name, $except)) {
+
+		if ($column->type == 'date') {
+		    $row->{$column->name} = $item->{$column->name}->toFormattedDateString();
+		}
+		elseif ($column->name == 'owned_by') {
+		    $row->owned_by = $item->user_name;
+		}
+		elseif ($column->name == 'access_level') {
+		    $row->access_level = __('labels.generic.'.$item->access_level);
+		}
+		elseif ($column->name == 'name' && !empty($prefix)) {
+		    $row->name = $prefix.' '.$item->name;
+		}
+		else {
+		    $row->{$column->name} = $item->{$column->name};
+		}
+	    }
+	    else {
+		$row->{$column->name} = null;
+	    }
+	}
+
+	return $row;
     }
 
     /*

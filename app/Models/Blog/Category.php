@@ -56,39 +56,26 @@ class Category extends Model
     }
 
     /*
-     * Gets the post items according to the filter, sort and pagination settings.
+     * Gets the category items as a tree.
      */
     public function getItems($request)
     {
-        $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
         $search = $request->input('search', null);
-        $sortedBy = $request->input('sorted_by', null);
-
-	$query = Category::query();
-	$query->select('blog_categories.*', 'users.name as user_name')->leftJoin('users', 'blog_categories.owned_by', '=', 'users.id');
 
 	if ($search !== null) {
-	    $query->where('name', 'like', '%'.$search.'%');
+	    return Category::where('name', 'like', '%'.$search.'%')->get();
 	}
-
-	if ($sortedBy !== null) {
-	    preg_match('#^([a-z0-9_]+)_(asc|desc)$#', $sortedBy, $matches);
-	    $query->orderBy($matches[1], $matches[2]);
+	else {
+	    return Category::select('blog_categories.*', 'users.name as user_name')->leftJoin('users', 'blog_categories.owned_by', '=', 'users.id')->get()->toTree();
 	}
-
-	$query->where('role_level', '<', auth()->user()->getRoleLevel())
-	      ->orWhereIn('access_level', ['public_ro', 'public_rw'])
-	      ->orWhere('owned_by', auth()->user()->id);
-
-        return $query->paginate($perPage);
     }
 
     public function getStatusOptions()
     {
-      return [
-	  ['value' => 'published', 'text' => __('labels.generic.published')],
-	  ['value' => 'unpublished', 'text' => __('labels.generic.unpublished')],
-      ];
+	return [
+	    ['value' => 'published', 'text' => __('labels.generic.published')],
+	    ['value' => 'unpublished', 'text' => __('labels.generic.unpublished')],
+	];
     }
 
     public function getParentIdOptions()

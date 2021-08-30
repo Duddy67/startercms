@@ -59,7 +59,7 @@ class CategoryController extends Controller
         $actions = $this->getActions('list');
         $filters = $this->getFilters($request);
 	$items = $this->model->getItems($request);
-	$rows = $this->getRows($columns, $items);
+	$rows = $this->getRowTree($columns, $items);
 	$query = $request->query();
 	$url = ['route' => 'admin.blog.categories', 'item_name' => 'category', 'query' => $query];
 
@@ -116,6 +116,7 @@ class CategoryController extends Controller
 	}
 
         $fields = $this->getFields($category, $except);
+	$this->setFieldValues($fields, $category);
 	$except = (!$category->canEdit()) ? ['destroy', 'save', 'saveClose'] : [];
         $actions = $this->getActions('form', $except);
 	// Add the id parameter to the query.
@@ -164,6 +165,12 @@ class CategoryController extends Controller
 	    $owner = ($category->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($category->owned_by);
 	    $category->role_level = $owner->getRoleLevel();
 	    $category->access_level = $request->input('access_level');
+	}
+
+        if ($category->parent_id != $request->input('parent_id')) {
+	    $category->parent_id = $request->input('parent_id');
+	    $parent = Category::findOrFail($category->parent_id);
+	    $parent->appendNode($category);
 	}
 
 	$category->save();
@@ -284,6 +291,15 @@ class CategoryController extends Controller
      */
     private function setFieldValues(&$fields, $category)
     {
-        // code...
+        foreach ($fields as $field) {
+            if ($field->name == 'parent_id') {
+	        foreach ($field->options as $key => $option) {
+		    if ($option['value'] == $category->id) {
+		        // Category cannot be its own children.
+		        $field->options[$key]['extra'] = ['disabled'];
+		    }
+		}
+	    }
+        }
     }
 }

@@ -10,7 +10,7 @@
 		    <button type="button" id="clear-search-btn" class="btn btn-space btn-secondary">@lang ('labels.button.clear')</button>
 		@endif
 
-		@if ($total == ($key + 1)) 
+		@if ($total > 1) 
 		    <button type="button" id="clear-all-btn" class="btn btn-space btn-secondary">@lang ('labels.button.clear_all')</button>
 		@endif
 	    </div>
