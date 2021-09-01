@@ -154,6 +154,19 @@ class CategoryController extends Controller
 	    return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.edit_not_auth'));
 	}
 
+	// Check the selected parent is not a descendant.
+	if ($request->input('parent_id')) {
+	    $node = Category::findOrFail($request->input('parent_id'));
+
+	    if ($category->id == $request->input('parent_id') || $node->isDescendantOf($category)) {
+		return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.must_not_be_descendant'));
+	    }
+
+	    if (!$node->canEdit()) {
+		return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.edit_not_auth'));
+	    }
+	}
+
 	$category->name = $request->input('name');
 	$category->slug = ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('name'), '-');
 	$category->description = $request->input('description');
@@ -276,6 +289,41 @@ class CategoryController extends Controller
         $messages = $this->checkInMultiple($request->input('ids'), '\\App\\Models\\Blog\\Category');
 
 	return redirect()->route('admin.blog.categories.index', $request->query())->with($messages);
+    }
+
+    public function massPublish(Request $request)
+    {
+        foreach ($request->input('ids') as $id) {
+	    $category = Category::findOrFail($id);
+//file_put_contents('debog_file.txt', print_r($category->parent, true));
+	    // Cannot published a category if its parent is unpublished.
+	    if ($category->parent && $category->parent->status == 'unpublished') {
+	        continue;
+	    }
+
+	    $category->status = 'published';
+	    $category->save();
+	}
+        echo 'massPublish';
+	return redirect()->route('admin.blog.categories.index', $request->query());
+    }
+
+    public function massUnpublish(Request $request)
+    {
+        foreach ($request->input('ids') as $id) {
+	    $category = Category::findOrFail($id);
+
+	    $category->status = 'unpublished';
+	    $category->save();
+
+	    // All the descendants must be unpublished as well.
+	    foreach ($category->descendants as $descendant) {
+	        $descendant->status = 'unpublished';
+		$descendant->save();
+	    }
+	}
+        echo 'massUnpublish';
+	return redirect()->route('admin.blog.categories.index', $request->query());
     }
 
     /**

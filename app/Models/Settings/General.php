@@ -102,6 +102,22 @@ class General extends Model
 	return $options;
     }
 
+    public static function getOwnedByOptions($table)
+    {
+	$owners = DB::table($table)->leftJoin('users', $table.'.owned_by', '=', 'users.id')
+				   ->select(['users.id', 'users.name'])
+				   ->whereIn($table.'.access_level', ['public_ro', 'public_rw'])
+				   ->orWhere($table.'.role_level', '<', auth()->user()->getRoleLevel())
+				   ->orWhere($table.'.owned_by', auth()->user()->id)->distinct()->get();
+	$options = [];
+
+	foreach ($owners as $owner) {
+	    $options[] = ['value' => $owner->id, 'text' => $owner->name];
+	}
+
+	return $options;
+    }
+
     public static function getTimezoneOptions()
     {
         $timezoneIdentifiers = \DateTimeZone::listIdentifiers();

@@ -1,7 +1,7 @@
 (function($) {
     // Run a function when the page is fully loaded including graphics.
     $(window).on('load', function() {
-	let actions = ['create', 'massDestroy', 'batch', 'checkin'];
+	let actions = ['create', 'massDestroy', 'batch', 'checkin', 'publish', 'unpublish'];
 
 	actions.forEach(function (action) {
 	    $('#'+action).click( function() { $.fn[action](); });
@@ -127,6 +127,22 @@
 	if ($.fn.setSelectedItems()) {
 	    $('#selectedItems input[name="_method"]').val('put');
 	    $('#selectedItems').attr('action', $('#checkinItems').val());
+	    $('#selectedItems').submit();
+	}
+    }
+
+    $.fn.publish = function() {
+	if ($.fn.setSelectedItems()) {
+	    $('#selectedItems input[name="_method"]').val('put');
+	    $('#selectedItems').attr('action', $('#publishItems').val());
+	    $('#selectedItems').submit();
+	}
+    }
+
+    $.fn.unpublish = function() {
+	if ($.fn.setSelectedItems()) {
+	    $('#selectedItems input[name="_method"]').val('put');
+	    $('#selectedItems').attr('action', $('#unpublishItems').val());
 	    $('#selectedItems').submit();
 	}
     }

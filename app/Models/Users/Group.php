@@ -50,12 +50,13 @@ class Group extends Model
         $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
         $search = $request->input('search', null);
         $sortedBy = $request->input('sorted_by', null);
+        $ownedBy = $request->input('owned_by', null);
 
 	$query = Group::query();
 	$query->select('groups.*', 'users.name as user_name')->leftJoin('users', 'groups.owned_by', '=', 'users.id');
 
 	if ($search !== null) {
-	    $query->where('name', 'like', '%'.$search.'%');
+	    $query->where('groups.name', 'like', '%'.$search.'%');
 	}
 
 	if ($sortedBy !== null) {
@@ -63,9 +64,15 @@ class Group extends Model
 	    $query->orderBy($matches[1], $matches[2]);
 	}
 
-	$query->where('role_level', '<', auth()->user()->getRoleLevel())
-	      ->orWhereIn('access_level', ['public_ro', 'public_rw'])
-	      ->orWhere('owned_by', auth()->user()->id);
+	if ($ownedBy !== null) {
+	    $query->whereIn('owned_by', $ownedBy);
+	}
+
+	$query->where(function($query) {
+	    $query->where('role_level', '<', auth()->user()->getRoleLevel())
+		  ->orWhereIn('access_level', ['public_ro', 'public_rw'])
+		  ->orWhere('owned_by', auth()->user()->id);
+	});
 
         return $query->paginate($perPage);
     }

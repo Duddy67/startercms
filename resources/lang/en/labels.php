@@ -92,6 +92,7 @@ return [
 	'search_by_name' => 'Search by name',
 	'sorted_by' => 'Sorted by',
 	'per_page' => 'Per page',
+	'owned_by' => 'Owned by',
     ],
     'button' => [
 	'new' => 'New',
@@ -106,6 +107,8 @@ return [
 	'rebuild' => 'Rebuild',
 	'batch' => 'Batch',
 	'checkin' => 'Check-in',
+	'publish' => 'Publish',
+	'unpublish' => 'Unpublish',
     ],
     'pagination' => [
 	'results' => 'Showing :first to :last of :total results',

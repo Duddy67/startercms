@@ -122,7 +122,7 @@ class Role extends SpatieRole
 	$query->select('roles.*', 'users.name as user_name')->leftJoin('users', 'roles.owned_by', '=', 'users.id');
 
 	if ($search !== null) {
-	    $query->where('name', 'like', '%'.$search.'%');
+	    $query->where('roles.name', 'like', '%'.$search.'%');
 	}
 
         return $query->paginate($perPage);

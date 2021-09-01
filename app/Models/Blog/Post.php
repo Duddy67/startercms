@@ -84,6 +84,32 @@ class Post extends Model
 	return $options;
     }
 
+    public function getCategoriesOptions()
+    {
+	$nodes = Category::get()->toTree();
+	$options = [];
+
+	$traverse = function ($categories, $prefix = '-') use (&$traverse, &$options) {
+	    foreach ($categories as $category) {
+		$options[] = ['value' => $category->id, 'text' => $prefix.' '.$category->name];
+
+		$traverse($category->children, $prefix.'-');
+	    }
+	};
+
+	$traverse($nodes);
+
+	return $options;
+    }
+
+    public function getStatusOptions()
+    {
+	return [
+	    ['value' => 'published', 'text' => __('labels.generic.published')],
+	    ['value' => 'unpublished', 'text' => __('labels.generic.unpublished')],
+	];
+    }
+
     /*
      * Generic function that returns model values which are handled by select inputs. 
      */

@@ -227,14 +227,18 @@ trait ItemConfig
 		$function = 'get'.str_replace('_', '', ucwords($filter->name, '_')).'Options';
 
 		// General filter.
+		//
 		if ($filter->name == 'per_page') {
 		    $options = General::$function();
 		    $default = General::getGeneralValue('pagination', 'per_page');
 		}
-		// General filter.
 		elseif ($filter->name == 'sorted_by') {
 		    $options = General::$function($this->pluginName, $this->modelName);
 		}
+		elseif ($filter->name == 'owned_by') {
+		    $options = General::$function($this->model->getTable());
+		}
+		// Specific to the model.
 		else {
 		    $options = $this->model->$function();
 		}

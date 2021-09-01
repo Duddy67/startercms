@@ -70,5 +70,6 @@ return [
         'check_in_not_auth' => 'You are not authorised to check-in some of the selected items.',
         'mass_update_not_auth' => 'You are not authorised to update some of the selected items.',
         'mass_delete_not_auth' => 'You are not authorised to delete some of the selected items.',
+	'must_not_be_descendant' => 'Node must not be a descendant.',
     ]
 ];
