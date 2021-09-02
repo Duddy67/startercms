@@ -14,15 +14,6 @@
     "placeholder": "labels.posts.slug"
   },
   {
-    "label": "labels.title.categories",
-    "type": "select",
-    "name": "categories",
-    "extra": ["multiple"],
-    "id": "categories",
-    "blank": "labels.generic.select_option",
-    "options": [] 
-  },
-  {
     "label": "labels.generic.status",
     "type": "select",
     "name": "status",

@@ -6,6 +6,16 @@
 	"type": "button"
       },
       {
+	"id": "publish",
+	"label": "labels.button.publish",
+	"type": "button"
+      },
+      {
+	"id": "unpublish",
+	"label": "labels.button.unpublish",
+	"type": "button"
+      },
+      {
 	"id": "massDestroy",
 	"label": "labels.button.delete",
 	"type": "button"

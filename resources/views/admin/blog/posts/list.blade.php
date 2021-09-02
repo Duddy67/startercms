@@ -30,6 +30,8 @@
     <input type="hidden" id="createItem" value="{{ route('admin.blog.posts.create', $query) }}">
     <input type="hidden" id="destroyItems" value="{{ route('admin.blog.posts.index', $query) }}">
     <input type="hidden" id="checkinItems" value="{{ route('admin.blog.posts.massCheckIn', $query) }}">
+    <input type="hidden" id="publishItems" value="{{ route('admin.blog.posts.massPublish', $query) }}">
+    <input type="hidden" id="unpublishItems" value="{{ route('admin.blog.posts.massUnpublish', $query) }}">
 
     <form id="selectedItems" action="{{ route('admin.blog.posts.index', $query) }}" method="post">
 	@method('delete')

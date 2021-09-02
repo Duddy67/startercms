@@ -295,7 +295,6 @@ class CategoryController extends Controller
     {
         foreach ($request->input('ids') as $id) {
 	    $category = Category::findOrFail($id);
-//file_put_contents('debog_file.txt', print_r($category->parent, true));
 	    // Cannot published a category if its parent is unpublished.
 	    if ($category->parent && $category->parent->status == 'unpublished') {
 	        continue;
@@ -304,7 +303,7 @@ class CategoryController extends Controller
 	    $category->status = 'published';
 	    $category->save();
 	}
-        echo 'massPublish';
+
 	return redirect()->route('admin.blog.categories.index', $request->query());
     }
 
@@ -322,7 +321,7 @@ class CategoryController extends Controller
 		$descendant->save();
 	    }
 	}
-        echo 'massUnpublish';
+
 	return redirect()->route('admin.blog.categories.index', $request->query());
     }
 

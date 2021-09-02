@@ -18,9 +18,11 @@ class Post extends Model
      * @var array
      */
     protected $fillable = [
-        'name',
+        'title',
+        'slug',
+        'status',
         'owned_by',
-        'description',
+        'content',
         'access_level',
     ];
 
@@ -52,12 +54,13 @@ class Post extends Model
         $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
         $search = $request->input('search', null);
         $sortedBy = $request->input('sorted_by', null);
+        $ownedBy = $request->input('owned_by', null);
 
 	$query = Post::query();
 	$query->select('posts.*', 'users.name as user_name')->leftJoin('users', 'posts.owned_by', '=', 'users.id');
 
 	if ($search !== null) {
-	    $query->where('title', 'like', '%'.$search.'%');
+	    $query->where('posts.title', 'like', '%'.$search.'%');
 	}
 
 	if ($sortedBy !== null) {
@@ -65,9 +68,15 @@ class Post extends Model
 	    $query->orderBy($matches[1], $matches[2]);
 	}
 
-	$query->where('role_level', '<', auth()->user()->getRoleLevel())
-	      ->orWhereIn('access_level', ['public_ro', 'public_rw'])
-	      ->orWhere('owned_by', auth()->user()->id);
+	if ($ownedBy !== null) {
+	    $query->whereIn('owned_by', $ownedBy);
+	}
+
+	$query->where(function($query) {
+	    $query->where('role_level', '<', auth()->user()->getRoleLevel())
+		  ->orWhereIn('access_level', ['public_ro', 'public_rw'])
+		  ->orWhere('owned_by', auth()->user()->id);
+	});
 
         return $query->paginate($perPage);
     }

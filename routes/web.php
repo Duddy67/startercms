@@ -88,6 +88,8 @@ Route::prefix('admin')->group(function () {
 	    Route::delete('/posts', [PostController::class, 'massDestroy'])->name('admin.blog.posts.massDestroy');
 	    Route::get('/posts/cancel/{post?}', [PostController::class, 'cancel'])->name('admin.blog.posts.cancel');
 	    Route::put('/posts/checkin', [PostController::class, 'massCheckIn'])->name('admin.blog.posts.massCheckIn');
+	    Route::put('/posts/publish', [PostController::class, 'massPublish'])->name('admin.blog.posts.massPublish');
+	    Route::put('/posts/unpublish', [PostController::class, 'massUnpublish'])->name('admin.blog.posts.massUnpublish');
 	    Route::resource('posts', PostController::class, ['as' => 'admin.blog'])->except(['show']);
 	    // Categories
 	    Route::delete('/categories', [BlogCategoryController::class, 'massDestroy'])->name('admin.blog.categories.massDestroy');

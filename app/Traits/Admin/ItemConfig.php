@@ -191,7 +191,7 @@ trait ItemConfig
 		    $field = $this->setExtraAttributes($field, ['disabled']);
 		}
 
-		if ($field->name == 'access_level' && method_exists($item, 'canChangeAccessLevel') && !$item->canChangeAccessLevel()) {
+		if (in_array($field->name, ['access_level', 'status']) && method_exists($item, 'canChangeAccessLevel') && !$item->canChangeAccessLevel()) {
 		    $field = $this->setExtraAttributes($field, ['disabled']);
 		}
 	    }

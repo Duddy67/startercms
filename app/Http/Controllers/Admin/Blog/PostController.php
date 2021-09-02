@@ -9,6 +9,9 @@ use App\Models\Blog\Post;
 use App\Models\Users\User;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
+use App\Http\Requests\Blog\Post\StoreRequest;
+use App\Http\Requests\Blog\Post\UpdateRequest;
+use Illuminate\Support\Str;
 
 
 class PostController extends Controller
@@ -150,8 +153,9 @@ class PostController extends Controller
 	    return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id]))->with('error',  __('messages.generic.edit_not_auth'));
 	}
 
-	$post->name = $request->input('name');
-	$post->description = $request->input('description');
+	$post->title = $request->input('title');
+	$post->slug = ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('title'), '-');
+	$post->content = $request->input('content');
 	$post->updated_by = auth()->user()->id;
 
 	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
@@ -182,13 +186,16 @@ class PostController extends Controller
     public function store(StoreRequest $request)
     {
 	$post = Post::create([
-	  'name' => $request->input('name'), 
-	  'description' => $request->input('description'), 
+	  'title' => $request->input('title'), 
+	  'slug' => ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('title'), '-'),
+	  'status' => $request->input('status'), 
+	  'content' => $request->input('content'), 
 	  'access_level' => $request->input('access_level'), 
 	  'owned_by' => $request->input('owned_by'),
 	]);
 
-	$post->role_level = auth()->user()->getRoleLevel();
+	$owner = ($post->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($post->owned_by);
+	$post->role_level = $owner->getRoleLevel();
 	$post->save();
 
         if ($request->input('_close', null)) {
@@ -260,6 +267,28 @@ class PostController extends Controller
         $messages = $this->checkInMultiple($request->input('ids'), '\\App\\Models\\Blog\\Post');
 
 	return redirect()->route('admin.blog.posts.index', $request->query())->with($messages);
+    }
+
+    public function massPublish(Request $request)
+    {
+        foreach ($request->input('ids') as $id) {
+	    $post = Post::findOrFail($id);
+	    $post->status = 'published';
+	    $post->save();
+	}
+
+	return redirect()->route('admin.blog.posts.index', $request->query());
+    }
+
+    public function massUnpublish(Request $request)
+    {
+        foreach ($request->input('ids') as $id) {
+	    $post = Post::findOrFail($id);
+	    $post->status = 'unpublished';
+	    $post->save();
+	}
+
+	return redirect()->route('admin.blog.posts.index', $request->query());
     }
 
     /*

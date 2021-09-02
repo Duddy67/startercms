@@ -26,7 +26,9 @@ class Button extends Component
 	'destroy' => 'fa-trash', 
 	'massDestroy' => 'fa-trash', 
 	'batch' => 'fa-copy',
-	'checkin' => 'fa-check-circle'
+	'checkin' => 'fa-check-circle',
+	'publish' => 'fa-check-square',
+	'unpublish' => 'fa-circle-blank'
     ];
 
 

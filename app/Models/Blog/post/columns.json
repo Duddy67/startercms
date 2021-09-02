@@ -12,6 +12,11 @@
     "type": "string"
   },
   {
+    "label": "labels.generic.status",
+    "name": "status",
+    "type": "string"
+  },
+  {
     "label": "labels.generic.access_level",
     "name": "access_level",
     "extra": ["sortable"],
