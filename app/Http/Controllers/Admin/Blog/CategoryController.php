@@ -309,7 +309,14 @@ class CategoryController extends Controller
 
     public function massUnpublish(Request $request)
     {
+        $treated = [];
+
         foreach ($request->input('ids') as $id) {
+	    //
+	    if (in_array($id, $treated)) {
+	        continue;
+	    }
+
 	    $category = Category::findOrFail($id);
 
 	    $category->status = 'unpublished';
@@ -319,6 +326,8 @@ class CategoryController extends Controller
 	    foreach ($category->descendants as $descendant) {
 	        $descendant->status = 'unpublished';
 		$descendant->save();
+		// Prevent this descendant to be treated twice.
+		$treated[] = $descendant->id;
 	    }
 	}
 

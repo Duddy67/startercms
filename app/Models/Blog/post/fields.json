@@ -22,6 +22,15 @@
     "options": [] 
   },
   {
+    "label": "labels.users.groups",
+    "type": "select",
+    "name": "groups",
+    "extra": ["multiple"],
+    "id": "groups",
+    "blank": "labels.generic.select_option",
+    "options": [] 
+  },
+  {
     "label": "labels.generic.access_level",
     "type": "select",
     "name": "access_level",

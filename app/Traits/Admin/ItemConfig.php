@@ -161,7 +161,7 @@ trait ItemConfig
 	        // Build the function name.
 		$function = 'get'.str_replace('_', '', ucwords($field->name, '_')).'Options';
 
-		if ($field->name == 'access_level') {
+		if (in_array($field->name, ['access_level', 'groups'])) {
 		    // Common options.
 		    $options = General::$function();
 		}
@@ -191,13 +191,17 @@ trait ItemConfig
 		    $field = $this->setExtraAttributes($field, ['disabled']);
 		}
 
-		if (in_array($field->name, ['access_level', 'status']) && method_exists($item, 'canChangeAccessLevel') && !$item->canChangeAccessLevel()) {
+		if ($field->name == 'status' && method_exists($item, 'canChangeStatus') && !$item->canChangeStatus()) {
+		    $field = $this->setExtraAttributes($field, ['disabled']);
+		}
+
+		if ($field->name == 'access_level' && method_exists($item, 'canChangeAccessLevel') && !$item->canChangeAccessLevel()) {
 		    $field = $this->setExtraAttributes($field, ['disabled']);
 		}
 	    }
 
 	    if ($field->name == 'owned_by' && count($field->options) == 1) {
-	        // The current user is the only owner possible so let's get rid of the empty option.
+	        // The current user is the only owner option possible so let's get rid of the empty option.
 		unset($fields[$key]->blank);
 	    }
 	}
@@ -237,6 +241,9 @@ trait ItemConfig
 		}
 		elseif ($filter->name == 'owned_by') {
 		    $options = General::$function($this->model->getTable());
+		}
+		elseif ($filter->name == 'groups') {
+		    $options = General::$function();
 		}
 		// Specific to the model.
 		else {

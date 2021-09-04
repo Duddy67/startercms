@@ -271,24 +271,50 @@ class PostController extends Controller
 
     public function massPublish(Request $request)
     {
+        $published = 0;
+
         foreach ($request->input('ids') as $id) {
 	    $post = Post::findOrFail($id);
+
+	    if (!$post->canChangeStatus()) {
+	      return redirect()->route('admin.blog.posts.index', $request->query())->with(
+		  [
+		      'error' => __('messages.generic.mass_publish_not_auth'), 
+		      'success' => __('messages.posts.publish_list_success', ['number' => $published])
+		  ]);
+	    }
+
 	    $post->status = 'published';
 	    $post->save();
+
+	    $published++;
 	}
 
-	return redirect()->route('admin.blog.posts.index', $request->query());
+	return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.publish_list_success', ['number' => $published]));
     }
 
     public function massUnpublish(Request $request)
     {
+        $unpublished = 0;
+
         foreach ($request->input('ids') as $id) {
 	    $post = Post::findOrFail($id);
+
+	    if (!$post->canChangeStatus()) {
+	      return redirect()->route('admin.blog.posts.index', $request->query())->with(
+		  [
+		      'error' => __('messages.generic.mass_unpublish_not_auth'), 
+		      'success' => __('messages.posts.unpublish_list_success', ['number' => $unpublished])
+		  ]);
+	    }
+
 	    $post->status = 'unpublished';
 	    $post->save();
+
+	    $unpublished++;
 	}
 
-	return redirect()->route('admin.blog.posts.index', $request->query());
+	return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.unpublish_list_success', ['number' => $unpublished]));
     }
 
     /*

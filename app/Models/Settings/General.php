@@ -6,6 +6,7 @@ use Request;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use App\Models\Users\Group;
 
 
 class General extends Model
@@ -97,6 +98,30 @@ class General extends Model
 	        $options[] = ['value' => $column->name.'_asc', 'text' => $column->name.' asc'];
 	        $options[] = ['value' => $column->name.'_desc', 'text' => $column->name.' desc'];
 	    }
+	}
+
+	return $options;
+    }
+
+    /*
+     * Builds the options for the 'groups' select field.
+     *
+     * @return Array
+     */
+    public static function getGroupsOptions()
+    {
+        $groups = Group::all();
+	$options = [];
+
+	foreach ($groups as $group) {
+	    $extra = [];
+
+	    // Ensure the current user can use this group.
+	    if ($group->access_level == 'private' && $group->role_level >= auth()->user()->getRoleLevel() && $group->owned_by != auth()->user()->id) {
+	        $extra = ['disabled'];
+	    }
+
+	    $options[] = ['value' => $group->id, 'text' => $group->name, 'extra' => $extra];
 	}
 
 	return $options;

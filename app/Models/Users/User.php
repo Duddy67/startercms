@@ -68,6 +68,16 @@ class User extends Authenticatable
     }
 
     /**
+     * The group ids the user is in.
+     *
+     * @return array
+     */
+    public function getUserGroupIds()
+    {
+        return $this->groups()->pluck('groups.id')->toArray();
+    }
+
+    /**
      * The user's documents.
      */
     public function documents()
@@ -161,30 +171,6 @@ class User extends Authenticatable
     }
 
     /*
-     * Builds the options for the 'groups' select field.
-     *
-     * @param  \App\Models\Users\User $user (optional)
-     * @return Array
-     */
-    public function getGroupsOptions()
-    {
-        $groups = Group::all();
-	$options = [];
-
-	foreach ($groups as $group) {
-	    $extra = [];
-
-	    if ($group->access_level == 'private' && $group->role_level >= auth()->user()->getRoleLevel() && $group->owned_by != auth()->user()->id) {
-	        $extra = ['disabled'];
-	    }
-
-	    $options[] = ['value' => $group->id, 'text' => $group->name, 'extra' => $extra];
-	}
-
-	return $options;
-    }
-
-    /*
      * Builds the options for the 'roles' select field, (used with filters).
      *
      * @return Array
@@ -217,7 +203,7 @@ class User extends Authenticatable
     }
 
     /*
-     * Checks whether this user has any private groups that the current user
+     * Checks whether this item has any private groups that the current user
      * is not allowed to add or remove. 
      *
      * @return array

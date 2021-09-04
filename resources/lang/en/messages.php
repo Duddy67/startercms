@@ -50,6 +50,8 @@ return [
         'delete_list_success' => ':number posts have been successfully deleted.',
         'edit_not_auth' => 'You are not authorised to edit posts.',
         'delete_not_auth' => 'You are not authorised to delete posts.',
+        'publish_list_success' => ':number posts have been successfully published.',
+        'unpublish_list_success' => ':number posts have been successfully unpublished.',
     ],
     'emails' => [
         'create_success' => 'Email successfully created.',
@@ -78,6 +80,8 @@ return [
         'check_in_not_auth' => 'You are not authorised to check-in some of the selected items.',
         'mass_update_not_auth' => 'You are not authorised to update some of the selected items.',
         'mass_delete_not_auth' => 'You are not authorised to delete some of the selected items.',
+        'mass_publish_not_auth' => 'You are not authorised to publish some of the selected items.',
+        'mass_unpublish_not_auth' => 'You are not authorised to unpublish some of the selected items.',
 	'must_not_be_descendant' => 'Node must not be a descendant.',
     ]
 ];

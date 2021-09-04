@@ -5,6 +5,7 @@ namespace App\Models\Users;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Users\User;
+use App\Models\Blog\Post;
 use App\Models\Settings\General;
 
 class Group extends Model
@@ -40,6 +41,14 @@ class Group extends Model
     public function users()
     {
         return $this->belongsToMany(User::class);
+    }
+
+    /**
+     * The posts that belong to the group.
+     */
+    public function posts()
+    {
+        return $this->belongsToMany(Post::class);
     }
 
     /*

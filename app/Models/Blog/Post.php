@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Settings\General;
 use App\Models\Blog\Category;
+use App\Models\Users\Group;
 
 
 class Post extends Model
@@ -44,6 +45,14 @@ class Post extends Model
     public function categories()
     {
         return $this->belongsToMany(Category::class);
+    }
+
+    /**
+     * The groups that belong to the post.
+     */
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class);
     }
 
     /*
@@ -124,6 +133,10 @@ class Post extends Model
      */
     public function getSelectedValue($fieldName)
     {
+        if ($fieldName == 'groups') {
+	    return $this->groups->pluck('id')->toArray();
+	}
+
 	return $this->{$fieldName};
     }
 
@@ -135,6 +148,17 @@ class Post extends Model
     public function canChangeAccessLevel()
     {
 	return ($this->owned_by == auth()->user()->id || auth()->user()->getRoleLevel() > $this->role_level) ? true : false;
+    }
+
+    /*
+     * Checks whether the current user is allowed to to change the status level of a given post.
+     *
+     * @return boolean
+     */
+    public function canChangeStatus()
+    {
+        // Use the access level constraints.
+	return $this->canChangeAccessLevel();
     }
 
     /*
