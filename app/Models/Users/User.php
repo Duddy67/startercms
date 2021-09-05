@@ -72,7 +72,7 @@ class User extends Authenticatable
      *
      * @return array
      */
-    public function getUserGroupIds()
+    public function getGroupIds()
     {
         return $this->groups()->pluck('groups.id')->toArray();
     }
@@ -200,21 +200,6 @@ class User extends Authenticatable
 	}
 
 	return null;
-    }
-
-    /*
-     * Checks whether this item has any private groups that the current user
-     * is not allowed to add or remove. 
-     *
-     * @return array
-     */
-    public function getPrivateGroups()
-    {
-	return $this->groups()->where([
-	    ['access_level', '=', 'private'], 
-	    ['role_level', '>=', auth()->user()->getRoleLevel()],
-	    ['owned_by', '!=', auth()->user()->id]
-	])->pluck('id')->toArray();
     }
 
     /*

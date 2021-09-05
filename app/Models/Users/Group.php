@@ -114,6 +114,21 @@ class Group extends Model
     }
 
     /*
+     * Checks whether the given item has any private groups that the current user
+     * is not allowed to add or remove. 
+     *
+     * @return array
+     */
+    public static function getPrivateGroups($item)
+    {
+	return $item->groups()->where([
+	    ['access_level', '=', 'private'], 
+	    ['role_level', '>=', auth()->user()->getRoleLevel()],
+	    ['owned_by', '!=', auth()->user()->id]
+	])->pluck('id')->toArray();
+    }
+
+    /*
      * Checks whether the current user is allowed to to change the access level of a given group.
      *
      * @return boolean

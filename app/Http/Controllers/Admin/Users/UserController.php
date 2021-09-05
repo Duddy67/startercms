@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\Users\User;
+use App\Models\Users\Group;
 use Illuminate\Support\Facades\Hash;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
@@ -162,7 +163,7 @@ class UserController extends Controller
 	    $user->syncRoles($request->input('role'));
 	}
 
-	$groups = array_merge($request->input('groups', []), $user->getPrivateGroups());
+	$groups = array_merge($request->input('groups', []), Group::getPrivateGroups($user));
 
 	if (!empty($groups)) {
 	    $user->groups()->sync($groups);

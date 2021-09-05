@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\Blog\Post;
 use App\Models\Users\User;
+use App\Models\Users\Group;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
 use App\Http\Requests\Blog\Post\StoreRequest;
@@ -166,6 +167,16 @@ class PostController extends Controller
 	    $post->access_level = $request->input('access_level');
 	}
 
+	$groups = array_merge($request->input('groups', []), Group::getPrivateGroups($post));
+
+	if (!empty($groups)) {
+	    $post->groups()->sync($groups);
+	}
+	else {
+	    // Remove all groups for this post.
+	    $post->groups()->sync([]);
+	}
+
 	$post->save();
 
         if ($request->input('_close', null)) {
@@ -196,6 +207,11 @@ class PostController extends Controller
 
 	$owner = ($post->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($post->owned_by);
 	$post->role_level = $owner->getRoleLevel();
+
+	if ($request->input('groups') !== null) {
+	    $post->groups()->attach($request->input('groups'));
+	}
+
 	$post->save();
 
         if ($request->input('_close', null)) {

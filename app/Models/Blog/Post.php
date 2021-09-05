@@ -87,6 +87,14 @@ class Post extends Model
 		  ->orWhere('owned_by', auth()->user()->id);
 	});
 
+        $groupIds = auth()->user()->getGroupIds();
+
+	if(!empty($groupIds)) {
+	    $query->orWhereHas('groups', function ($query)  use ($groupIds) {
+		$query->whereIn('id', $groupIds);
+	    });
+	}
+
         return $query->paginate($perPage);
     }
 
