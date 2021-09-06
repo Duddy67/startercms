@@ -154,10 +154,10 @@ class CategoryController extends Controller
 	    return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.edit_not_auth'));
 	}
 
-	// Check the selected parent is not a descendant.
 	if ($request->input('parent_id')) {
 	    $node = Category::findOrFail($request->input('parent_id'));
 
+	    // Check the selected parent is not a descendant.
 	    if ($category->id == $request->input('parent_id') || $node->isDescendantOf($category)) {
 		return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.must_not_be_descendant'));
 	    }

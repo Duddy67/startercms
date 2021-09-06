@@ -235,8 +235,6 @@ class PostController extends Controller
 	}
 
 	$name = $post->name;
-
-	//$post->categories()->detach();
 	$post->delete();
 
 	return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.delete_success', ['name' => $name]));
@@ -251,6 +249,7 @@ class PostController extends Controller
     public function massDestroy(Request $request)
     {
         $deleted = 0;
+
         // Remove the posts selected from the list.
         foreach ($request->input('ids') as $id) {
 	    $post = Post::findOrFail($id);
@@ -263,7 +262,6 @@ class PostController extends Controller
 		  ]);
 	    }
 
-	    //$post->categories()->detach();
 	    $post->delete();
 
 	    $deleted++;
@@ -285,6 +283,12 @@ class PostController extends Controller
 	return redirect()->route('admin.blog.posts.index', $request->query())->with($messages);
     }
 
+    /**
+     * Publishes one or more posts.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return Response
+     */
     public function massPublish(Request $request)
     {
         $published = 0;
@@ -301,6 +305,7 @@ class PostController extends Controller
 	    }
 
 	    $post->status = 'published';
+
 	    $post->save();
 
 	    $published++;
@@ -309,6 +314,12 @@ class PostController extends Controller
 	return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.publish_list_success', ['number' => $published]));
     }
 
+    /**
+     * Unpublishes one or more posts.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return Response
+     */
     public function massUnpublish(Request $request)
     {
         $unpublished = 0;
@@ -325,6 +336,7 @@ class PostController extends Controller
 	    }
 
 	    $post->status = 'unpublished';
+
 	    $post->save();
 
 	    $unpublished++;

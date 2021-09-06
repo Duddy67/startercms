@@ -55,6 +55,21 @@ class Post extends Model
         return $this->belongsToMany(Group::class);
     }
 
+    /**
+     * Delete the model from the database (override).
+     *
+     * @return bool|null
+     *
+     * @throws \LogicException
+     */
+    public function delete()
+    {
+        //$this->categories()->detach();
+        $this->groups()->detach();
+
+        parent::delete();
+    }
+
     /*
      * Gets the post items according to the filter, sort and pagination settings.
      */

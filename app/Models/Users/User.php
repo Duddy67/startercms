@@ -85,8 +85,12 @@ class User extends Authenticatable
         return $this->HasMany(Document::class, 'item_id');
     }
 
-    /*
-     * Override.
+    /**
+     * Delete the model from the database (override).
+     *
+     * @return bool|null
+     *
+     * @throws \LogicException
      */
     public function delete()
     {
