@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use App\Models\Users\Group;
+use App\Models\Users\User;
 
 
 class General extends Model
@@ -115,9 +116,10 @@ class General extends Model
 
 	foreach ($groups as $group) {
 	    $extra = [];
+	    $owner = ($group->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($group->owned_by);
 
 	    // Ensure the current user can use this group.
-	    if ($group->access_level == 'private' && $group->role_level >= auth()->user()->getRoleLevel() && $group->owned_by != auth()->user()->id) {
+	    if ($group->access_level == 'private' && $owner->getRoleLevel() >= auth()->user()->getRoleLevel() && $group->owned_by != auth()->user()->id) {
 	        $extra = ['disabled'];
 	    }
 
@@ -130,9 +132,11 @@ class General extends Model
     public static function getOwnedByOptions($table)
     {
 	$owners = DB::table($table)->leftJoin('users', $table.'.owned_by', '=', 'users.id')
+				   ->join('model_has_roles', $table.'.owned_by', '=', 'model_id')
+				   ->join('roles', 'roles.id', '=', 'role_id')
 				   ->select(['users.id', 'users.name'])
 				   ->whereIn($table.'.access_level', ['public_ro', 'public_rw'])
-				   ->orWhere($table.'.role_level', '<', auth()->user()->getRoleLevel())
+				   ->orWhere('roles.role_level', '<', auth()->user()->getRoleLevel())
 				   ->orWhere($table.'.owned_by', auth()->user()->id)->distinct()->get();
 	$options = [];
 

@@ -63,6 +63,8 @@ class Group extends Model
 
 	$query = Group::query();
 	$query->select('groups.*', 'users.name as user_name')->leftJoin('users', 'groups.owned_by', '=', 'users.id');
+	// Join the role tables to get the owner's role level.
+	$query->join('model_has_roles', 'groups.owned_by', '=', 'model_id')->join('roles', 'roles.id', '=', 'role_id');
 
 	if ($search !== null) {
 	    $query->where('groups.name', 'like', '%'.$search.'%');
@@ -74,13 +76,13 @@ class Group extends Model
 	}
 
 	if ($ownedBy !== null) {
-	    $query->whereIn('owned_by', $ownedBy);
+	    $query->whereIn('groups.owned_by', $ownedBy);
 	}
 
 	$query->where(function($query) {
-	    $query->where('role_level', '<', auth()->user()->getRoleLevel())
-		  ->orWhereIn('access_level', ['public_ro', 'public_rw'])
-		  ->orWhere('owned_by', auth()->user()->id);
+	    $query->where('roles.role_level', '<', auth()->user()->getRoleLevel())
+		  ->orWhereIn('groups.access_level', ['public_ro', 'public_rw'])
+		  ->orWhere('groups.owned_by', auth()->user()->id);
 	});
 
         return $query->paginate($perPage);
@@ -121,63 +123,12 @@ class Group extends Model
      */
     public static function getPrivateGroups($item)
     {
-	return $item->groups()->where([
-	    ['access_level', '=', 'private'], 
-	    ['role_level', '>=', auth()->user()->getRoleLevel()],
-	    ['owned_by', '!=', auth()->user()->id]
-	])->pluck('id')->toArray();
-    }
-
-    /*
-     * Checks whether the current user is allowed to to change the access level of a given group.
-     *
-     * @return boolean
-     */
-    public function canChangeAccessLevel()
-    {
-	return ($this->owned_by == auth()->user()->id || auth()->user()->getRoleLevel() > $this->role_level) ? true: false;
-    }
-
-    /*
-     * Checks whether the current user is allowed to access a given group.
-     *
-     * @return boolean
-     */
-    public function canAccess()
-    {
-        return ($this->access_level == 'public_ro' || $this->canEdit()) ? true : false;
-    }
-
-    /*
-     * Checks whether the current user is allowed to edit a given group.
-     *
-     * @return boolean
-     */
-    public function canEdit()
-    {
-        if ($this->access_level == 'public_rw' || $this->role_level < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id) {
-	    return true;
-	}
-
-	return false;
-    }
-
-    /*
-     * Checks whether the current user is allowed to delete a given group according to their role level.
-     *
-     * @return boolean
-     */
-    public function canDelete()
-    {
-        if (auth()->user()->hasRole('super-admin')) {
-	    return true;
-	}
-
-	// The owner role level is lower than the current user's or the current user owns the group.
-	if ($this->role_level < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id) {
-	    return true;
-	}
-
-	return false;
+      return $item->groups()->join('model_has_roles', 'groups.owned_by', '=', 'model_id')
+			    ->join('roles', 'roles.id', '=', 'role_id')
+	                    ->where([
+					['groups.access_level', '=', 'private'], 
+					['roles.role_level', '>=', auth()->user()->getRoleLevel()],
+					['groups.owned_by', '!=', auth()->user()->id]
+				    ])->pluck('groups.id')->toArray();
     }
 }

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
+use App\Traits\Admin\AccessLevel;
 use App\Models\Users\Role;
 use App\Models\Users\Permission;
 use App\Models\Users\User;
@@ -16,7 +17,7 @@ use App\Http\Requests\Users\Role\UpdateRequest;
 
 class RoleController extends Controller
 {
-    use ItemConfig, CheckInCheckOut;
+    use ItemConfig, CheckInCheckOut, AccessLevel;
 
     /*
      * Instance of the model.
@@ -101,7 +102,7 @@ class RoleController extends Controller
 		      ->leftJoin('users as users2', 'roles.updated_by', '=', 'users2.id')
 		      ->findOrFail($id);
 
-	if (!$role->canAccess()) {
+	if (!$this->canAccess($role)) {
 	    return redirect()->route('admin.users.roles.index', $request->query())->with('error',  __('messages.generic.access_not_auth'));
 	}
 
@@ -120,7 +121,7 @@ class RoleController extends Controller
 
 	    // Gather the needed data to build the form.
 
-	    $except = (auth()->user()->getRoleLevel() > $role->role_level || $role->owned_by == auth()->user()->id) ? ['owner_name'] : ['owned_by'];
+	    $except = (auth()->user()->getRoleLevel() > $this->getOwnerRoleLevel($role) || $role->owned_by == auth()->user()->id) ? ['owner_name'] : ['owned_by'];
 
 	    if ($role->updated_by === null) {
 		array_push($except, 'updated_by', 'updated_at');
@@ -130,7 +131,7 @@ class RoleController extends Controller
         $fields = $this->getFields($role, $except);
         $this->setFieldValues($fields, $role);
 	$board = $this->getPermissionBoard($role);
-	$except = (in_array($role->name, Role::getDefaultRoles()) || !$role->canEdit()) ? ['save', 'saveClose', 'destroy'] : [];
+	$except = (in_array($role->name, Role::getDefaultRoles()) || !$this->canEdit($role)) ? ['save', 'saveClose', 'destroy'] : [];
         $actions = $this->getActions('form', $except);
 	// Add the id parameter to the query.
 	$query = array_merge($request->query(), ['role' => $id]);
@@ -167,7 +168,7 @@ class RoleController extends Controller
 	    return redirect()->route('admin.users.roles.edit', $role->id)->with('error', __('messages.roles.cannot_update_default_roles'));
 	}
 
-	if (!$role->canEdit()) {
+	if (!$this->canEdit($role)) {
 	    return redirect()->route('admin.users.roles.edit', array_merge($request->query(), ['role' => $role->id]))->with('error',  __('messages.generic.edit_not_auth'));
 	}
 
@@ -175,10 +176,8 @@ class RoleController extends Controller
 	$role->updated_by = auth()->user()->id;
 
 	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
-	if (auth()->user()->getRoleLevel() > $role->role_level || $role->owned_by == auth()->user()->id) {
+	if (auth()->user()->getRoleLevel() > $this->getOwnerRoleLevel($role) || $role->owned_by == auth()->user()->id) {
 	    $role->owned_by = $request->input('owned_by');
-	    $owner = ($role->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($role->owned_by);
-	    $role->role_level = $owner->getRoleLevel();
 	    $role->access_level = $request->input('access_level');
 	}
 
@@ -254,9 +253,9 @@ class RoleController extends Controller
 	    $role->givePermissionTo($permission->name);
 	}
 
+	// Set the role attributes.
 	$role->role_type = $request->input('role_type');
-	$owner = ($role->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($role->owned_by);
-	$role->role_level = $owner->getRoleLevel();
+	$role->role_level = Role::getRoleHierarchy()[$role->role_type];
 
 	$role->save();
 
@@ -276,7 +275,7 @@ class RoleController extends Controller
      */
     public function destroy(Request $request, Role $role)
     {
-	if (!$role->canDelete()) {
+	if (!$this->canDelete($role)) {
 	    return redirect()->route('admin.users.roles.edit', array_merge($request->query(), ['role' => $role->id]))->with('error',  __('messages.generic.delete_not_auth'));
 	}
 
@@ -321,7 +320,7 @@ class RoleController extends Controller
 		return redirect()->route('admin.users.roles.index', $request->query())->with('error', __('messages.roles.users_assigned_to_roles', ['name' => $role->name]));
 	    }
 
-	    if (!$role->canDelete()) {
+	    if (!$this->canDelete($role)) {
 		return redirect()->route('admin.users.roles.edit', array_merge($request->query(), ['role' => $id]))->with('error',  __('messages.generic.delete_not_auth'));
 	    }
 
@@ -409,7 +408,7 @@ class RoleController extends Controller
 			$role->role_type = 'super-admin';
 		    }
 
-		    if (($role->role_level >= $userRoleLevel && $role->access_level != 'public_rw') || in_array($role->name, Role::getDefaultRoles())) {
+		    if (($this->getOwnerRoleLevel($role) >= $userRoleLevel && $role->access_level != 'public_rw') || in_array($role->name, Role::getDefaultRoles())) {
 			$checkbox->disabled = true;
 		    }
 		}

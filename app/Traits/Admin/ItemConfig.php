@@ -6,10 +6,13 @@ use App\Models\Settings\General;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use App\Traits\Admin\AccessLevel;
 
 
 trait ItemConfig
 {
+    use AccessLevel;
+
     /*
      * Returns the column data for an item list.
      *
@@ -187,15 +190,15 @@ trait ItemConfig
 		    $fields[$key]->value = $item->{$field->name};
 		}
 
-		if (method_exists($item, 'canEdit') && !$item->canEdit()) {
+		if (isset($item->access_level) && !$this->canEdit($item)) {
 		    $field = $this->setExtraAttributes($field, ['disabled']);
 		}
 
-		if ($field->name == 'status' && method_exists($item, 'canChangeStatus') && !$item->canChangeStatus()) {
+		if ($field->name == 'status' && !$this->canChangeStatus($item)) {
 		    $field = $this->setExtraAttributes($field, ['disabled']);
 		}
 
-		if ($field->name == 'access_level' && method_exists($item, 'canChangeAccessLevel') && !$item->canChangeAccessLevel()) {
+		if (in_array($field->name, ['access_level', 'groups', 'categories']) && !$this->canChangeAccessLevel($item)) {
 		    $field = $this->setExtraAttributes($field, ['disabled']);
 		}
 	    }

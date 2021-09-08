@@ -163,8 +163,9 @@ class User extends Authenticatable
 
 	foreach ($roles as $role) {
 	    $extra = [];
+	    $owner = ($role->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($role->owned_by);
 
-	    if ($role->access_level == 'private' && $role->role_level >= auth()->user()->getRoleLevel() && $role->owned_by != auth()->user()->id) {
+	    if ($role->access_level == 'private' && $owner->getRoleLevel() >= auth()->user()->getRoleLevel() && $role->owned_by != auth()->user()->id) {
 	        $extra = ['disabled'];
 	    }
 
@@ -215,7 +216,9 @@ class User extends Authenticatable
     public function isRolePrivate()
     {
         $role = $this->roles[0];
-	return ($role->access_level == 'private' && $role->role_level >= auth()->user()->getRoleLevel() && $role->owned_by != auth()->user()->id) ? true : false;
+	$owner = ($role->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($role->owned_by);
+
+	return ($role->access_level == 'private' && $owner->getRoleLevel() >= auth()->user()->getRoleLevel() && $role->owned_by != auth()->user()->id) ? true : false;
     }
 
     /*

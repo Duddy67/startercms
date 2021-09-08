@@ -9,6 +9,7 @@ use App\Models\Blog\Category;
 use App\Models\Users\User;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
+use App\Traits\Admin\AccessLevel;
 use App\Http\Requests\Blog\Category\StoreRequest;
 use App\Http\Requests\Blog\Category\UpdateRequest;
 use Illuminate\Support\Str;
@@ -16,7 +17,7 @@ use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    use ItemConfig, CheckInCheckOut;
+    use ItemConfig, CheckInCheckOut, AccessLevel;
 
     /*
      * Instance of the model.
@@ -97,7 +98,7 @@ class CategoryController extends Controller
 			      ->leftJoin('users as users2', 'blog_categories.updated_by', '=', 'users2.id')
 			      ->findOrFail($id);
 
-	if (!$category->canAccess()) {
+	if (!$this->canAccess($category)) {
 	    return redirect()->route('admin.blog.categories.index')->with('error',  __('messages.generic.access_not_auth'));
 	}
 
@@ -109,7 +110,7 @@ class CategoryController extends Controller
 
         // Gather the needed data to build the form.
 	
-	$except = (auth()->user()->getRoleLevel() > $category->role_level || $category->owned_by == auth()->user()->id) ? ['owner_name'] : ['owned_by'];
+	$except = (auth()->user()->getRoleLevel() > $this->getOwnerRoleLevel($category) || $category->owned_by == auth()->user()->id) ? ['owner_name'] : ['owned_by'];
 
 	if ($category->updated_by === null) {
 	    array_push($except, 'updated_by', 'updated_at');
@@ -117,7 +118,7 @@ class CategoryController extends Controller
 
         $fields = $this->getFields($category, $except);
 	$this->setFieldValues($fields, $category);
-	$except = (!$category->canEdit()) ? ['destroy', 'save', 'saveClose'] : [];
+	$except = (!$this->canEdit($category)) ? ['destroy', 'save', 'saveClose'] : [];
         $actions = $this->getActions('form', $except);
 	// Add the id parameter to the query.
 	$query = array_merge($request->query(), ['category' => $id]);
@@ -150,7 +151,7 @@ class CategoryController extends Controller
      */
     public function update(UpdateRequest $request, Category $category)
     {
-	if (!$category->canEdit()) {
+	if (!$this->canEdit($category)) {
 	    return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.edit_not_auth'));
 	}
 
@@ -162,7 +163,7 @@ class CategoryController extends Controller
 		return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.must_not_be_descendant'));
 	    }
 
-	    if (!$node->canEdit()) {
+	    if (!$this->canEdit($node)) {
 		return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.edit_not_auth'));
 	    }
 	}
@@ -175,10 +176,8 @@ class CategoryController extends Controller
 	$category->parent_id = $request->input('parent_id');
 
 	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
-	if (auth()->user()->getRoleLevel() > $category->role_level || $category->owned_by == auth()->user()->id) {
+	if (auth()->user()->getRoleLevel() > $this->getOwnerRoleLevel($category) || $category->owned_by == auth()->user()->id) {
 	    $category->owned_by = $request->input('owned_by');
-	    $owner = ($category->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($category->owned_by);
-	    $category->role_level = $owner->getRoleLevel();
 	    $category->access_level = $request->input('access_level');
 	}
 
@@ -211,8 +210,6 @@ class CategoryController extends Controller
 	    'parent_id' => (empty($request->input('parent_id'))) ? null : $request->input('parent_id'),
 	]);
 
-	$owner = ($category->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($category->owned_by);
-	$category->role_level = $owner->getRoleLevel();
 	$category->save();
 
         if ($category->parent_id) {
@@ -236,7 +233,7 @@ class CategoryController extends Controller
      */
     public function destroy(Request $request, Category $category)
     {
-	if (!$category->canDelete()) {
+	if (!$this->canDelete($category)) {
 	    return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.delete_not_auth'));
 	}
 
@@ -261,7 +258,7 @@ class CategoryController extends Controller
         foreach ($request->input('ids') as $id) {
 	    $category = Category::findOrFail($id);
 
-	    if (!$category->canDelete()) {
+	    if (!$this->canDelete($category)) {
 	      return redirect()->route('admin.blog.categories.index', $request->query())->with(
 		  [
 		      'error' => __('messages.generic.delete_not_auth'), 

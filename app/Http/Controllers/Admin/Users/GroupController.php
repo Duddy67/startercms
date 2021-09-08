@@ -8,6 +8,7 @@ use Illuminate\Validation\Rule;
 use App\Models\Users\Group;
 use App\Models\Users\User;
 use App\Traits\Admin\ItemConfig;
+use App\Traits\Admin\AccessLevel;
 use App\Traits\Admin\CheckInCheckOut;
 use App\Http\Requests\Users\Group\StoreRequest;
 use App\Http\Requests\Users\Group\UpdateRequest;
@@ -15,7 +16,7 @@ use App\Http\Requests\Users\Group\UpdateRequest;
 
 class GroupController extends Controller
 {
-    use ItemConfig, CheckInCheckOut;
+    use ItemConfig, CheckInCheckOut, AccessLevel;
 
     /*
      * Instance of the model.
@@ -96,7 +97,7 @@ class GroupController extends Controller
 			->leftJoin('users as users2', 'groups.updated_by', '=', 'users2.id')
 			->findOrFail($id);
 
-	if (!$group->canAccess()) {
+	if (!$this->canAccess($group)) {
 	    return redirect()->route('admin.users.groups.index')->with('error',  __('messages.generic.access_not_auth'));
 	}
 
@@ -108,14 +109,14 @@ class GroupController extends Controller
 
         // Gather the needed data to build the form.
 	
-	$except = (auth()->user()->getRoleLevel() > $group->role_level || $group->owned_by == auth()->user()->id) ? ['owner_name'] : ['owned_by'];
+	$except = (auth()->user()->getRoleLevel() > $this->getOwnerRoleLevel($group) || $group->owned_by == auth()->user()->id) ? ['owner_name'] : ['owned_by'];
 
 	if ($group->updated_by === null) {
 	    array_push($except, 'updated_by', 'updated_at');
 	}
 
         $fields = $this->getFields($group, $except);
-	$except = (!$group->canEdit()) ? ['destroy', 'save', 'saveClose'] : [];
+	$except = (!$this->canEdit($group)) ? ['destroy', 'save', 'saveClose'] : [];
         $actions = $this->getActions('form', $except);
 	// Add the id parameter to the query.
 	$query = array_merge($request->query(), ['group' => $id]);
@@ -148,7 +149,7 @@ class GroupController extends Controller
      */
     public function update(UpdateRequest $request, Group $group)
     {
-	if (!$group->canEdit()) {
+	if (!$this->canEdit($group)) {
 	    return redirect()->route('admin.users.groups.edit', array_merge($request->query(), ['group' => $group->id]))->with('error',  __('messages.generic.edit_not_auth'));
 	}
 
@@ -157,10 +158,8 @@ class GroupController extends Controller
 	$group->updated_by = auth()->user()->id;
 
 	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
-	if (auth()->user()->getRoleLevel() > $group->role_level || $group->owned_by == auth()->user()->id) {
+	if (auth()->user()->getRoleLevel() > $this->getOwnerRoleLevel($group) || $group->owned_by == auth()->user()->id) {
 	    $group->owned_by = $request->input('owned_by');
-	    $owner = ($group->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($group->owned_by);
-	    $group->role_level = $owner->getRoleLevel();
 	    $group->access_level = $request->input('access_level');
 	}
 
@@ -190,9 +189,6 @@ class GroupController extends Controller
 	  'owned_by' => $request->input('owned_by'),
 	]);
 
-	$owner = ($group->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($group->owned_by);
-	$group->role_level = $owner->getRoleLevel();
-
 	$group->save();
 
         if ($request->input('_close', null)) {
@@ -211,7 +207,7 @@ class GroupController extends Controller
      */
     public function destroy(Request $request, Group $group)
     {
-	if (!$group->canDelete()) {
+	if (!$this->canDelete($group)) {
 	    return redirect()->route('admin.users.groups.edit', array_merge($request->query(), ['group' => $group->id]))->with('error',  __('messages.generic.delete_not_auth'));
 	}
 
@@ -236,7 +232,7 @@ class GroupController extends Controller
         foreach ($request->input('ids') as $id) {
 	    $group = Group::findOrFail($id);
 
-	    if (!$group->canDelete()) {
+	    if (!$this->canDelete($group)) {
 	      return redirect()->route('admin.users.groups.index', $request->query())->with(
 		  [
 		      'error' => __('messages.generic.delete_not_auth'), 

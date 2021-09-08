@@ -51,7 +51,7 @@ class Role extends SpatieRole
     }
 
     /*
-     * The role hierarchy defined numerically. 
+     * The default type role hierarchy defined numerically. 
      *
      * @return Array
      */
@@ -167,54 +167,5 @@ class Role extends SpatieRole
     public function getSelectedValue($fieldName)
     {
         return $this->{$fieldName};
-    }
-
-    /*
-     * Checks whether the current user is allowed to to change the access level of a given role.
-     *
-     * @return boolean
-     */
-    public function canChangeAccessLevel()
-    {
-	return ($this->owned_by == auth()->user()->id || auth()->user()->getRoleLevel() > $this->role_level) ? true: false;
-    }
-
-    /*
-     * Checks whether the current user is allowed to access a given role according to their role level.
-     *
-     * @return boolean
-     */
-    public function canAccess()
-    {
-        return ($this->access_level == 'public_ro' || $this->canEdit()) ? true : false;
-    }
-
-    /*
-     * Checks whether the current user is allowed to edit a given role according to their role level.
-     *
-     * @return boolean
-     */
-    public function canEdit()
-    {
-        if ($this->access_level == 'public_rw' || $this->role_level < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id) {
-	    return true;
-	}
-
-	return false;
-    }
-
-    /*
-     * Checks whether the current user is allowed to delete a given role according to their role level.
-     *
-     * @return boolean
-     */
-    public function canDelete()
-    {
-	// The owner role level is lower than the current user's or the current user owns the role.
-	if ($this->role_level < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id) {
-	    return true;
-	}
-
-	return false;
     }
 }

@@ -82,6 +82,8 @@ class Post extends Model
 
 	$query = Post::query();
 	$query->select('posts.*', 'users.name as user_name')->leftJoin('users', 'posts.owned_by', '=', 'users.id');
+	// Join the role tables to get the owner's role level.
+	$query->join('model_has_roles', 'posts.owned_by', '=', 'model_id')->join('roles', 'roles.id', '=', 'role_id');
 
 	if ($search !== null) {
 	    $query->where('posts.title', 'like', '%'.$search.'%');
@@ -93,13 +95,13 @@ class Post extends Model
 	}
 
 	if ($ownedBy !== null) {
-	    $query->whereIn('owned_by', $ownedBy);
+	    $query->whereIn('posts.owned_by', $ownedBy);
 	}
 
 	$query->where(function($query) {
-	    $query->where('role_level', '<', auth()->user()->getRoleLevel())
-		  ->orWhereIn('access_level', ['public_ro', 'public_rw'])
-		  ->orWhere('owned_by', auth()->user()->id);
+	    $query->where('roles.role_level', '<', auth()->user()->getRoleLevel())
+		  ->orWhereIn('posts.access_level', ['public_ro', 'public_rw'])
+		  ->orWhere('posts.owned_by', auth()->user()->id);
 	});
 
         $groupIds = auth()->user()->getGroupIds();
@@ -161,57 +163,5 @@ class Post extends Model
 	}
 
 	return $this->{$fieldName};
-    }
-
-    /*
-     * Checks whether the current user is allowed to to change the access level of a given post.
-     *
-     * @return boolean
-     */
-    public function canChangeAccessLevel()
-    {
-	return ($this->owned_by == auth()->user()->id || auth()->user()->getRoleLevel() > $this->role_level) ? true : false;
-    }
-
-    /*
-     * Checks whether the current user is allowed to to change the status level of a given post.
-     *
-     * @return boolean
-     */
-    public function canChangeStatus()
-    {
-        // Use the access level constraints.
-	return $this->canChangeAccessLevel();
-    }
-
-    /*
-     * Checks whether the current user is allowed to access a given post.
-     *
-     * @return boolean
-     */
-    public function canAccess()
-    {
-        return ($this->access_level == 'public_ro' || $this->canEdit()) ? true : false;
-    }
-
-    /*
-     * Checks whether the current user is allowed to edit a given post.
-     *
-     * @return boolean
-     */
-    public function canEdit()
-    {
-        return ($this->access_level == 'public_rw' || $this->role_level < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id) ? true : false;
-    }
-
-    /*
-     * Checks whether the current user is allowed to delete a given post according to their role level.
-     *
-     * @return boolean
-     */
-    public function canDelete()
-    {
-	// The owner role level is lower than the current user's or the current user owns the post.
-	return ($this->role_level < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id) ? true : false;
     }
 }
