@@ -8,11 +8,12 @@ use App\Models\Settings\General;
 use App\Models\Blog\Post;
 use Kalnoy\Nestedset\NodeTrait;
 use App\Traits\Admin\AccessLevel;
+use App\Traits\Admin\CheckInCheckOut;
 
 
 class Category extends Model
 {
-    use HasFactory, NodeTrait, AccessLevel;
+    use HasFactory, NodeTrait, AccessLevel, CheckInCheckOut;
 
     /**
      * The table associated with the model.

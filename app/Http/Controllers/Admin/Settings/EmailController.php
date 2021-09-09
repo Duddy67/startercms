@@ -15,7 +15,7 @@ use App\Http\Requests\Settings\Email\UpdateRequest;
 
 class EmailController extends Controller
 {
-    use ItemConfig, CheckInCheckOut;
+    use ItemConfig;
 
     /*
      * Instance of the model.
@@ -99,7 +99,7 @@ class EmailController extends Controller
 	    return redirect()->route('admin.settings.emails.index')->with('error',  __('messages.generic.checked_out'));
 	}
 
-	$this->checkOut($email);
+	$email->checkOut();
 
         // Gather the needed data to build the form.
 	
@@ -125,7 +125,7 @@ class EmailController extends Controller
     public function cancel(Request $request, Email $email = null)
     {
         if ($email) {
-	    $this->checkIn($email);
+	    $email->checkIn();
 	}
 
 	return redirect()->route('admin.settings.emails.index', $request->query());
@@ -139,7 +139,7 @@ class EmailController extends Controller
      */
     public function massCheckIn(Request $request)
     {
-        $messages = $this->checkInMultiple($request->input('ids'), '\\App\\Models\\Settings\\Email');
+        $messages = CheckInCheckOut::checkInMultiple($request->input('ids'), '\\App\\Models\\Settings\\Email');
 
 	return redirect()->route('admin.settings.emails.index', $request->query())->with($messages);
     }

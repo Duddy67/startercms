@@ -8,11 +8,12 @@ use App\Models\Users\User;
 use App\Models\Blog\Post;
 use App\Models\Settings\General;
 use App\Traits\Admin\AccessLevel;
+use App\Traits\Admin\CheckInCheckOut;
 
 
 class Group extends Model
 {
-    use HasFactory, AccessLevel;
+    use HasFactory, AccessLevel, CheckInCheckOut;
 
     /**
      * The attributes that are mass assignable.

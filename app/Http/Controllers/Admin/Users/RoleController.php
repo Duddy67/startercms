@@ -16,7 +16,7 @@ use App\Http\Requests\Users\Role\UpdateRequest;
 
 class RoleController extends Controller
 {
-    use ItemConfig, CheckInCheckOut;
+    use ItemConfig;
 
     /*
      * Instance of the model.
@@ -116,7 +116,7 @@ class RoleController extends Controller
 	}
 	// Regular roles.
 	else {
-	    $this->checkOut($role);
+	    $role->checkOut();
 
 	    // Gather the needed data to build the form.
 
@@ -148,7 +148,7 @@ class RoleController extends Controller
     public function cancel(Request $request, Role $role = null)
     {
         if ($role) {
-	    $this->checkIn($role);
+	    $role->checkIn();
 	}
 
 	return redirect()->route('admin.users.roles.index', $request->query());
@@ -202,7 +202,7 @@ class RoleController extends Controller
 	}
 
         if ($request->input('_close', null)) {
-	    $this->checkIn($role);
+	    $role->checkIn();
 	    return redirect()->route('admin.users.roles.index', $request->query())->with('success', __('messages.roles.update_success'));
 	}
 
@@ -341,7 +341,7 @@ class RoleController extends Controller
      */
     public function massCheckIn(Request $request)
     {
-        $messages = $this->checkInMultiple($request->input('ids'), '\\Spatie\\Permission\\Models\\Role');
+        $messages = CheckInCheckOut::checkInMultiple($request->input('ids'), '\\App\\Models\\Users\\Role');
 
 	return redirect()->route('admin.users.roles.index', $request->query())->with($messages);
     }

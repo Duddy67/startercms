@@ -15,7 +15,7 @@ use App\Http\Requests\Users\Group\UpdateRequest;
 
 class GroupController extends Controller
 {
-    use ItemConfig, CheckInCheckOut;
+    use ItemConfig;
 
     /*
      * Instance of the model.
@@ -104,7 +104,7 @@ class GroupController extends Controller
 	    return redirect()->route('admin.users.groups.index')->with('error',  __('messages.generic.checked_out'));
 	}
 
-	$this->checkOut($group);
+	$group->checkOut();
 
         // Gather the needed data to build the form.
 	
@@ -133,7 +133,7 @@ class GroupController extends Controller
     public function cancel(Request $request, Group $group = null)
     {
         if ($group) {
-	    $this->checkIn($group);
+	    $group->checkIn();
 	}
 
 	return redirect()->route('admin.users.groups.index', $request->query());
@@ -165,7 +165,7 @@ class GroupController extends Controller
 	$group->save();
 
         if ($request->input('_close', null)) {
-	    $this->checkIn($group);
+	    $group->checkIn();
 	    // Redirect to the list.
 	    return redirect()->route('admin.users.groups.index', $request->query())->with('success', __('messages.groups.update_success'));
 	}
@@ -256,7 +256,7 @@ class GroupController extends Controller
      */
     public function massCheckIn(Request $request)
     {
-        $messages = $this->checkInMultiple($request->input('ids'), '\\App\\Models\\Users\\Group');
+        $messages = CheckInCheckOut::checkInMultiple($request->input('ids'), '\\App\\Models\\Users\\Group');
 
 	return redirect()->route('admin.users.groups.index', $request->query())->with($messages);
     }

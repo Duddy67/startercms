@@ -11,11 +11,12 @@ use App\Models\Users\Role;
 use App\Models\Users\Group;
 use App\Models\Cms\Document;
 use App\Models\Settings\General;
+use App\Traits\Admin\CheckInCheckOut;
 
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, CheckInCheckOut;
 
     /**
      * The attributes that are mass assignable.

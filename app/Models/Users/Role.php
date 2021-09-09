@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Models\Role as SpatieRole;
 use App\Models\Settings\General;
 use App\Traits\Admin\AccessLevel;
+use App\Traits\Admin\CheckInCheckOut;
 
 
 class Role extends SpatieRole 
 {
-    use HasFactory, AccessLevel;
+    use HasFactory, AccessLevel, CheckInCheckOut;
 
     /**
      * The attributes that should be mutated to dates.

@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Mail\AppMailer;
 use Illuminate\Support\Facades\Mail;
+use App\Traits\Admin\CheckInCheckOut;
 
 
 class Email extends Model
 {
-    use HasFactory;
+    use HasFactory, CheckInCheckOut;
 
     /**
      * The attributes that are mass assignable.

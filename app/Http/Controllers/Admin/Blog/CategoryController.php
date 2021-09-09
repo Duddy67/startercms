@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    use ItemConfig, CheckInCheckOut;
+    use ItemConfig;
 
     /*
      * Instance of the model.
@@ -105,7 +105,7 @@ class CategoryController extends Controller
 	    return redirect()->route('admin.blog.categories.index')->with('error',  __('messages.generic.checked_out'));
 	}
 
-	$this->checkOut($category);
+	$category->checkOut();
 
         // Gather the needed data to build the form.
 	
@@ -135,7 +135,7 @@ class CategoryController extends Controller
     public function cancel(Request $request, Category $category = null)
     {
         if ($category) {
-	    $this->checkIn($category);
+	    $category->checkIn();
 	}
 
 	return redirect()->route('admin.blog.categories.index', $request->query());
@@ -183,7 +183,7 @@ class CategoryController extends Controller
 	$category->save();
 
         if ($request->input('_close', null)) {
-	    $this->checkIn($category);
+	    $category->checkIn();
 	    // Redirect to the list.
 	    return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.update_success'));
 	}
@@ -282,7 +282,7 @@ class CategoryController extends Controller
      */
     public function massCheckIn(Request $request)
     {
-        $messages = $this->checkInMultiple($request->input('ids'), '\\App\\Models\\Blog\\Category');
+        $messages = CheckInCheckOut::checkInMultiple($request->input('ids'), '\\App\\Models\\Blog\\Category');
 
 	return redirect()->route('admin.blog.categories.index', $request->query())->with($messages);
     }

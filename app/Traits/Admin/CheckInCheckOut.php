@@ -16,11 +16,11 @@ trait CheckInCheckOut
      * @param model instance  $record
      * @return void
      */
-    public function checkOut($record)
+    public function checkOut()
     {
-        $record->checked_out = auth()->user()->id;
-	$record->checked_out_time = Carbon::now();
-	$record->save();
+        $this->checked_out = auth()->user()->id;
+	$this->checked_out_time = Carbon::now();
+	$this->save();
     }
 
     /**
@@ -29,11 +29,11 @@ trait CheckInCheckOut
      * @param model instance  $record
      * @return void
      */
-    public function checkIn($record)
+    public function checkIn()
     {
-        $record->checked_out = null;
-	$record->checked_out_time = null;
-	$record->save();
+        $this->checked_out = null;
+	$this->checked_out_time = null;
+	$this->save();
     }
 
     /**
@@ -42,13 +42,13 @@ trait CheckInCheckOut
      * @param model instance  $record
      * @return boolean
      */
-    public function canCheckIn($record)
+    public function canCheckIn()
     {
         // Get the user for whom the record is checked out .
-	$user = User::findOrFail($record->checked_out);
+	$user = User::findOrFail($this->checked_out);
 
 	// Ensure the current user has a higher role level or that they are the user for whom the record is checked out. 
-	if (auth()->user()->getRoleLevel() > $user->getRoleLevel() || $record->checked_out == auth()->user()->id) {
+	if (auth()->user()->getRoleLevel() > $user->getRoleLevel() || $this->checked_out == auth()->user()->id) {
 	    return true;
 	}
 
@@ -62,7 +62,7 @@ trait CheckInCheckOut
      * @param model instance  $model
      * @return Array
      */
-    public function checkInMultiple($recordIds, $model)
+    public static function checkInMultiple($recordIds, $model)
     {
         $checkedIn = 0;
 	$messages = [];
@@ -75,12 +75,12 @@ trait CheckInCheckOut
 	        continue;
 	    }
 
-	    if (!$this->canCheckIn($record)) {
+	    if (!$record->canCheckIn()) {
 	        $messages['error'] = __('messages.generic.check_in_not_auth');
 	        continue;
 	    }
 
-	    $this->checkIn($record);
+	    $record->checkIn();
 	    $checkedIn++;
 	}
 

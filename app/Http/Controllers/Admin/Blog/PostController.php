@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
-    use ItemConfig, CheckInCheckOut;
+    use ItemConfig;
 
     /*
      * Instance of the model.
@@ -106,7 +106,7 @@ class PostController extends Controller
 	    return redirect()->route('admin.blog.posts.index')->with('error',  __('messages.generic.checked_out'));
 	}
 
-	$this->checkOut($post);
+	$post->checkOut();
 
         // Gather the needed data to build the form.
 	
@@ -135,7 +135,7 @@ class PostController extends Controller
     public function cancel(Request $request, Post $post = null)
     {
         if ($post) {
-	    $this->checkIn($post);
+	    $post->checkIn();
 	}
 
 	return redirect()->route('admin.blog.posts.index', $request->query());
@@ -178,7 +178,7 @@ class PostController extends Controller
 	$post->save();
 
         if ($request->input('_close', null)) {
-	    $this->checkIn($post);
+	    $post->checkIn();
 	    // Redirect to the list.
 	    return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.update_success'));
 	}
@@ -273,7 +273,7 @@ class PostController extends Controller
      */
     public function massCheckIn(Request $request)
     {
-        $messages = $this->checkInMultiple($request->input('ids'), '\\App\\Models\\Blog\\Post');
+        $messages = CheckInCheckOut::checkInMultiple($request->input('ids'), '\\App\\Models\\Blog\\Post');
 
 	return redirect()->route('admin.blog.posts.index', $request->query())->with($messages);
     }

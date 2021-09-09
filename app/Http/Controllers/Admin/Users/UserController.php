@@ -18,7 +18,7 @@ use App\Http\Requests\Users\User\UpdateRequest;
 
 class UserController extends Controller
 {
-    use ItemConfig, CheckInCheckOut;
+    use ItemConfig;
 
     /*
      * Instance of the model.
@@ -104,7 +104,7 @@ class UserController extends Controller
 	    return redirect()->route('admin.users.users.index')->with('error',  __('messages.generic.checked_out'));
 	}
 
-	$this->checkOut($user);
+	$user->checkOut();
 
         // Gather the needed data to build the form.
 	
@@ -131,7 +131,7 @@ class UserController extends Controller
     public function cancel(Request $request, User $user = null)
     {
         if ($user) {
-	    $this->checkIn($user);
+	    $user->checkIn();
 	}
 
 	return redirect()->route('admin.users.users.index', $request->query());
@@ -180,7 +180,7 @@ class UserController extends Controller
 	}
 
         if ($request->input('_close', null)) {
-	    $this->checkIn($user);
+	    $user->checkIn();
 	    return redirect()->route('admin.users.users.index', $request->query())->with('success', __('messages.users.update_success'));
 	}
 
@@ -284,7 +284,7 @@ class UserController extends Controller
      */
     public function massCheckIn(Request $request)
     {
-        $messages = $this->checkInMultiple($request->input('ids'), '\\App\\Models\\Users\\User');
+        $messages = CheckInCheckOut::checkInMultiple($request->input('ids'), '\\App\\Models\\Users\\User');
 
 	return redirect()->route('admin.users.users.index', $request->query())->with($messages);
     }
