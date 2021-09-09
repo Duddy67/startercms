@@ -13,9 +13,9 @@ trait AccessLevel
      * @param Object  $item
      * @return boolean
      */
-    public function canChangeAccessLevel($item)
+    public function canChangeAccessLevel()
     {
-	return ($item->owned_by == auth()->user()->id || auth()->user()->getRoleLevel() > $this->getOwnerRoleLevel($item)) ? true: false;
+	return ($this->owned_by == auth()->user()->id || auth()->user()->getRoleLevel() > $this->getOwnerRoleLevel()) ? true: false;
     }
 
     /*
@@ -24,9 +24,9 @@ trait AccessLevel
      * @param Object  $item
      * @return boolean
      */
-    public function canAccess($item)
+    public function canAccess()
     {
-        return ($item->access_level == 'public_ro' || $this->canEdit($item)) ? true : false;
+        return ($this->access_level == 'public_ro' || $this->canEdit()) ? true : false;
     }
 
     /*
@@ -35,9 +35,9 @@ trait AccessLevel
      * @param Object  $item
      * @return boolean
      */
-    public function canEdit($item)
+    public function canEdit()
     {
-        if ($item->access_level == 'public_rw' || $this->getOwnerRoleLevel($item) < auth()->user()->getRoleLevel() || $item->owned_by == auth()->user()->id) {
+        if ($this->access_level == 'public_rw' || $this->getOwnerRoleLevel() < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id) {
 	    return true;
 	}
 
@@ -50,10 +50,10 @@ trait AccessLevel
      * @param Object  $item
      * @return boolean
      */
-    public function canDelete($item)
+    public function canDelete()
     {
 	// The owner role level is lower than the current user's or the current user owns the item.
-	if ($this->getOwnerRoleLevel($item) < auth()->user()->getRoleLevel() || $item->owned_by == auth()->user()->id) {
+	if ($this->getOwnerRoleLevel() < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id) {
 	    return true;
 	}
 
@@ -66,9 +66,9 @@ trait AccessLevel
      * @param Object  $item
      * @return integer
      */
-    public function getOwnerRoleLevel($item)
+    public function getOwnerRoleLevel()
     {
-	$owner = ($item->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($item->owned_by);
+	$owner = ($this->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($this->owned_by);
 
 	return $owner->getRoleLevel();
     }
@@ -78,10 +78,10 @@ trait AccessLevel
      *
      * @return boolean
      */
-    public function canChangeStatus($item)
+    public function canChangeStatus()
     {
         // Use the access level constraints.
-	return $this->canChangeAccessLevel($item);
+	return $this->canChangeAccessLevel();
     }
 }
 

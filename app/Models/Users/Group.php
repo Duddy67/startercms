@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Users\User;
 use App\Models\Blog\Post;
 use App\Models\Settings\General;
+use App\Traits\Admin\AccessLevel;
+
 
 class Group extends Model
 {
-    use HasFactory;
+    use HasFactory, AccessLevel;
 
     /**
      * The attributes that are mass assignable.

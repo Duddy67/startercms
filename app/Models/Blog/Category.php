@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Settings\General;
 use App\Models\Blog\Post;
 use Kalnoy\Nestedset\NodeTrait;
+use App\Traits\Admin\AccessLevel;
 
 
 class Category extends Model
 {
-    use HasFactory, NodeTrait;
+    use HasFactory, NodeTrait, AccessLevel;
 
     /**
      * The table associated with the model.

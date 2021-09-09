@@ -10,7 +10,6 @@ use App\Models\Users\User;
 use App\Models\Users\Group;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
-use App\Traits\Admin\AccessLevel;
 use App\Http\Requests\Blog\Post\StoreRequest;
 use App\Http\Requests\Blog\Post\UpdateRequest;
 use Illuminate\Support\Str;
@@ -18,7 +17,7 @@ use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
-    use ItemConfig, CheckInCheckOut, AccessLevel;
+    use ItemConfig, CheckInCheckOut;
 
     /*
      * Instance of the model.
@@ -99,7 +98,7 @@ class PostController extends Controller
 			->leftJoin('users as users2', 'posts.updated_by', '=', 'users2.id')
 			->findOrFail($id);
 
-	if (!$this->canAccess($post)) {
+	if (!$post->canAccess()) {
 	    return redirect()->route('admin.blog.posts.index')->with('error',  __('messages.generic.access_not_auth'));
 	}
 
@@ -111,14 +110,14 @@ class PostController extends Controller
 
         // Gather the needed data to build the form.
 	
-	$except = (auth()->user()->getRoleLevel() > $this->getOwnerRoleLevel($post) || $post->owned_by == auth()->user()->id) ? ['owner_name'] : ['owned_by'];
+	$except = (auth()->user()->getRoleLevel() > $post->getOwnerRoleLevel() || $post->owned_by == auth()->user()->id) ? ['owner_name'] : ['owned_by'];
 
 	if ($post->updated_by === null) {
 	    array_push($except, 'updated_by', 'updated_at');
 	}
 
         $fields = $this->getFields($post, $except);
-	$except = (!$this->canEdit($post)) ? ['destroy', 'save', 'saveClose'] : [];
+	$except = (!$post->canEdit()) ? ['destroy', 'save', 'saveClose'] : [];
         $actions = $this->getActions('form', $except);
 	// Add the id parameter to the query.
 	$query = array_merge($request->query(), ['post' => $id]);
@@ -151,7 +150,7 @@ class PostController extends Controller
      */
     public function update(UpdateRequest $request, Post $post)
     {
-	if (!$this->canEdit($post)) {
+	if (!$post->canEdit()) {
 	    return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id]))->with('error',  __('messages.generic.edit_not_auth'));
 	}
 
@@ -161,7 +160,7 @@ class PostController extends Controller
 	$post->updated_by = auth()->user()->id;
 
 	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
-	if (auth()->user()->getRoleLevel() > $this->getOwnerRoleLevel($post) || $post->owned_by == auth()->user()->id) {
+	if (auth()->user()->getRoleLevel() > $post->getOwnerRoleLevel() || $post->owned_by == auth()->user()->id) {
 	    $post->owned_by = $request->input('owned_by');
 	    $post->access_level = $request->input('access_level');
 	}
@@ -226,7 +225,7 @@ class PostController extends Controller
      */
     public function destroy(Request $request, Post $post)
     {
-	if (!$this->canDelete($post)) {
+	if (!$post->canDelete()) {
 	    return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id]))->with('error',  __('messages.generic.delete_not_auth'));
 	}
 
@@ -250,7 +249,7 @@ class PostController extends Controller
         foreach ($request->input('ids') as $id) {
 	    $post = Post::findOrFail($id);
 
-	    if (!$this->canDelete($post)) {
+	    if (!$post->canDelete()) {
 	      return redirect()->route('admin.blog.posts.index', $request->query())->with(
 		  [
 		      'error' => __('messages.generic.delete_not_auth'), 
@@ -292,7 +291,7 @@ class PostController extends Controller
         foreach ($request->input('ids') as $id) {
 	    $post = Post::findOrFail($id);
 
-	    if (!$this->canChangeStatus($post)) {
+	    if (!$post->canChangeStatus()) {
 	      return redirect()->route('admin.blog.posts.index', $request->query())->with(
 		  [
 		      'error' => __('messages.generic.mass_publish_not_auth'), 
@@ -323,7 +322,7 @@ class PostController extends Controller
         foreach ($request->input('ids') as $id) {
 	    $post = Post::findOrFail($id);
 
-	    if (!$this->canChangeStatus($post)) {
+	    if (!$post->canChangeStatus()) {
 	      return redirect()->route('admin.blog.posts.index', $request->query())->with(
 		  [
 		      'error' => __('messages.generic.mass_unpublish_not_auth'), 
