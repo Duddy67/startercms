@@ -165,6 +165,9 @@ trait ItemConfig
 		    // Common options.
 		    $options = General::$function();
 		}
+		elseif ($field->name == 'parent_id') {
+		    $options = ($item) ? $item->$function() : $this->model->$function();
+		}
 		else {
 		    $options = $this->model->$function();
 		}
@@ -195,8 +198,31 @@ trait ItemConfig
 		    $field = $this->setExtraAttributes($field, ['disabled']);
 		}
 
-		if (isset($item->access_level) && in_array($field->name, ['access_level', 'groups', 'categories']) && !$item->canChangeAccessLevel()) {
+		if (isset($item->access_level) && in_array($field->name, ['access_level', 'owned_by', 'groups', 'categories', 'parent_id']) && !$item->canChangeAccessLevel()) {
 		    $field = $this->setExtraAttributes($field, ['disabled']);
+		}
+
+		if (method_exists($item, 'isParentPrivate') && $item->access_level == 'private') { 
+		    // Check for parent or children private items then disable field(s) accordingly.
+		    if ((in_array($field->name, ['access_level', 'owned_by']) && $item->isParentPrivate()) || ($field->name == 'owned_by' && !$item->isParentPrivate())) {
+			$field = $this->setExtraAttributes($field, ['disabled']);
+		    }
+
+		    // Only the owner of the descendants private items can change their parents.
+		    if ($field->name == 'parent_id' && $item->isParentPrivate() && $item->owned_by != auth()->user()->id) {
+			$field = $this->setExtraAttributes($field, ['disabled']);
+		    }
+		}
+
+		if (method_exists($item, 'canDescendantsBePrivate') && $field->name == 'access_level' && $item->access_level != 'private' && !$item->canDescendantsBePrivate()) { 
+		    // Prevent the private option to be selected.
+                    foreach ($field->options as $key => $option) {
+		        if ($option['value'] == 'private') {
+			    $field->options[$key] = ['value' => 'private', 'text' => $option['text'], 'extra' => ['disabled']];
+			    break;
+			}
+		    }
+		    
 		}
 	    }
 

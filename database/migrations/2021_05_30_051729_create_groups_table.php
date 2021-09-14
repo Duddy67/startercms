@@ -18,7 +18,6 @@ class CreateGroupsTable extends Migration
             $table->string('name', 80);
             $table->tinyText('description')->nullable();
             $table->char('access_level', 10);
-            $table->tinyInteger('role_level')->nullable();
             $table->unsignedBigInteger('checked_out')->nullable();
             $table->timestamp('checked_out_time')->nullable();
             $table->unsignedBigInteger('owned_by');

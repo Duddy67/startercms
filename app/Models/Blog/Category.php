@@ -7,13 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Settings\General;
 use App\Models\Blog\Post;
 use Kalnoy\Nestedset\NodeTrait;
-use App\Traits\Admin\AccessLevel;
+//use App\Traits\Admin\AccessLevel;
+use App\Traits\Admin\TreeAccessLevel;
 use App\Traits\Admin\CheckInCheckOut;
 
 
 class Category extends Model
 {
-    use HasFactory, NodeTrait, AccessLevel, CheckInCheckOut;
+    use HasFactory, NodeTrait, TreeAccessLevel, CheckInCheckOut;
 
     /**
      * The table associated with the model.
@@ -84,10 +85,30 @@ class Category extends Model
     {
 	$nodes = Category::get()->toTree();
 	$options = [];
+	// Defines the state of the current instance.
+	$isNew = ($this->id) ? false : true;
 
-	$traverse = function ($categories, $prefix = '-') use (&$traverse, &$options) {
+	$traverse = function ($categories, $prefix = '-') use (&$traverse, &$options, $isNew) {
+
 	    foreach ($categories as $category) {
-		$options[] = ['value' => $category->id, 'text' => $prefix.' '.$category->name];
+//file_put_contents('debog_file.txt', print_r($this->slug.'('.$this->access_level.') : '.$category->slug.'('.$category->access_level.') - ', true), FILE_APPEND);
+	        if (!$isNew && $this->access_level != 'private') {
+		    // A non private category cannot be a private category's children.
+		    $extra = ($category->access_level == 'private') ? ['disabled'] : [];
+		}
+		elseif (!$isNew && $this->access_level == 'private' && $category->access_level == 'private') {
+		      // Only the category's owner can access it.
+		      $extra = ($category->owned_by == auth()->user()->id) ? [] : ['disabled'];
+		}
+		elseif ($isNew && $category->access_level == 'private') {
+		      // Only the category's owner can access it.
+		      $extra = ($category->owned_by == auth()->user()->id) ? [] : ['disabled'];
+		}
+		else {
+		    $extra = [];
+		}
+
+		$options[] = ['value' => $category->id, 'text' => $prefix.' '.$category->name, 'extra' => $extra];
 
 		$traverse($category->children, $prefix.'-');
 	    }

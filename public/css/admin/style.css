@@ -57,3 +57,11 @@ tr.clickable-row {
 .indent-3 {
   padding-left: 30px;
 }
+
+.indent-4 {
+  padding-left: 40px;
+}
+
+.indent-5 {
+  padding-left: 50px;
+}

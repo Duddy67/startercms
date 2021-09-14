@@ -72,6 +72,7 @@ return [
         'access_not_auth' => 'You are not authorised to access this resource.',
         'edit_not_auth' => 'You are not authorised to edit this resource.',
         'delete_not_auth' => 'You are not authorised to delete this resource.',
+        'ids_does_not_match' => 'The id of the user supposed to edit this item doesn\'t match with your id. Or may be you\'ve been checked in by an administrator.',
         'owner_not_valid' => 'The owner of the item is not valid.',
         'no_item_selected' => 'No item selected.',
         'mass_update_success' => ':number items successfully updated.',
@@ -83,5 +84,6 @@ return [
         'mass_publish_not_auth' => 'You are not authorised to publish some of the selected items.',
         'mass_unpublish_not_auth' => 'You are not authorised to unpublish some of the selected items.',
 	'must_not_be_descendant' => 'Node must not be a descendant.',
+        'item_is_private' => ':name item is private.',
     ]
 ];

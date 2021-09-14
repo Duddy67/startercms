@@ -33,7 +33,13 @@ class UpdateRequest extends FormRequest
 	    ],
         ];
 
-	if (auth()->user()->getRoleLevel() > $this->getOwnerRoleLevel($this->category) || $this->category->owned_by == auth()->user()->id) {
+	// It's a parent private category.
+	if ($this->category->access_level == 'private' && !$this->category->isParentPrivate() && $this->category->canChangeAccessLevel()) {
+	    // Only access level is settable.
+	    $rules['access_level'] = 'required';
+	}
+
+	if ($this->category->access_level != 'private' && $this->category->canChangeAccessLevel()) {
 	    $rules['access_level'] = 'required';
 	    $rules['owned_by'] = 'required';
 	}

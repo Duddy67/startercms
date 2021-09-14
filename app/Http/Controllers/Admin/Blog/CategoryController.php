@@ -150,20 +150,24 @@ class CategoryController extends Controller
      */
     public function update(UpdateRequest $request, Category $category)
     {
+	if ($category->checked_out != auth()->user()->id) {
+	    return redirect()->route('admin.blog.categories.index', $request->query())->with('error',  __('messages.generic.ids_does_not_match'));
+	}
+
 	if (!$category->canEdit()) {
-	    return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.edit_not_auth'));
+	    return redirect()->route('admin.blog.categories.index', $request->query())->with('error',  __('messages.generic.edit_not_auth'));
 	}
 
 	if ($request->input('parent_id')) {
-	    $node = Category::findOrFail($request->input('parent_id'));
+	    $parent = Category::findOrFail($request->input('parent_id'));
 
-	    // Check the selected parent is not a descendant.
-	    if ($category->id == $request->input('parent_id') || $node->isDescendantOf($category)) {
+	    // Check the selected parent is not the category itself or a descendant.
+	    if ($category->id == $request->input('parent_id') || $parent->isDescendantOf($category)) {
 		return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.must_not_be_descendant'));
 	    }
 
-	    if (!$node->canEdit()) {
-		return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.edit_not_auth'));
+	    if ($parent->access_level == 'private' && $parent->owned_by != auth()->user()->id) {
+		return redirect()->route('admin.blog.categories.create', $request->query())->with('error',  __('messages.generic.item_is_private', ['name' => $parent->name]));
 	    }
 	}
 
@@ -171,13 +175,36 @@ class CategoryController extends Controller
 	$category->slug = ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('name'), '-');
 	$category->description = $request->input('description');
 	$category->updated_by = auth()->user()->id;
-	// N.B The nested set model is updated automatically.
-	$category->parent_id = $request->input('parent_id');
 
-	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
-	if (auth()->user()->getRoleLevel() > $category->getOwnerRoleLevel() || $category->owned_by == auth()->user()->id) {
-	    $category->owned_by = $request->input('owned_by');
-	    $category->access_level = $request->input('access_level');
+	if ($category->canChangeAccessLevel()) {
+
+	    if ($category->access_level != 'private') {
+		// The access level has just been set to private. Check first for descendants.
+		if ($request->input('access_level') == 'private' && !$category->canDescendantsBePrivate()) {
+		    return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.descendants_cannot_be_private'));
+		}
+
+		if ($request->input('access_level') == 'private' && $category->anyDescendantCheckedOut()) {
+		    return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.descendants_checked_out'));
+		}
+
+		if ($request->input('access_level') == 'private') {
+		    $category->setDescendantAccessToPrivate();
+		}
+
+		$category->owned_by = $request->input('owned_by');
+	    }
+
+	    if ($category->access_level != 'private' || ($category->access_level == 'private' && !$category->isParentPrivate())) {
+		$category->access_level = $request->input('access_level');
+		// N.B: The nested set model is updated automatically.
+		$category->parent_id = $request->input('parent_id');
+	    }
+
+	    if ($category->access_level == 'private' && $category->isParentPrivate() && $category->owned_by == auth()->user()->id) {
+		// Only the owner of the descendants private items can change their parents.
+		$category->parent_id = $request->input('parent_id');
+	    }
 	}
 
 	$category->save();
@@ -199,6 +226,23 @@ class CategoryController extends Controller
      */
     public function store(StoreRequest $request)
     {
+        // Check first for parent id.
+	if ($request->input('parent_id')) {
+	    $parent = Category::findOrFail($request->input('parent_id'));
+
+	    if ($parent->access_level == 'private' && $parent->owned_by != auth()->user()->id) {
+		return redirect()->route('admin.blog.categories.create', $request->query())->with('error',  __('messages.generic.item_is_private', ['name' => $parent->name]));
+	    }
+
+	    if ($parent->access_level == 'private' && $request->input('access_level') != 'private') {
+		return redirect()->route('admin.blog.categories.create', $request->query())->with('error',  __('messages.generic.access_level_must_be_private'));
+	    }
+
+	    if ($parent->access_level == 'private' && $request->input('owned_by') != $parent->owned_by) {
+		return redirect()->route('admin.blog.categories.create', $request->query())->with('error',  __('messages.generic.owner_must_match_parent_category'));
+	    }
+	}
+
 	$category = Category::create([
 	    'name' => $request->input('name'), 
 	    'slug' => ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('name'), '-'),
@@ -208,8 +252,6 @@ class CategoryController extends Controller
 	    'owned_by' => $request->input('owned_by'),
 	    'parent_id' => (empty($request->input('parent_id'))) ? null : $request->input('parent_id'),
 	]);
-
-	$category->save();
 
         if ($category->parent_id) {
 	    $parent = Category::findOrFail($category->parent_id);
@@ -232,14 +274,14 @@ class CategoryController extends Controller
      */
     public function destroy(Request $request, Category $category)
     {
-	if (!$category->canDelete()) {
+	if (!$category->canDelete() || !$category->canDeleteDescendants()) {
 	    return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.delete_not_auth'));
 	}
 
 	$name = $category->name;
 
 	//$category->categories()->detach();
-	$category->delete();
+	//$category->delete();
 
 	return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.delete_success', ['name' => $name]));
     }
@@ -257,7 +299,7 @@ class CategoryController extends Controller
         foreach ($request->input('ids') as $id) {
 	    $category = Category::findOrFail($id);
 
-	    if (!$category->canDelete()) {
+	    if (!$category->canDelete() || !$category->canDeleteDescendants()) {
 	      return redirect()->route('admin.blog.categories.index', $request->query())->with(
 		  [
 		      'error' => __('messages.generic.delete_not_auth'), 
