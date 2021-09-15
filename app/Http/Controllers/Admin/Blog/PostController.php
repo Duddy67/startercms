@@ -150,6 +150,10 @@ class PostController extends Controller
      */
     public function update(UpdateRequest $request, Post $post)
     {
+	if ($post->checked_out != auth()->user()->id) {
+	    return redirect()->route('admin.blog.categories.index', $request->query())->with('error',  __('messages.generic.user_id_does_not_match'));
+	}
+
 	if (!$post->canEdit()) {
 	    return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id]))->with('error',  __('messages.generic.edit_not_auth'));
 	}
@@ -159,10 +163,13 @@ class PostController extends Controller
 	$post->content = $request->input('content');
 	$post->updated_by = auth()->user()->id;
 
-	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
-	if (auth()->user()->getRoleLevel() > $post->getOwnerRoleLevel() || $post->owned_by == auth()->user()->id) {
+	if ($post->canChangeAccessLevel()) {
 	    $post->owned_by = $request->input('owned_by');
 	    $post->access_level = $request->input('access_level');
+	}
+
+	if ($post->canChangeStatus()) {
+	    $post->status = $request->input('status');
 	}
 
 	$groups = array_merge($request->input('groups', []), Group::getPrivateGroups($post));
@@ -173,6 +180,16 @@ class PostController extends Controller
 	else {
 	    // Remove all groups for this post.
 	    $post->groups()->sync([]);
+	}
+
+	$categories = array_merge($request->input('categories', []), $post->getPrivateCategories());
+
+	if (!empty($categories)) {
+	    $post->categories()->sync($categories);
+	}
+	else {
+	    // Remove all categories for this post.
+	    $post->categories()->sync([]);
 	}
 
 	$post->save();

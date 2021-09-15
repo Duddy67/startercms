@@ -126,12 +126,12 @@ class Group extends Model
      */
     public static function getPrivateGroups($item)
     {
-      return $item->groups()->join('model_has_roles', 'groups.owned_by', '=', 'model_id')
-			    ->join('roles', 'roles.id', '=', 'role_id')
-	                    ->where([
-					['groups.access_level', '=', 'private'], 
-					['roles.role_level', '>=', auth()->user()->getRoleLevel()],
-					['groups.owned_by', '!=', auth()->user()->id]
-				    ])->pluck('groups.id')->toArray();
+	return $item->groups()->join('model_has_roles', 'groups.owned_by', '=', 'model_id')
+			      ->join('roles', 'roles.id', '=', 'role_id')
+			      ->where([
+					  ['groups.access_level', '=', 'private'], 
+					  ['roles.role_level', '>=', auth()->user()->getRoleLevel()],
+					  ['groups.owned_by', '!=', auth()->user()->id]
+				      ])->pluck('groups.id')->toArray();
     }
 }

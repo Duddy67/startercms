@@ -151,7 +151,7 @@ class CategoryController extends Controller
     public function update(UpdateRequest $request, Category $category)
     {
 	if ($category->checked_out != auth()->user()->id) {
-	    return redirect()->route('admin.blog.categories.index', $request->query())->with('error',  __('messages.generic.ids_does_not_match'));
+	    return redirect()->route('admin.blog.categories.index', $request->query())->with('error',  __('messages.generic.user_id_does_not_match'));
 	}
 
 	if (!$category->canEdit()) {

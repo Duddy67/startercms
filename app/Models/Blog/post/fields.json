@@ -22,13 +22,14 @@
     "options": [] 
   },
   {
-    "label": "labels.users.groups",
+    "label": "labels.title.categories",
     "type": "select",
-    "name": "groups",
+    "name": "categories",
     "extra": ["multiple"],
-    "id": "groups",
+    "id": "categories",
+    "class": "_locked",
     "blank": "labels.generic.select_option",
-    "options": [] 
+    "options": []
   },
   {
     "label": "labels.generic.access_level",
@@ -52,6 +53,16 @@
     "name": "owner_name",
     "id": "owner_name",
     "extra": ["disabled"]
+  },
+  {
+    "label": "labels.users.groups",
+    "type": "select",
+    "name": "groups",
+    "extra": ["multiple"],
+    "id": "groups",
+    "class": "_locked",
+    "blank": "labels.generic.select_option",
+    "options": [] 
   },
   {
     "label": "labels.generic.created_at",

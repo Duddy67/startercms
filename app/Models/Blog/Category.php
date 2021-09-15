@@ -91,7 +91,6 @@ class Category extends Model
 	$traverse = function ($categories, $prefix = '-') use (&$traverse, &$options, $isNew) {
 
 	    foreach ($categories as $category) {
-//file_put_contents('debog_file.txt', print_r($this->slug.'('.$this->access_level.') : '.$category->slug.'('.$category->access_level.') - ', true), FILE_APPEND);
 	        if (!$isNew && $this->access_level != 'private') {
 		    // A non private category cannot be a private category's children.
 		    $extra = ($category->access_level == 'private') ? ['disabled'] : [];

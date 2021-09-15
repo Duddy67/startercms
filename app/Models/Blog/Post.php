@@ -66,7 +66,7 @@ class Post extends Model
      */
     public function delete()
     {
-        //$this->categories()->detach();
+        $this->categories()->detach();
         $this->groups()->detach();
 
         parent::delete();
@@ -81,6 +81,8 @@ class Post extends Model
         $search = $request->input('search', null);
         $sortedBy = $request->input('sorted_by', null);
         $ownedBy = $request->input('owned_by', null);
+        $groups = $request->input('groups', []);
+        $categories = $request->input('categories', []);
 
 	$query = Post::query();
 	$query->select('posts.*', 'users.name as user_name')->leftJoin('users', 'posts.owned_by', '=', 'users.id');
@@ -98,6 +100,18 @@ class Post extends Model
 
 	if ($ownedBy !== null) {
 	    $query->whereIn('posts.owned_by', $ownedBy);
+	}
+
+	if (!empty($groups)) {
+	    $query->whereHas('groups', function($query) use($groups) {
+		$query->whereIn('id', $groups);
+	    });
+	}
+
+	if (!empty($categories)) {
+	    $query->whereHas('categories', function($query) use($categories) {
+		$query->whereIn('id', $categories);
+	    });
 	}
 
 	$query->where(function($query) {
@@ -136,7 +150,8 @@ class Post extends Model
 
 	$traverse = function ($categories, $prefix = '-') use (&$traverse, &$options) {
 	    foreach ($categories as $category) {
-		$options[] = ['value' => $category->id, 'text' => $prefix.' '.$category->name];
+		$extra = ($category->access_level == 'private' && $category->owned_by != auth()->user()->id) ? ['disabled'] : [];
+		$options[] = ['value' => $category->id, 'text' => $prefix.' '.$category->name, 'extra' => $extra];
 
 		$traverse($category->children, $prefix.'-');
 	    }
@@ -164,6 +179,18 @@ class Post extends Model
 	    return $this->groups->pluck('id')->toArray();
 	}
 
+        if ($fieldName == 'categories') {
+	    return $this->categories->pluck('id')->toArray();
+	}
+
 	return $this->{$fieldName};
+    }
+
+    public function getPrivateCategories()
+    {
+        return $this->categories()->where([
+					  ['blog_categories.access_level', '=', 'private'], 
+					  ['blog_categories.owned_by', '!=', auth()->user()->id]
+				      ])->pluck('blog_categories.id')->toArray();
     }
 }
