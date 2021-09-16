@@ -147,10 +147,12 @@ class Post extends Model
     {
 	$nodes = Category::get()->toTree();
 	$options = [];
+	$userGroupIds = auth()->user()->getGroupIds();
 
-	$traverse = function ($categories, $prefix = '-') use (&$traverse, &$options) {
+	$traverse = function ($categories, $prefix = '-') use (&$traverse, &$options, $userGroupIds) {
 	    foreach ($categories as $category) {
-		$extra = ($category->access_level == 'private' && $category->owned_by != auth()->user()->id) ? ['disabled'] : [];
+	        $isUserInGroup = (!empty(array_intersect($userGroupIds, $category->getGroupIds()))) ? true : false;
+		$extra = ($category->access_level == 'private' && $category->owned_by != auth()->user()->id && !$isUserInGroup) ? ['disabled'] : [];
 		$options[] = ['value' => $category->id, 'text' => $prefix.' '.$category->name, 'extra' => $extra];
 
 		$traverse($category->children, $prefix.'-');

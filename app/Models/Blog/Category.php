@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Settings\General;
 use App\Models\Blog\Post;
 use Kalnoy\Nestedset\NodeTrait;
-//use App\Traits\Admin\AccessLevel;
+use App\Models\Users\Group;
 use App\Traits\Admin\TreeAccessLevel;
 use App\Traits\Admin\CheckInCheckOut;
 
@@ -56,6 +56,24 @@ class Category extends Model
     public function posts()
     {
         return $this->belongsToMany(Post::class);
+    }
+
+    /**
+     * The groups that belong to the category.
+     */
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'blog_category_group');
+    }
+
+    /**
+     * The group ids the category is in.
+     *
+     * @return array
+     */
+    public function getGroupIds()
+    {
+        return $this->groups()->pluck('groups.id')->toArray();
     }
 
     /*
@@ -135,6 +153,10 @@ class Category extends Model
      */
     public function getSelectedValue($fieldName)
     {
+        if ($fieldName == 'groups') {
+	    return $this->groups->pluck('id')->toArray();
+	}
+
 	return $this->{$fieldName};
     }
 }

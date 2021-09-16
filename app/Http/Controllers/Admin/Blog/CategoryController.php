@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\Blog\Category;
 use App\Models\Users\User;
+use App\Models\Users\Group;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
 use App\Http\Requests\Blog\Category\StoreRequest;
@@ -205,6 +206,17 @@ class CategoryController extends Controller
 		// Only the owner of the descendants private items can change their parents.
 		$category->parent_id = $request->input('parent_id');
 	    }
+	}
+
+
+	$groups = array_merge($request->input('groups', []), Group::getPrivateGroups($category));
+
+	if (!empty($groups)) {
+	    $category->groups()->sync($groups);
+	}
+	else {
+	    // Remove all groups for this post.
+	    $category->groups()->sync([]);
 	}
 
 	$category->save();

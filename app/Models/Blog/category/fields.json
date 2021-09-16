@@ -53,6 +53,16 @@
     "extra": ["disabled"]
   },
   {
+    "label": "labels.users.groups",
+    "type": "select",
+    "name": "groups",
+    "extra": ["multiple"],
+    "id": "groups",
+    "class": "_locked",
+    "blank": "labels.generic.select_option",
+    "options": [] 
+  },
+  {
     "label": "labels.generic.created_at",
     "type": "date",
     "name": "created_at",
