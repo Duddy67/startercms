@@ -40,6 +40,7 @@
     "name": "groups",
     "extra": ["multiple"],
     "id": "groups",
+    "class": "_locked",
     "blank": "labels.generic.select_option",
     "options": [] 
   },

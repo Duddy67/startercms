@@ -63,3 +63,4 @@
     <script type="text/javascript" src="{{ url('/') }}/js/admin/disable.toolbars.js"></script>
     <script type="text/javascript" src="{{ url('/') }}/js/select2.locked.options.js"></script>
 @endpush
+
