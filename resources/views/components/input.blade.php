@@ -8,6 +8,7 @@
 @php $name = (isset($field->name)) ? $field->name : null @endphp
 @php $name = ($name && isset($field->group)) ? $field->group.'['.$name.']' : $name @endphp
 @php $multiple = (isset($field->extra) && in_array('multiple', $field->extra)) ? 'multiple' : '' @endphp
+@php $titleAsId = (isset($field->extra) && in_array('title_as_id', $field->extra)) ? true : false @endphp
 @php $multi = ($multiple) ? '[]' : '' @endphp
 @php
     $dataset = ''; 
@@ -19,7 +20,7 @@
 @endphp
 
 @if ($field->type == 'text' || $field->type == 'password' || $field->type == 'date' || $field->type == 'file')
-    <input  id="{{ $field->id }}" {{ $disabled }} {{ $multiple }} 
+    <input  id="{{ $field->id }}" {{ $disabled }} 
 
     @if ($field->type == 'date')
 	type="text" class="form-control date {{ $class }}"
@@ -28,7 +29,7 @@
     @endif
 
     @if ($name)
-	name="{{ $name.$multi }}"
+	name="{{ $name }}"
     @endif
 
     @if (isset($field->placeholder))
@@ -64,7 +65,13 @@
 
 	    @php $disabled = (isset($option['extra']) && in_array('disabled', $option['extra'])) ? 'disabled=disabled locked=locked' : '' @endphp
 
-	    <option value="{{ $option['value'] }}" {{ $disabled }} {{ $selected }}>{{ $option['text'] }}</option>
+	    <option
+	    @if ($titleAsId)
+		title="{{ $field->id }}-{{ $option['value'] }}"
+	    @endif
+
+	    value="{{ $option['value'] }}" {{ $disabled }} {{ $selected }}>{{ $option['text'] }}</option>
+
         @endforeach
     </select> 
 @elseif ($field->type == 'checkbox')
@@ -111,6 +118,8 @@
     @endif
     >{{ $value }}</textarea>
     
+@elseif ($field->type == 'hidden')
+    <input type="hidden" name="{{ $name }}" id="{{ $field->id }}" value="{{ $value }}"> 
 @endif
 
 @if ($name)

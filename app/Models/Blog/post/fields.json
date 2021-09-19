@@ -25,11 +25,16 @@
     "label": "labels.title.categories",
     "type": "select",
     "name": "categories",
-    "extra": ["multiple"],
+    "extra": ["multiple","title_as_id"],
     "id": "categories",
     "class": "_locked",
     "blank": "labels.generic.select_option",
     "options": []
+  },
+  {
+    "type": "hidden",
+    "name": "main_cat_id",
+    "id": "main-cat-id"
   },
   {
     "label": "labels.generic.access_level",

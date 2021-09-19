@@ -162,6 +162,7 @@ class PostController extends Controller
 	$post->slug = ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('title'), '-');
 	$post->content = $request->input('content');
 	$post->updated_by = auth()->user()->id;
+	$post->main_cat_id = $request->input('main_cat_id');
 
 	if ($post->canChangeAccessLevel()) {
 	    $post->owned_by = $request->input('owned_by');
@@ -218,6 +219,7 @@ class PostController extends Controller
 	  'content' => $request->input('content'), 
 	  'access_level' => $request->input('access_level'), 
 	  'owned_by' => $request->input('owned_by'),
+	  'main_cat_id' => $request->input('main_cat_id'),
 	]);
 
 	if ($request->input('groups') !== null) {

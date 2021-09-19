@@ -25,6 +25,7 @@ class Post extends Model
         'slug',
         'status',
         'owned_by',
+        'main_cat_id',
         'content',
         'access_level',
     ];
@@ -151,8 +152,10 @@ class Post extends Model
 
 	$traverse = function ($categories, $prefix = '-') use (&$traverse, &$options, $userGroupIds) {
 	    foreach ($categories as $category) {
-	        $isUserInGroup = (!empty(array_intersect($userGroupIds, $category->getGroupIds()))) ? true : false;
-		$extra = ($category->access_level == 'private' && $category->owned_by != auth()->user()->id && !$isUserInGroup) ? ['disabled'] : [];
+	        // Check wether the current user groups match the category groups (if any).
+	        $belongsToGroups = (!empty(array_intersect($userGroupIds, $category->getGroupIds()))) ? true : false;
+		// Set the category option accordingly.
+		$extra = ($category->access_level == 'private' && $category->owned_by != auth()->user()->id && !$belongsToGroups) ? ['disabled'] : [];
 		$options[] = ['value' => $category->id, 'text' => $prefix.' '.$category->name, 'extra' => $extra];
 
 		$traverse($category->children, $prefix.'-');
