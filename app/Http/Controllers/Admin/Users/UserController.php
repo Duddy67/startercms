@@ -384,7 +384,18 @@ class UserController extends Controller
 		}
 
 	        if ($column->name == 'groups') {
-		    $groups = $user->groups()->pluck('name')->toArray();
+		    $groups = [];
+
+	            $user->groups()->each(function ($group, $key) use(&$groups) {
+		        //
+                        if ($group->access_level == 'private' && $group->owned_by != auth()->user()->id && auth()->user()->getRoleLevel() <= $group->getOwnerRoleLevel()) {
+			    // continue
+			    return; 
+			} 
+
+			$groups[] = $group->name;
+		    });
+
 		    $groups = (!empty($groups)) ? implode(',', $groups) : '-';
 		    $rows[$key]->groups = $groups;
 		}

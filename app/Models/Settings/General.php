@@ -115,15 +115,14 @@ class General extends Model
 	$options = [];
 
 	foreach ($groups as $group) {
-	    $extra = [];
 	    $owner = ($group->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($group->owned_by);
 
 	    // Ensure the current user can use this group.
 	    if ($group->access_level == 'private' && $owner->getRoleLevel() >= auth()->user()->getRoleLevel() && $group->owned_by != auth()->user()->id) {
-	        $extra = ['disabled'];
+		continue;
 	    }
 
-	    $options[] = ['value' => $group->id, 'text' => $group->name, 'extra' => $extra];
+	    $options[] = ['value' => $group->id, 'text' => $group->name];
 	}
 
 	return $options;

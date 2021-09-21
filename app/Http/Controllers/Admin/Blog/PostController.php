@@ -162,35 +162,36 @@ class PostController extends Controller
 	$post->slug = ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('title'), '-');
 	$post->content = $request->input('content');
 	$post->updated_by = auth()->user()->id;
-	$post->main_cat_id = $request->input('main_cat_id');
 
 	if ($post->canChangeAccessLevel()) {
 	    $post->owned_by = $request->input('owned_by');
 	    $post->access_level = $request->input('access_level');
+
+	    $groups = array_merge($request->input('groups', []), Group::getPrivateGroups($post));
+
+	    if (!empty($groups)) {
+		$post->groups()->sync($groups);
+	    }
+	    else {
+		// Remove all groups for this post.
+		$post->groups()->sync([]);
+	    }
+
+	    $categories = array_merge($request->input('categories', []), $post->getPrivateCategories());
+
+	    if (!empty($categories)) {
+		$post->categories()->sync($categories);
+	    }
+	    else {
+		// Remove all categories for this post.
+		$post->categories()->sync([]);
+	    }
+
+	    $post->main_cat_id = $request->input('main_cat_id');
 	}
 
 	if ($post->canChangeStatus()) {
 	    $post->status = $request->input('status');
-	}
-
-	$groups = array_merge($request->input('groups', []), Group::getPrivateGroups($post));
-
-	if (!empty($groups)) {
-	    $post->groups()->sync($groups);
-	}
-	else {
-	    // Remove all groups for this post.
-	    $post->groups()->sync([]);
-	}
-
-	$categories = array_merge($request->input('categories', []), $post->getPrivateCategories());
-
-	if (!empty($categories)) {
-	    $post->categories()->sync($categories);
-	}
-	else {
-	    // Remove all categories for this post.
-	    $post->categories()->sync([]);
 	}
 
 	$post->save();

@@ -29,13 +29,13 @@ class UpdateRequest extends FormRequest
     {
         $rules = [
 	    'title' => 'required',
-	    'status' => 'required',
 	    'content' => 'required',
         ];
 
-	if (auth()->user()->getRoleLevel() > $this->post->getOwnerRoleLevel() || $this->post->owned_by == auth()->user()->id) {
+	if ($this->post->canChangeAccessLevel()) {
 	    $rules['access_level'] = 'required';
 	    $rules['owned_by'] = 'required';
+	    $rules['status'] = 'required';
 	}
 
 	return $rules;
