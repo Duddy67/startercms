@@ -343,6 +343,8 @@ class CategoryController extends Controller
 
     public function massPublish(Request $request)
     {
+        $changed = 0;
+
         foreach ($request->input('ids') as $id) {
 	    $category = Category::findOrFail($id);
 	    // Cannot published a category if its parent is unpublished.
@@ -350,16 +352,29 @@ class CategoryController extends Controller
 	        continue;
 	    }
 
+	    if (!$category->canChangeStatus()) {
+	      $messages = ['error' => __('messages.generic.change_status_not_auth')];
+
+	      if ($changed) {
+		  $messages['success'] = __('messages.categories.change_status_list_success', ['number' => $changed]);
+	      }
+
+	      return redirect()->route('admin.blog.categories.index', $request->query())->with($messages);
+	    }
+
 	    $category->status = 'published';
 	    $category->save();
+
+	    $changed++;
 	}
 
-	return redirect()->route('admin.blog.categories.index', $request->query());
+	return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.change_status_list_success', ['number' => $changed]));
     }
 
     public function massUnpublish(Request $request)
     {
         $treated = [];
+        $changed = 0;
 
         foreach ($request->input('ids') as $id) {
 	    //
@@ -369,8 +384,20 @@ class CategoryController extends Controller
 
 	    $category = Category::findOrFail($id);
 
+	    if (!$category->canChangeStatus()) {
+	      $messages = ['error' => __('messages.generic.change_status_not_auth')];
+
+	      if ($changed) {
+		  $messages['success'] = __('messages.categories.change_status_list_success', ['number' => $changed]);
+	      }
+
+	      return redirect()->route('admin.blog.categories.index', $request->query())->with($messages);
+	    }
+
 	    $category->status = 'unpublished';
 	    $category->save();
+
+	    $changed++;
 
 	    // All the descendants must be unpublished as well.
 	    foreach ($category->descendants as $descendant) {
@@ -381,7 +408,7 @@ class CategoryController extends Controller
 	    }
 	}
 
-	return redirect()->route('admin.blog.categories.index', $request->query());
+	return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.change_status_list_success', ['number' => $changed]));
     }
 
     /**

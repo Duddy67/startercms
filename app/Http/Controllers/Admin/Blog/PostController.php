@@ -167,6 +167,7 @@ class PostController extends Controller
 	    $post->owned_by = $request->input('owned_by');
 	    $post->access_level = $request->input('access_level');
 
+	    // N.B: Get also the private groups (if any) that are not returned by the form (as they're not available).
 	    $groups = array_merge($request->input('groups', []), Group::getPrivateGroups($post));
 
 	    if (!empty($groups)) {
@@ -177,6 +178,7 @@ class PostController extends Controller
 		$post->groups()->sync([]);
 	    }
 
+	    // N.B: Get also the private categories (if any) that are not returned by the form (as they're disabled).
 	    $categories = array_merge($request->input('categories', []), $post->getPrivateCategories());
 
 	    if (!empty($categories)) {

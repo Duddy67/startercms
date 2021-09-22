@@ -7,6 +7,8 @@
 	  $.fn.refreshMainCategoryBox();
       }
 
+      $.fn.setLockedCategories();
+
       // The main category can't be selected if the dropdown list is disabled.
       if ($('#categories').attr('disabled') === undefined) {
 
@@ -29,6 +31,7 @@
 		  $.fn.selectAsMainCategory($(this).select2('data')[0].id);
 	      }
 
+	      $.fn.setLockedCategories();
 	      $.fn.refreshMainCategoryBox();
 	      // Prevents the dropdown from opening.
 	      e.params.originalEvent.stopPropagation();
@@ -45,6 +48,7 @@
 		  return;
 	      }
 
+	      $.fn.setLockedCategories();
 	      $.fn.refreshMainCategoryBox();
 	  });
 
@@ -95,6 +99,23 @@
 		$(this).css('background-color', '#aedef4');
 	    }
       });
+  }
+
+  $.fn.setLockedCategories = function() {
+      // Get the selected options.
+      let categories = $('#categories').select2('data');
+
+      for (let i = 0; i < categories.length; i++) {
+	  // The options that are selected and disabled cannot be unselected (ie: removed).
+	  if (categories[i].disabled) {
+	      $('#categories').next('span').find('ul li').each(function() {
+		  if ($(this).attr('title') !== undefined && $(this).attr('title') == categories[i].title) {
+		      // Add the 'locked-tag' class to be able to style element in select.
+		      $(this).addClass('locked-tag');
+		  }
+	      });
+	  }
+      }
   }
 
 })(jQuery);
