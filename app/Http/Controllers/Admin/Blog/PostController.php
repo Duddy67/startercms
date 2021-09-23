@@ -164,9 +164,12 @@ class PostController extends Controller
 	$post->updated_by = auth()->user()->id;
 
 	if ($post->canChangeAccessLevel()) {
-	    $post->owned_by = $request->input('owned_by');
 	    $post->access_level = $request->input('access_level');
+	}
 
+	if ($post->canChangeAttachments()) {
+
+	    $post->owned_by = $request->input('owned_by');
 	    // N.B: Get also the private groups (if any) that are not returned by the form (as they're not available).
 	    $groups = array_merge($request->input('groups', []), Group::getPrivateGroups($post));
 

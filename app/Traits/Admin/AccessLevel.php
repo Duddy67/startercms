@@ -83,5 +83,17 @@ trait AccessLevel
         // Use the access level constraints.
 	return $this->canChangeAccessLevel();
     }
+
+    /*
+     * Checks whether the current user is allowed to change the owner,
+     * groups, categories or parent category of a given item.
+     *
+     * @return boolean
+     */
+    public function canChangeAttachments()
+    {
+        // Use the access level constraints.
+	return $this->canChangeAccessLevel();
+    }
 }
 

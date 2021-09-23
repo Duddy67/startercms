@@ -177,6 +177,23 @@ class CategoryController extends Controller
 	$category->description = $request->input('description');
 	$category->updated_by = auth()->user()->id;
 
+	if ($category->canChangeAttachments()) {
+
+	    if ($category->access_level != 'private') {
+		$category->owned_by = $request->input('owned_by');
+	    }
+
+	    $groups = array_merge($request->input('groups', []), Group::getPrivateGroups($category));
+
+	    if (!empty($groups)) {
+		$category->groups()->sync($groups);
+	    }
+	    else {
+		// Remove all groups for this post.
+		$category->groups()->sync([]);
+	    }
+	}
+
 	if ($category->canChangeAccessLevel()) {
 
 	    if ($category->access_level != 'private') {
@@ -192,8 +209,6 @@ class CategoryController extends Controller
 		if ($request->input('access_level') == 'private') {
 		    $category->setDescendantAccessToPrivate();
 		}
-
-		$category->owned_by = $request->input('owned_by');
 	    }
 
 	    if ($category->access_level != 'private' || ($category->access_level == 'private' && !$category->isParentPrivate())) {
@@ -206,17 +221,6 @@ class CategoryController extends Controller
 		// Only the owner of the descendants private items can change their parents.
 		$category->parent_id = $request->input('parent_id');
 	    }
-	}
-
-
-	$groups = array_merge($request->input('groups', []), Group::getPrivateGroups($category));
-
-	if (!empty($groups)) {
-	    $category->groups()->sync($groups);
-	}
-	else {
-	    // Remove all groups for this post.
-	    $category->groups()->sync([]);
 	}
 
 	$category->save();
