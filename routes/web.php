@@ -14,8 +14,12 @@ use App\Http\Controllers\Admin\Users\GroupController;
 use App\Http\Controllers\Admin\Settings\GeneralController;
 use App\Http\Controllers\Admin\Settings\EmailController;
 use App\Http\Controllers\Cms\DocumentController;
-use App\Http\Controllers\Admin\Blog\PostController;
-use App\Http\Controllers\Admin\Blog\CategoryController as BlogCategoryController;
+use App\Http\Controllers\Admin\Blog\PostController as AdminPostController;
+use App\Http\Controllers\Admin\Blog\CategoryController as AdminBlogCategoryController;
+use App\Http\Controllers\Blog\PostController;
+use App\Http\Controllers\Blog\CategoryController as BlogCategoryController;
+use App\Http\Controllers\Admin\Menus\MenuController;
+use App\Http\Controllers\Admin\Menus\MenuItemController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +35,8 @@ use App\Http\Controllers\Admin\Blog\CategoryController as BlogCategoryController
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/post/{slug}/{id}', [PostController::class, 'show'])->name('blog.post');
 
 Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -85,21 +91,28 @@ Route::prefix('admin')->group(function () {
 
 	Route::prefix('blog')->group(function () {
 	    // Posts
-	    Route::delete('/posts', [PostController::class, 'massDestroy'])->name('admin.blog.posts.massDestroy');
-	    Route::get('/posts/cancel/{post?}', [PostController::class, 'cancel'])->name('admin.blog.posts.cancel');
-	    Route::put('/posts/checkin', [PostController::class, 'massCheckIn'])->name('admin.blog.posts.massCheckIn');
-	    Route::put('/posts/publish', [PostController::class, 'massPublish'])->name('admin.blog.posts.massPublish');
-	    Route::put('/posts/unpublish', [PostController::class, 'massUnpublish'])->name('admin.blog.posts.massUnpublish');
-	    Route::resource('posts', PostController::class, ['as' => 'admin.blog'])->except(['show']);
+	    Route::delete('/posts', [AdminPostController::class, 'massDestroy'])->name('admin.blog.posts.massDestroy');
+	    Route::get('/posts/cancel/{post?}', [AdminPostController::class, 'cancel'])->name('admin.blog.posts.cancel');
+	    Route::put('/posts/checkin', [AdminPostController::class, 'massCheckIn'])->name('admin.blog.posts.massCheckIn');
+	    Route::put('/posts/publish', [AdminPostController::class, 'massPublish'])->name('admin.blog.posts.massPublish');
+	    Route::put('/posts/unpublish', [AdminPostController::class, 'massUnpublish'])->name('admin.blog.posts.massUnpublish');
+	    Route::resource('posts', AdminPostController::class, ['as' => 'admin.blog'])->except(['show']);
 	    // Categories
-	    Route::delete('/categories', [BlogCategoryController::class, 'massDestroy'])->name('admin.blog.categories.massDestroy');
-	    Route::get('/categories/cancel/{category?}', [BlogCategoryController::class, 'cancel'])->name('admin.blog.categories.cancel');
-	    Route::put('/categories/checkin', [BlogCategoryController::class, 'massCheckIn'])->name('admin.blog.categories.massCheckIn');
-	    Route::put('/categories/publish', [BlogCategoryController::class, 'massPublish'])->name('admin.blog.categories.massPublish');
-	    Route::put('/categories/unpublish', [BlogCategoryController::class, 'massUnpublish'])->name('admin.blog.categories.massUnpublish');
-	    Route::get('/categories/up/{category}', [BlogCategoryController::class, 'up'])->name('admin.blog.categories.up');
-	    Route::get('/categories/down/{category}', [BlogCategoryController::class, 'down'])->name('admin.blog.categories.down');
-	    Route::resource('categories', BlogCategoryController::class, ['as' => 'admin.blog'])->except(['show']);
+	    Route::delete('/categories', [AdminBlogCategoryController::class, 'massDestroy'])->name('admin.blog.categories.massDestroy');
+	    Route::get('/categories/cancel/{category?}', [AdminBlogCategoryController::class, 'cancel'])->name('admin.blog.categories.cancel');
+	    Route::put('/categories/checkin', [AdminBlogCategoryController::class, 'massCheckIn'])->name('admin.blog.categories.massCheckIn');
+	    Route::put('/categories/publish', [AdminBlogCategoryController::class, 'massPublish'])->name('admin.blog.categories.massPublish');
+	    Route::put('/categories/unpublish', [AdminBlogCategoryController::class, 'massUnpublish'])->name('admin.blog.categories.massUnpublish');
+	    Route::get('/categories/up/{category}', [AdminBlogCategoryController::class, 'up'])->name('admin.blog.categories.up');
+	    Route::get('/categories/down/{category}', [AdminBlogCategoryController::class, 'down'])->name('admin.blog.categories.down');
+	    Route::resource('categories', AdminBlogCategoryController::class, ['as' => 'admin.blog'])->except(['show']);
+	});
+
+	Route::prefix('menus')->group(function () {
+	    // Menus 
+	    Route::resource('menus', MenuController::class, ['as' => 'admin.menus'])->except(['show']);
+	    // Menu Items
+	    Route::resource('menuitems', MenuController::class, ['as' => 'admin.menus'])->except(['show']);
 	});
 
 	Route::prefix('settings')->group(function () {

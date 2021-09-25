@@ -15,6 +15,7 @@ return [
 	'blog' => 'Blog',
 	'posts' => 'Posts',
 	'categories' => 'Categories',
+	'menus' => 'Menus',
     ],
     'users' => [
 	'email' => 'Email',

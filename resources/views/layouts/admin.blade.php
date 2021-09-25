@@ -153,6 +153,23 @@ scratch. This page gets rid of all links and provides the needed markup only.
 	      </li>
 	  @endallowto
 
+	  @allowto ('create-menu')
+	      @php $open = (request()->is('admin/menus*')) ? 'menu-open' : '' @endphp
+	      <li class="nav-item {{ $open }}">
+		  @php $active = (request()->is('admin/menus*')) ? 'active' : '' @endphp
+		  <a href="#" class="nav-link {{ $active }}">
+		    <i class="nav-icon fas fa-bars"></i>
+		    <p>@lang ('labels.title.menus')<i class="right fas fa-angle-left"></i></p>
+		  </a>
+		  <ul class="nav nav-treeview">
+			  @php $active = (request()->is('admin/menus/types*')) ? true : false @endphp
+			  <x-menu-item href="{{ route('admin.menus.menus.index') }}" :sub=true :active="$active">
+			    @lang ('labels.title.menus')
+			  </x-menu-item>
+		  </ul>
+	      </li>
+	  @endallowto
+
 	  @allowtoany (['global-settings', 'blog-settings', 'update-email'])
 	      @php $open = (request()->is('admin/settings*')) ? 'menu-open' : '' @endphp
 	      <li class="nav-item {{ $open }}">

@@ -49,6 +49,23 @@
 	"optional": "admin"
       }
   ],
+  "menus": [
+      {
+	"name": "create-menu",
+	"type": "level1",
+	"roles": "admin"
+      },
+      {
+	"name": "update-menu",
+	"type": "level1",
+	"roles": "admin"
+      },
+      {
+	"name": "delete-menu",
+	"type": "level1",
+	"roles": "admin"
+      }
+  ],
   "blog": [
       {
 	"name": "create-post",
