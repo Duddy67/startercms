@@ -110,9 +110,21 @@ Route::prefix('admin')->group(function () {
 
 	Route::prefix('menus')->group(function () {
 	    // Menus 
+	    Route::delete('/menus', [MenuController::class, 'massDestroy'])->name('admin.menus.menus.massDestroy');
+	    Route::get('/menus/cancel/{menu?}', [MenuController::class, 'cancel'])->name('admin.menus.menus.cancel');
+	    Route::put('/menus/checkin', [MenuController::class, 'massCheckIn'])->name('admin.menus.menus.massCheckIn');
+	    Route::put('/menus/publish', [MenuController::class, 'massPublish'])->name('admin.menus.menus.massPublish');
+	    Route::put('/menus/unpublish', [MenuController::class, 'massUnpublish'])->name('admin.menus.menus.massUnpublish');
 	    Route::resource('menus', MenuController::class, ['as' => 'admin.menus'])->except(['show']);
 	    // Menu Items
-	    Route::resource('menuitems', MenuController::class, ['as' => 'admin.menus'])->except(['show']);
+	    Route::get('/menuitems/{code}', [MenuItemController::class, 'index'])->name('admin.menus.menuitems.index');
+	    Route::get('/menuitems/create/{code}', [MenuItemController::class, 'create'])->name('admin.menus.menuitems.create');
+	    Route::delete('/menuitems', [MenuItemController::class, 'massDestroy'])->name('admin.menus.menuitems.massDestroy');
+	    Route::get('/menuitems/cancel/{menuItem?}', [MenuItemController::class, 'cancel'])->name('admin.menus.menuitems.cancel');
+	    Route::put('/menuitems/checkin', [MenuItemController::class, 'massCheckIn'])->name('admin.menus.menuitems.massCheckIn');
+	    Route::put('/menuitems/publish', [MenuItemController::class, 'massPublish'])->name('admin.menus.menuitems.massPublish');
+	    Route::put('/menuitems/unpublish', [MenuItemController::class, 'massUnpublish'])->name('admin.menus.menuitems.massUnpublish');
+	    Route::resource('menuitems', MenuItemController::class, ['as' => 'admin.menus'])->except(['show', 'index', 'create']);
 	});
 
 	Route::prefix('settings')->group(function () {

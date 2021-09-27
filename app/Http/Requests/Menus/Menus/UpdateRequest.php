@@ -13,7 +13,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,8 +23,22 @@ class UpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            //
+        $rules = [
+	    'title' => 'required',
         ];
+
+	if ($this->menu->canChangeAccessLevel()) {
+	    $rules['access_level'] = 'required';
+	}
+
+	if ($this->menu->canChangeStatus()) {
+	    $rules['status'] = 'required';
+	}
+
+	if ($this->menu->canChangeAttachments()) {
+	    $rules['owned_by'] = 'required';
+	}
+
+	return $rules;
     }
 }

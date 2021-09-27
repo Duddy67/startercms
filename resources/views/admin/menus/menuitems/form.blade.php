@@ -1,28 +1,28 @@
 @extends ('layouts.admin')
 
 @section ('main')
-    <h3>@php echo (isset($category)) ? __('labels.categories.edit_category') : __('labels.categories.create_category'); @endphp</h3>
+    <h3>@php echo (isset($menuItem)) ? __('labels.menuitems.edit_menu_item') : __('labels.menuitems.create_menu_item'); @endphp</h3>
 
-    @php $action = (isset($category)) ? route('admin.blog.categories.update', $query) : route('admin.blog.categories.store', $query) @endphp
+    @php $action = (isset($menuItem)) ? route('admin.menus.menuitems.update', $query) : route('admin.menus.menuitems.store', $query) @endphp
     <form method="post" action="{{ $action }}" id="itemForm">
         @csrf
 
-	@if (isset($category))
+	@if (isset($menuItem))
 	    @method('put')
 	@endif
 
         @foreach ($fields as $field)
-	    @php $value = (isset($category)) ? old($field->name, $field->value) : old($field->name); @endphp
+	    @php $value = (isset($menuItem)) ? old($field->name, $field->value) : old($field->name); @endphp
 	    <x-input :field="$field" :value="$value" />
         @endforeach
 
-	<input type="hidden" id="cancelEdit" value="{{ route('admin.blog.categories.cancel', $query) }}">
+	<input type="hidden" id="cancelEdit" value="{{ route('admin.menus.menuitems.cancel', $query) }}">
 	<input type="hidden" id="close" name="_close" value="0">
     </form>
     <x-toolbar :items=$actions />
 
-    @if (isset($category))
-	<form id="deleteItem" action="{{ route('admin.blog.categories.destroy', $query) }}" method="post">
+    @if (isset($menuItem))
+	<form id="deleteItem" action="{{ route('admin.menus.menuitems.destroy', $query) }}" method="post">
 	    @method('delete')
 	    @csrf
 	</form>

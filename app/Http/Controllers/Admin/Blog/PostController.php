@@ -151,7 +151,7 @@ class PostController extends Controller
     public function update(UpdateRequest $request, Post $post)
     {
 	if ($post->checked_out != auth()->user()->id) {
-	    return redirect()->route('admin.blog.categories.index', $request->query())->with('error',  __('messages.generic.user_id_does_not_match'));
+	    return redirect()->route('admin.blog.posts.index', $request->query())->with('error',  __('messages.generic.user_id_does_not_match'));
 	}
 
 	if (!$post->canEdit()) {

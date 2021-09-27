@@ -17,6 +17,7 @@ class CreateMenuItemsTable extends Migration
             $table->id();
             $table->string('title', 80);
             $table->string('menu_code', 30);
+            $table->string('url');
             $table->char('status', 12);
             $table->char('access_level', 10);
 	    $table->nestedSet();

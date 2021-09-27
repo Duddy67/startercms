@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Admin\Blog;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use App\Models\Blog\Category;
-use App\Models\Users\User;
 use App\Models\Users\Group;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;

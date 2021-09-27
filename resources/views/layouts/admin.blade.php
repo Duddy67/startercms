@@ -162,10 +162,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		    <p>@lang ('labels.title.menus')<i class="right fas fa-angle-left"></i></p>
 		  </a>
 		  <ul class="nav nav-treeview">
-			  @php $active = (request()->is('admin/menus/types*')) ? true : false @endphp
+			  @php $active = (request()->is('admin/menus/menus*')) ? true : false @endphp
 			  <x-menu-item href="{{ route('admin.menus.menus.index') }}" :sub=true :active="$active">
 			    @lang ('labels.title.menus')
 			  </x-menu-item>
+                          @foreach (\App\Models\Menus\Menu::getMenus() as $menu)
+			      @php $active = (request()->is('admin/menus/menuitems/'.$menu->code.'*')) ? true : false @endphp
+			      <x-menu-item href="{{ route('admin.menus.menuitems.index', $menu->code) }}" :sub=true :active="$active">
+				 {{ $menu->title }}
+			      </x-menu-item>
+			  @endforeach
 		  </ul>
 	      </li>
 	  @endallowto

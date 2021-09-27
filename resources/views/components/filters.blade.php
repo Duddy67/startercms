@@ -1,4 +1,4 @@
-<form id="item-filters" action="{{ route($url['route'].'.index') }}" method="get">
+<form id="item-filters" action="{{ route($url['route'].'.index', $url['query']) }}" method="get">
     <div class="row">
         @php $total = count($filters) @endphp
 	@foreach ($filters as $key => $filter)

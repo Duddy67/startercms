@@ -1,28 +1,28 @@
 @extends ('layouts.admin')
 
 @section ('main')
-    <h3>@php echo (isset($post)) ? __('labels.posts.edit_post') : __('labels.posts.create_post'); @endphp</h3>
+    <h3>@php echo (isset($menu)) ? __('labels.menus.edit_menu') : __('labels.menus.create_menu'); @endphp</h3>
 
-    @php $action = (isset($post)) ? route('admin.blog.posts.update', $query) : route('admin.blog.posts.store', $query) @endphp
+    @php $action = (isset($menu)) ? route('admin.menus.menus.update', $query) : route('admin.menus.menus.store', $query) @endphp
     <form method="post" action="{{ $action }}" id="itemForm">
         @csrf
 
-	@if (isset($post))
+	@if (isset($menu))
 	    @method('put')
 	@endif
 
         @foreach ($fields as $field)
-	    @php $value = (isset($post)) ? old($field->name, $field->value) : old($field->name); @endphp
+	    @php $value = (isset($menu)) ? old($field->name, $field->value) : old($field->name); @endphp
 	    <x-input :field="$field" :value="$value" />
         @endforeach
 
-	<input type="hidden" id="cancelEdit" value="{{ route('admin.blog.posts.cancel', $query) }}">
+	<input type="hidden" id="cancelEdit" value="{{ route('admin.menus.menus.cancel', $query) }}">
 	<input type="hidden" id="close" name="_close" value="0">
     </form>
     <x-toolbar :items=$actions />
 
-    @if (isset($post))
-	<form id="deleteItem" action="{{ route('admin.blog.posts.destroy', $query) }}" method="post">
+    @if (isset($menu))
+	<form id="deleteItem" action="{{ route('admin.menus.menus.destroy', $query) }}" method="post">
 	    @method('delete')
 	    @csrf
 	</form>
@@ -35,7 +35,5 @@
     <link rel="stylesheet" href="{{ url('/') }}/vendor/adminlte/plugins/jquery-ui/jquery-ui.min.css"></script>
     <script type="text/javascript" src="{{ url('/') }}/js/admin/datepicker.js"></script>
     <script type="text/javascript" src="{{ url('/') }}/js/admin/form.js"></script>
-    <script type="text/javascript" src="{{ url('/') }}/js/admin/posts/set.main.category.js"></script>
     <script type="text/javascript" src="{{ url('/') }}/js/admin/disable.toolbars.js"></script>
-    <script type="text/javascript" src="{{ url('/') }}/js/tinymce/filemanager.js"></script>
 @endpush

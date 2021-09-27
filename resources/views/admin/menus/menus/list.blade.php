@@ -1,7 +1,7 @@
 @extends ('layouts.admin')
 
 @section ('header')
-    <p class="h3">Posts</p>
+    <h3>@php echo __('labels.title.menus'); @endphp</h3>
 @endsection
 
 @section ('main')
@@ -27,13 +27,13 @@
 
     <x-pagination :items=$items />
 
-    <input type="hidden" id="createItem" value="{{ route('admin.blog.posts.create', $query) }}">
-    <input type="hidden" id="destroyItems" value="{{ route('admin.blog.posts.index', $query) }}">
-    <input type="hidden" id="checkinItems" value="{{ route('admin.blog.posts.massCheckIn', $query) }}">
-    <input type="hidden" id="publishItems" value="{{ route('admin.blog.posts.massPublish', $query) }}">
-    <input type="hidden" id="unpublishItems" value="{{ route('admin.blog.posts.massUnpublish', $query) }}">
+    <input type="hidden" id="createItem" value="{{ route('admin.menus.menus.create', $query) }}">
+    <input type="hidden" id="destroyItems" value="{{ route('admin.menus.menus.index', $query) }}">
+    <input type="hidden" id="checkinItems" value="{{ route('admin.menus.menus.massCheckIn', $query) }}">
+    <input type="hidden" id="publishItems" value="{{ route('admin.menus.menus.massPublish', $query) }}">
+    <input type="hidden" id="unpublishItems" value="{{ route('admin.menus.menus.massUnpublish', $query) }}">
 
-    <form id="selectedItems" action="{{ route('admin.blog.posts.index', $query) }}" method="post">
+    <form id="selectedItems" action="{{ route('admin.menus.menus.index', $query) }}" method="post">
 	@method('delete')
 	@csrf
     </form>

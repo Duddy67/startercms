@@ -1,7 +1,7 @@
 @extends ('layouts.admin')
 
 @section ('header')
-    <p class="h3">Categories</p>
+    <p class="h3">Menu items</p>
 @endsection
 
 @section ('main')
@@ -25,13 +25,13 @@
 	</div>
     @endif
 
-    <input type="hidden" id="createItem" value="{{ route('admin.blog.categories.create', $query) }}">
-    <input type="hidden" id="destroyItems" value="{{ route('admin.blog.categories.index', $query) }}">
-    <input type="hidden" id="checkinItems" value="{{ route('admin.blog.categories.massCheckIn', $query) }}">
-    <input type="hidden" id="publishItems" value="{{ route('admin.blog.categories.massPublish', $query) }}">
-    <input type="hidden" id="unpublishItems" value="{{ route('admin.blog.categories.massUnpublish', $query) }}">
+    <input type="hidden" id="createItem" value="{{ route('admin.menus.menuitems.create', $query) }}">
+    <input type="hidden" id="destroyItems" value="{{ route('admin.menus.menuitems.index', $query) }}">
+    <input type="hidden" id="checkinItems" value="{{ route('admin.menus.menuitems.massCheckIn', $query) }}">
+    <input type="hidden" id="publishItems" value="{{ route('admin.menus.menuitems.massPublish', $query) }}">
+    <input type="hidden" id="unpublishItems" value="{{ route('admin.menus.menuitems.massUnpublish', $query) }}">
 
-    <form id="selectedItems" action="{{ route('admin.blog.categories.index', $query) }}" method="post">
+    <form id="selectedItems" action="{{ route('admin.menus.menuitems.index', $query) }}" method="post">
 	@method('delete')
 	@csrf
     </form>

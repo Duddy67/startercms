@@ -34,8 +34,14 @@ class UpdateRequest extends FormRequest
 
 	if ($this->post->canChangeAccessLevel()) {
 	    $rules['access_level'] = 'required';
-	    $rules['owned_by'] = 'required';
+	}
+
+	if ($this->post->canChangeStatus()) {
 	    $rules['status'] = 'required';
+	}
+
+	if ($this->post->canChangeAttachments()) {
+	    $rules['owned_by'] = 'required';
 	}
 
 	return $rules;

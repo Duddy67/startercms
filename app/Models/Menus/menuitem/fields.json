@@ -1,20 +1,20 @@
 [
   {
-    "label": "labels.generic.name",
+    "label": "labels.generic.title",
     "type": "text",
-    "name": "name",
-    "id": "name",
-    "placeholder": "labels.generic.name"
+    "name": "title",
+    "id": "title",
+    "placeholder": "labels.generic.title"
   },
   {
-    "label": "labels.generic.slug",
+    "label": "labels.menuitems.url",
     "type": "text",
-    "name": "slug",
-    "id": "slug",
-    "placeholder": "labels.generic.slug"
+    "name": "url",
+    "id": "url",
+    "placeholder": "labels.menuitems.url"
   },
   {
-    "label": "labels.categories.parent_category",
+    "label": "labels.menuitems.parent_item",
     "type": "select",
     "name": "parent_id",
     "id": "parent_id",
@@ -80,11 +80,5 @@
     "type": "date",
     "name": "updated_at",
     "id": "updated_at"
-  },
-  {
-    "label": "labels.generic.description",
-    "type": "textarea",
-    "name": "description",
-    "id": "description"
   }
 ]

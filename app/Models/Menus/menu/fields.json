@@ -7,11 +7,11 @@
     "placeholder": "labels.generic.title"
   },
   {
-    "label": "labels.posts.slug",
+    "label": "labels.generic.code",
     "type": "text",
-    "name": "slug",
-    "id": "slug",
-    "placeholder": "labels.posts.slug"
+    "name": "code",
+    "id": "code",
+    "placeholder": "labels.generic.code"
   },
   {
     "label": "labels.generic.status",
@@ -20,21 +20,6 @@
     "id": "status",
     "blank": "labels.generic.select_option",
     "options": [] 
-  },
-  {
-    "label": "labels.title.categories",
-    "type": "select",
-    "name": "categories",
-    "extra": ["multiple","title_as_id"],
-    "id": "categories",
-    "class": "_locked",
-    "blank": "labels.generic.select_option",
-    "options": []
-  },
-  {
-    "type": "hidden",
-    "name": "main_cat_id",
-    "id": "main-cat-id"
   },
   {
     "label": "labels.generic.access_level",
@@ -87,11 +72,5 @@
     "type": "date",
     "name": "updated_at",
     "id": "updated_at"
-  },
-  {
-    "label": "labels.posts.content",
-    "type": "textarea",
-    "name": "content",
-    "id": "texteditor"
   }
 ]

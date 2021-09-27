@@ -1,7 +1,7 @@
 @extends ('layouts.admin')
 
 @section ('header')
-    <p class="h3">User groups</p>
+    <h3>@php echo __('labels.title.groups'); @endphp</h3>
 @endsection
 
 @section ('main')

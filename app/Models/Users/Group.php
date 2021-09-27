@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Users\User;
 use App\Models\Blog\Post;
 use App\Models\Blog\Category;
+use App\Models\Menus\Menu;
 use App\Models\Settings\General;
 use App\Traits\Admin\AccessLevel;
 use App\Traits\Admin\CheckInCheckOut;
@@ -61,6 +62,14 @@ class Group extends Model
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'blog_category_group');
+    }
+
+    /**
+     * The menus that belong to the group.
+     */
+    public function menus()
+    {
+        return $this->belongsToMany(Menu::class);
     }
 
     /*
