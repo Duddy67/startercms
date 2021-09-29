@@ -18,7 +18,6 @@
     "type": "select",
     "name": "parent_id",
     "id": "parent_id",
-    "blank": "labels.generic.none",
     "options": [] 
   },
   {

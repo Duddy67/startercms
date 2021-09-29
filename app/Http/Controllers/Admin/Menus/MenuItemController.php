@@ -8,8 +8,8 @@ use App\Models\Menus\MenuItem;
 use App\Models\Users\Group;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
-use App\Http\Requests\Menus\MenuItem\StoreRequest;
-use App\Http\Requests\Menus\MenuItem\UpdateRequest;
+use App\Http\Requests\Menus\MenuItems\StoreRequest;
+use App\Http\Requests\Menus\MenuItems\UpdateRequest;
 use Illuminate\Support\Str;
 
 class MenuItemController extends Controller
@@ -57,12 +57,12 @@ class MenuItemController extends Controller
         $columns = $this->getColumns();
         $actions = $this->getActions('list');
         $filters = $this->getFilters($request);
-	$items = $this->model->getItems($request);
+	$items = $this->model->getItems($request, $code);
 	$rows = $this->getRowTree($columns, $items);
 	$query = $request->query();
 	$query['code'] = $code;
 
-	$url = ['route' => 'admin.menus.menuitems', 'item_name' => 'menuitem', 'query' => $query];
+	$url = ['route' => 'admin.menus.menuitems', 'item_name' => 'menuItem', 'query' => $query];
 
         return view('admin.menus.menuitems.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
     }
@@ -80,7 +80,7 @@ class MenuItemController extends Controller
 
         $fields = $this->getFields(null, ['updated_by', 'created_at', 'updated_at', 'owner_name']);
         $actions = $this->getActions('form', ['destroy']);
-	$query = $request->query();
+	$query = array_merge($request->query(), ['code' => $code]);
 
         return view('admin.menus.menuitems.form', compact('fields', 'actions', 'query'));
     }
@@ -92,7 +92,7 @@ class MenuItemController extends Controller
      * @param  int  $id
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function edit(Request $request, $id)
+    public function edit(Request $request, $code, $id)
     {
         $menuItem = MenuItem::select('menu_items.*', 'users.name as owner_name', 'users2.name as modifier_name')
 			      ->leftJoin('users', 'menu_items.owned_by', '=', 'users.id')
@@ -122,7 +122,7 @@ class MenuItemController extends Controller
 	$except = (!$menuItem->canEdit()) ? ['destroy', 'save', 'saveClose'] : [];
         $actions = $this->getActions('form', $except);
 	// Add the id parameter to the query.
-	$query = array_merge($request->query(), ['menuitem' => $id]);
+	$query = array_merge($request->query(), ['code' => $code, 'menuItem' => $id]);
 
         return view('admin.menus.menuitems.form', compact('menuItem', 'fields', 'actions', 'query'));
     }
@@ -134,13 +134,13 @@ class MenuItemController extends Controller
      * @param  \App\Models\Menus\MenuItem $menuItem (optional)
      * @return Response
      */
-    public function cancel(Request $request, MenuItem $menuItem = null)
+    public function cancel(Request $request, $code, MenuItem $menuItem = null)
     {
         if ($menuItem) {
 	    $menuItem->checkIn();
 	}
 
-	return redirect()->route('admin.menus.menuitems.index', $request->query());
+	return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]));
     }
 
     /**
@@ -150,7 +150,7 @@ class MenuItemController extends Controller
      * @param  \App\Models\Menus\MenuItem  $menuItem
      * @return Response
      */
-    public function update(UpdateRequest $request, MenuItem $menuItem)
+    public function update(UpdateRequest $request, $code, MenuItem $menuItem)
     {
 	if ($menuItem->checked_out != auth()->user()->id) {
 	    return redirect()->route('admin.menus.menuitems.index', $request->query())->with('error',  __('messages.generic.user_id_does_not_match'));
@@ -240,8 +240,10 @@ class MenuItemController extends Controller
      * @param  \App\Http\Requests\Menus\MenuItem\StoreRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreRequest $request)
+    public function store(StoreRequest $request, $code)
     {
+//echo $code;
+//return;
         // Check first for parent id.
 	if ($request->input('parent_id')) {
 	    $parent = MenuItem::findOrFail($request->input('parent_id'));
@@ -273,11 +275,14 @@ class MenuItemController extends Controller
 	    $parent->appendNode($menuItem);
 	}
 
+	$menuItem->menu_code = $code;
+	$menuItem->save();
+
         if ($request->input('_close', null)) {
 	    return redirect()->route('admin.menus.menuitems.index', $request->query())->with('success', __('messages.menuitems.create_success'));
 	}
 
-	return redirect()->route('admin.menus.menuitems.edit', array_merge($request->query(), ['menuitem' => $menuItem->id]))->with('success', __('messages.menuitems.create_success'));
+	return redirect()->route('admin.menus.menuitems.edit', array_merge($request->query(), ['code' => $code, 'menuItem' => $menuItem->id]))->with('success', __('messages.menuitems.create_success'));
     }
 
     /**
@@ -287,7 +292,7 @@ class MenuItemController extends Controller
      * @param  \App\Models\Menus\MenuItem $menuItem
      * @return Response
      */
-    public function destroy(Request $request, MenuItem $menuItem)
+    public function destroy(Request $request, $code, MenuItem $menuItem)
     {
 	if (!$menuItem->canDelete() || !$menuItem->canDeleteDescendants()) {
 	    return redirect()->route('admin.menus.menuitems.edit', array_merge($request->query(), ['menuitem' => $menuItem->id]))->with('error',  __('messages.generic.delete_not_auth'));
@@ -307,7 +312,7 @@ class MenuItemController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return Response
      */
-    public function massDestroy(Request $request)
+    public function massDestroy(Request $request, $code)
     {
         $deleted = 0;
         // Remove the menu items selected from the list.
@@ -337,14 +342,14 @@ class MenuItemController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return Response
      */
-    public function massCheckIn(Request $request)
+    public function massCheckIn(Request $request, $code)
     {
         $messages = CheckInCheckOut::checkInMultiple($request->input('ids'), '\\App\\Models\\Menus\\MenuItem');
 
-	return redirect()->route('admin.menus.menuitems.index', $request->query())->with($messages);
+	return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with($messages);
     }
 
-    public function massPublish(Request $request)
+    public function massPublish(Request $request, $code)
     {
         $changed = 0;
 
@@ -362,7 +367,7 @@ class MenuItemController extends Controller
 		  $messages['success'] = __('messages.menuitems.change_status_list_success', ['number' => $changed]);
 	      }
 
-	      return redirect()->route('admin.menus.menuitems.index', $request->query())->with($messages);
+	      return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with($messages);
 	    }
 
 	    $menuItem->status = 'published';
@@ -371,10 +376,10 @@ class MenuItemController extends Controller
 	    $changed++;
 	}
 
-	return redirect()->route('admin.menus.menuitems.index', $request->query())->with('success', __('messages.menuitems.change_status_list_success', ['number' => $changed]));
+	return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with('success', __('messages.menuitems.change_status_list_success', ['number' => $changed]));
     }
 
-    public function massUnpublish(Request $request)
+    public function massUnpublish(Request $request, $code)
     {
         $treated = [];
         $changed = 0;
@@ -394,7 +399,7 @@ class MenuItemController extends Controller
 		  $messages['success'] = __('messages.menuitems.change_status_list_success', ['number' => $changed]);
 	      }
 
-	      return redirect()->route('admin.menus.menuitems.index', $request->query())->with($messages);
+	      return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with($messages);
 	    }
 
 	    $menuItem->status = 'unpublished';
@@ -411,7 +416,7 @@ class MenuItemController extends Controller
 	    }
 	}
 
-	return redirect()->route('admin.menus.menuitems.index', $request->query())->with('success', __('messages.menuitems.change_status_list_success', ['number' => $changed]));
+	return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with('success', __('messages.menuitems.change_status_list_success', ['number' => $changed]));
     }
 
     /**
@@ -421,10 +426,10 @@ class MenuItemController extends Controller
      * @param  \App\Models\Menus\MenuItem $menuItem
      * @return Response
      */
-    public function up(Request $request, MenuItem $menuItem)
+    public function up(Request $request, $code, MenuItem $menuItem)
     {
 	$menuItem->up();
-	return redirect()->route('admin.menus.menuitems.index', $request->query());
+	return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]));
     }
 
     /**
@@ -434,10 +439,10 @@ class MenuItemController extends Controller
      * @param  \App\Models\Menus\MenuItem $menuItem
      * @return Response
      */
-    public function down(Request $request, MenuItem $menuItem)
+    public function down(Request $request, $code, MenuItem $menuItem)
     {
 	$menuItem->down();
-	return redirect()->route('admin.menus.menuitems.index', $request->query());
+	return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]));
     }
 
     /*

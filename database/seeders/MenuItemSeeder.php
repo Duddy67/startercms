@@ -16,8 +16,8 @@ class MenuItemSeeder extends Seeder
     {
         // Creates the root item which is the parent of all of the menu items. 
         $node = new MenuItem;
-	$node->title = 'Root item';
-	$node->menu_code = 'root-item';
+	$node->title = 'Root';
+	$node->menu_code = 'root';
 	$node->url = 'root';
 	$node->status = 'published';
 	$node->access_level = 'public_ro';

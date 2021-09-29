@@ -77,7 +77,7 @@ class MenuItem extends Model
     /*
      * Gets the menu items as a tree.
      */
-    public function getItems($request)
+    public function getItems($request, $code)
     {
         $search = $request->input('search', null);
 
@@ -85,7 +85,8 @@ class MenuItem extends Model
 	    return MenuItem::where('title', 'like', '%'.$search.'%')->get();
 	}
 	else {
-	    return MenuItem::select('menu_items.*', 'users.name as user_name')->leftJoin('users', 'menu_items.owned_by', '=', 'users.id')->defaultOrder()->get()->toTree();
+	  return MenuItem::select('menu_items.*', 'users.name as user_name')->leftJoin('users', 'menu_items.owned_by', '=', 'users.id')
+								            ->where('menu_code', $code)->defaultOrder()->get()->toTree();
 	}
     }
 
@@ -123,7 +124,7 @@ class MenuItem extends Model
 		    $extra = [];
 		}
 
-		$options[] = ['value' => $menuItem->id, 'text' => $prefix.' '.$menuItem->name, 'extra' => $extra];
+		$options[] = ['value' => $menuItem->id, 'text' => $prefix.' '.$menuItem->title, 'extra' => $extra];
 
 		$traverse($menuItem->children, $prefix.'-');
 	    }

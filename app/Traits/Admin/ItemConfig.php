@@ -110,19 +110,22 @@ trait ItemConfig
 		elseif ($column->name == 'status') {
 		    $row->status = __('labels.generic.'.$item->status);
 		}
-		elseif ($column->name == 'name' && !empty($prefix)) {
-		    $row->name = $prefix.' '.$item->name;
+		elseif (in_array($column->name, ['name', 'title']) && !empty($prefix)) {
+		    $attributeName = ($column->name == 'name') ? 'name' : 'title';
+		    $row->$attributeName = $prefix.' '.$item->$attributeName;
 		}
 		// Sets the ordering links according to the position of the item/node.
 		elseif ($column->name == 'ordering') {
 		    $ordering = [];
+		    // A menu code variable is required for the menu item routes.
+		    $query = ($this->modelName == 'menuitem') ? ['code' => $item->menu_code, 'menuItem' => $item->id] : [$this->modelName => $item->id];
 
 		    if ($item->getPrevSibling()) { 
-		        $ordering['up'] = route('admin.'.$this->pluginName.'.'.Str::plural($this->modelName).'.up', $item->id);
+		        $ordering['up'] = route('admin.'.$this->pluginName.'.'.Str::plural($this->modelName).'.up', $query);
 		    }
 
 		    if ($item->getNextSibling()) { 
-		        $ordering['down'] = route('admin.'.$this->pluginName.'.'.Str::plural($this->modelName).'.down', $item->id);
+		        $ordering['down'] = route('admin.'.$this->pluginName.'.'.Str::plural($this->modelName).'.down', $query);
 		    }
 
 		    $row->ordering = $ordering;
