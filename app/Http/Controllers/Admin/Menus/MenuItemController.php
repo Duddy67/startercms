@@ -147,6 +147,7 @@ class MenuItemController extends Controller
      * Update the specified menu item.
      *
      * @param  \App\Http\Requests\Menus\MenuItem\UpdateRequest  $request
+     * @param  string  $code
      * @param  \App\Models\Menus\MenuItem  $menuItem
      * @return Response
      */
@@ -160,17 +161,17 @@ class MenuItemController extends Controller
 	    return redirect()->route('admin.menus.menuitems.index', $request->query())->with('error',  __('messages.generic.edit_not_auth'));
 	}
 
-	if ($request->input('parent_id')) {
-	    $parent = MenuItem::findOrFail($request->input('parent_id'));
+	$query = array_merge($request->query(), ['code' => $code, 'menuItem' => $menuItem->id]);
 
-	    // Check the selected parent is not the menu item itself or a descendant.
-	    if ($menuItem->id == $request->input('parent_id') || $parent->isDescendantOf($menuItem)) {
-		return redirect()->route('admin.menus.menuitems.edit', array_merge($request->query(), ['menuitem' => $menuItem->id]))->with('error',  __('messages.generic.must_not_be_descendant'));
-	    }
+	$parent = MenuItem::findOrFail($request->input('parent_id'));
 
-	    if ($parent->access_level == 'private' && $parent->owned_by != auth()->user()->id) {
-		return redirect()->route('admin.menus.menuitems.create', $request->query())->with('error',  __('messages.generic.item_is_private', ['name' => $parent->name]));
-	    }
+	// Check the selected parent is not the menu item itself or a descendant.
+	if ($menuItem->id == $request->input('parent_id') || $parent->isDescendantOf($menuItem)) {
+	    return redirect()->route('admin.menus.menuitems.edit', $query)->with('error',  __('messages.generic.must_not_be_descendant'));
+	}
+
+	if ($parent->access_level == 'private' && $parent->owned_by != auth()->user()->id) {
+	    return redirect()->route('admin.menus.menuitems.edit', $query)->with('error',  __('messages.generic.item_is_private', ['name' => $parent->name]));
 	}
 
 	$menuItem->title = $request->input('title');
@@ -199,11 +200,11 @@ class MenuItemController extends Controller
 	    if ($menuItem->access_level != 'private') {
 		// The access level has just been set to private. Check first for descendants.
 		if ($request->input('access_level') == 'private' && !$menuItem->canDescendantsBePrivate()) {
-		    return redirect()->route('admin.menus.menuitems.edit', array_merge($request->query(), ['menuitem' => $menuItem->id]))->with('error',  __('messages.generic.descendants_cannot_be_private'));
+		    return redirect()->route('admin.menus.menuitems.edit', $query)->with('error',  __('messages.generic.descendants_cannot_be_private'));
 		}
 
 		if ($request->input('access_level') == 'private' && $menuItem->anyDescendantCheckedOut()) {
-		    return redirect()->route('admin.menus.menuitems.edit', array_merge($request->query(), ['menuitem' => $menuItem->id]))->with('error',  __('messages.generic.descendants_checked_out'));
+		    return redirect()->route('admin.menus.menuitems.edit', $query)->with('error',  __('messages.generic.descendants_checked_out'));
 		}
 
 		if ($request->input('access_level') == 'private') {
@@ -228,37 +229,34 @@ class MenuItemController extends Controller
         if ($request->input('_close', null)) {
 	    $menuItem->checkIn();
 	    // Redirect to the list.
-	    return redirect()->route('admin.menus.menuitems.index', $request->query())->with('success', __('messages.menuitems.update_success'));
+	    return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with('success', __('messages.menuitems.update_success'));
 	}
 
-	return redirect()->route('admin.menus.menuitems.edit', array_merge($request->query(), ['menuitem' => $menuItem->id]))->with('success', __('messages.menuitems.update_success'));
+	return redirect()->route('admin.menus.menuitems.edit', $query)->with('success', __('messages.menuitems.update_success'));
     }
 
     /**
      * Store a new menu item.
      *
      * @param  \App\Http\Requests\Menus\MenuItem\StoreRequest  $request
+     * @param  string  $code
      * @return \Illuminate\Http\Response
      */
     public function store(StoreRequest $request, $code)
     {
-//echo $code;
-//return;
-        // Check first for parent id.
-	if ($request->input('parent_id')) {
-	    $parent = MenuItem::findOrFail($request->input('parent_id'));
+        // Check first for parent id. (N.B: menu items cannot be null as they have a root parent id by default).
+	$parent = MenuItem::findOrFail($request->input('parent_id'));
 
-	    if ($parent->access_level == 'private' && $parent->owned_by != auth()->user()->id) {
-		return redirect()->route('admin.menus.menuitems.create', $request->query())->with('error',  __('messages.generic.item_is_private', ['name' => $parent->name]));
-	    }
+	if ($parent->access_level == 'private' && $parent->owned_by != auth()->user()->id) {
+	    return redirect()->route('admin.menus.menuitems.create', array_merge($request->query(), ['code' => $code]))->with('error',  __('messages.generic.item_is_private', ['name' => $parent->name]));
+	}
 
-	    if ($parent->access_level == 'private' && $request->input('access_level') != 'private') {
-		return redirect()->route('admin.menus.menuitems.create', $request->query())->with('error',  __('messages.generic.access_level_must_be_private'));
-	    }
+	if ($parent->access_level == 'private' && $request->input('access_level') != 'private') {
+	    return redirect()->route('admin.menus.menuitems.create', array_merge($request->query(), ['code' => $code]))->with('error',  __('messages.generic.access_level_must_be_private'));
+	}
 
-	    if ($parent->access_level == 'private' && $request->input('owned_by') != $parent->owned_by) {
-		return redirect()->route('admin.menus.menuitems.create', $request->query())->with('error',  __('messages.generic.owner_must_match_parent_menu_item'));
-	    }
+	if ($parent->access_level == 'private' && $request->input('owned_by') != $parent->owned_by) {
+	    return redirect()->route('admin.menus.menuitems.create', array_merge($request->query(), ['code' => $code]))->with('error',  __('messages.generic.owner_must_match_parent_menu_item'));
 	}
 
 	$menuItem = MenuItem::create([
@@ -270,16 +268,14 @@ class MenuItemController extends Controller
 	    'parent_id' => (empty($request->input('parent_id'))) ? null : $request->input('parent_id'),
 	]);
 
-        if ($menuItem->parent_id) {
-	    $parent = MenuItem::findOrFail($menuItem->parent_id);
-	    $parent->appendNode($menuItem);
-	}
+	$parent = MenuItem::findOrFail($menuItem->parent_id);
+	$parent->appendNode($menuItem);
 
 	$menuItem->menu_code = $code;
 	$menuItem->save();
 
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.menus.menuitems.index', $request->query())->with('success', __('messages.menuitems.create_success'));
+	    return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with('success', __('messages.menuitems.create_success'));
 	}
 
 	return redirect()->route('admin.menus.menuitems.edit', array_merge($request->query(), ['code' => $code, 'menuItem' => $menuItem->id]))->with('success', __('messages.menuitems.create_success'));
@@ -289,13 +285,14 @@ class MenuItemController extends Controller
      * Remove the specified menu item from storage.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  string  $code
      * @param  \App\Models\Menus\MenuItem $menuItem
      * @return Response
      */
     public function destroy(Request $request, $code, MenuItem $menuItem)
     {
 	if (!$menuItem->canDelete() || !$menuItem->canDeleteDescendants()) {
-	    return redirect()->route('admin.menus.menuitems.edit', array_merge($request->query(), ['menuitem' => $menuItem->id]))->with('error',  __('messages.generic.delete_not_auth'));
+	    return redirect()->route('admin.menus.menuitems.edit', array_merge($request->query(), ['code' => $code, 'menuItem' => $menuItem->id]))->with('error',  __('messages.generic.delete_not_auth'));
 	}
 
 	$name = $menuItem->name;
@@ -303,13 +300,14 @@ class MenuItemController extends Controller
 	//$menuItem->menuitems()->detach();
 	//$menuItem->delete();
 
-	return redirect()->route('admin.menus.menuitems.index', $request->query())->with('success', __('messages.menuitems.delete_success', ['name' => $name]));
+	return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with('success', __('messages.menuitems.delete_success', ['name' => $name]));
     }
 
     /**
      * Removes one or more menu items from storage.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  string  $code
      * @return Response
      */
     public function massDestroy(Request $request, $code)
@@ -320,7 +318,7 @@ class MenuItemController extends Controller
 	    $menuItem = MenuItem::findOrFail($id);
 
 	    if (!$menuItem->canDelete() || !$menuItem->canDeleteDescendants()) {
-	      return redirect()->route('admin.menus.menuitems.index', $request->query())->with(
+	      return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with(
 		  [
 		      'error' => __('messages.generic.delete_not_auth'), 
 		      'success' => __('messages.menuitems.delete_list_success', ['number' => $deleted])
@@ -333,13 +331,14 @@ class MenuItemController extends Controller
 	    $deleted++;
 	}
 
-	return redirect()->route('admin.menus.menuitems.index', $request->query())->with('success', __('messages.menuitems.delete_list_success', ['number' => $deleted]));
+	return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with('success', __('messages.menuitems.delete_list_success', ['number' => $deleted]));
     }
 
     /**
      * Checks in one or more menu items.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  string  $code
      * @return Response
      */
     public function massCheckIn(Request $request, $code)

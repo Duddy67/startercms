@@ -39,11 +39,11 @@
 			    @endif
 			</td>
 		    @else
-			@php $indent = ($column->name == 'name' && preg_match('#^(-{1,}) #', $row->name, $matches)) ? strlen($matches[1]) : 0; @endphp
+			@php $indent = (in_array($column->name, ['name', 'title']) && preg_match('#^(-{1,}) #', $row->{$column->name}, $matches)) ? strlen($matches[1]) : 0; @endphp
 			<td>
 			    @php echo (in_array($column->name, ['name', 'title', 'code'])) ? '<a href="'.route($url['route'].'.edit', $query).'">' : ''; @endphp
 			    <span class="indent-{{ $indent }}"></span>{{ $row->{$column->name} }}
-			    @php echo (in_array($column->name, ['name', 'title'])) ? '</a>' : ''; @endphp
+			    @php echo (in_array($column->name, ['name', 'title', 'code'])) ? '</a>' : ''; @endphp
 			</td>
 		    @endif
 		@endforeach

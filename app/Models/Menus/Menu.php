@@ -5,6 +5,7 @@ namespace App\Models\Menus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Users\Group;
+use App\Models\Menus\MenuItem;
 use App\Models\Settings\General;
 use App\Traits\Admin\AccessLevel;
 use App\Traits\Admin\CheckInCheckOut;
@@ -111,6 +112,67 @@ class Menu extends Model
 	}
 
         return $query->paginate($perPage);
+    }
+
+    public function loop($menuItems, $item, $node)
+    {
+	foreach ($menuItems as $key => $menuItem) {
+	    if ($menuItem->id == $node->parent_id) {
+		$menuItems[$key]->children[] = $item;
+	    }
+	    elseif (!empty($menuItems[$key]->children)) {
+	        $this->loop($menuItems[$key]->children, $item, $node);
+	    }
+	}
+
+        return $menuItems;
+    }
+
+    public function getMenuItems()
+    {
+	$nodes = MenuItem::where('menu_code', $this->code)->get()->toTree();
+	$menuItems = [];
+
+	$traverse = function ($nodes, $level = 0) use (&$traverse, &$menuItems) {
+
+	    foreach ($nodes as $node) {
+		/*if ($this->access_level == 'private' && $item->access_level == 'private') {
+		      // Only the menu item's owner can access it.
+		      //$extra = ($menuItem->owned_by == auth()->user()->id) ? [] : ['disabled'];
+	          }*/
+
+	        $item = new \stdClass();
+		$item->id = $node->id;
+		$item->title = $node->title;
+		$item->url = $node->url;
+		$item->level = $level;
+		$item->parent_id = $node->parent_id;
+		$item->children = [];
+
+		$parent = MenuItem::findOrFail($node->parent_id);
+
+		//if ($parent->menu_code != 'root') {
+		if ($node->parent_id != 1) {
+		    /*foreach ($menuItems as $key => $menuItem) {
+		        if ($menuItem->id == $node->parent_id) {
+			    //$menuItems[$key]['children'][] = ['id' => $item->id, 'url' => $item->url, 'title' => $item->title, 'level' => $level, 'children' => []];
+			    $menuItems[$key]->children[] = $item;
+			}
+		      }*/
+		  $menuItems = $this->loop($menuItems, $item, $node);
+		}
+		else {
+		    //$menuItems[] = ['id' => $item->id, 'url' => $item->url, 'title' => $item->title, 'level' => $level, 'children' => []];
+		    $menuItems[] = $item;
+		}
+
+		$traverse($node->children, $level + 1);
+	    }
+	};
+
+	$traverse($nodes);
+
+	return $menuItems;
     }
 
     public function getOwnedByOptions()

@@ -13,7 +13,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,8 +23,22 @@ class UpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            //
+        $rules = [
+	    'title' => 'required', 
+	    'url' => 'required',
         ];
+
+	// It's a parent private menu item.
+	if ($this->menuItem->access_level == 'private' && !$this->menuItem->isParentPrivate() && $this->menuItem->canChangeAccessLevel()) {
+	    // Only access level is settable.
+	    $rules['access_level'] = 'required';
+	}
+
+	if ($this->menuItem->access_level != 'private' && $this->menuItem->canChangeAccessLevel()) {
+	    $rules['access_level'] = 'required';
+	    $rules['owned_by'] = 'required';
+	}
+
+	return $rules;
     }
 }
