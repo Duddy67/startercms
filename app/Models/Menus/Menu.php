@@ -114,14 +114,17 @@ class Menu extends Model
         return $query->paginate($perPage);
     }
 
-    public function loop($menuItems, $item, $node)
+    private function getMenuItemChildren($menuItems, $item, $node)
     {
+        // Loop through the existing menu items.
 	foreach ($menuItems as $key => $menuItem) {
 	    if ($menuItem->id == $node->parent_id) {
 		$menuItems[$key]->children[] = $item;
 	    }
+	    // Search for sub-children.
 	    elseif (!empty($menuItems[$key]->children)) {
-	        $this->loop($menuItems[$key]->children, $item, $node);
+	        // Recursive call.
+	        $this->getMenuItemChildren($menuItems[$key]->children, $item, $node);
 	    }
 	}
 
@@ -151,18 +154,10 @@ class Menu extends Model
 
 		$parent = MenuItem::findOrFail($node->parent_id);
 
-		//if ($parent->menu_code != 'root') {
-		if ($node->parent_id != 1) {
-		    /*foreach ($menuItems as $key => $menuItem) {
-		        if ($menuItem->id == $node->parent_id) {
-			    //$menuItems[$key]['children'][] = ['id' => $item->id, 'url' => $item->url, 'title' => $item->title, 'level' => $level, 'children' => []];
-			    $menuItems[$key]->children[] = $item;
-			}
-		      }*/
-		  $menuItems = $this->loop($menuItems, $item, $node);
+		if ($parent->menu_code != 'root') {
+		    $menuItems = $this->getMenuItemChildren($menuItems, $item, $node);
 		}
 		else {
-		    //$menuItems[] = ['id' => $item->id, 'url' => $item->url, 'title' => $item->title, 'level' => $level, 'children' => []];
 		    $menuItems[] = $item;
 		}
 
@@ -210,6 +205,11 @@ class Menu extends Model
     public static function getMenus()
     {
         return Menu::all();
+    }
+
+    public static function getMenu($code)
+    {
+        return Menu::where('code', $code)->first();
     }
 
     public static function makeCodeUnique($code)
