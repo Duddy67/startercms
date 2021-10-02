@@ -132,6 +132,11 @@ class Post extends Model
         return $query->paginate($perPage);
     }
 
+    public function getUrl()
+    {
+        return '/post/'.$this->id.'/'.$this->slug;
+    }
+
     public function getOwnedByOptions()
     {
 	$users = auth()->user()->getAssignableUsers();

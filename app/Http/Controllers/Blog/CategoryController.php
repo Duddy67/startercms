@@ -4,15 +4,17 @@ namespace App\Http\Controllers\Blog;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Menus\Menu;
+use App\Models\Blog\Category;
 
 
 class CategoryController extends Controller
 {
-    public function show($id, $slug)
+    public function index(Request $request, $id, $slug)
     {
         $page = 'category';
 
-        return view('default', compact('page', 'id', 'slug'));
+	$category = Category::where('id', $id)->first();
+
+        return view('default', compact('page', 'id', 'slug', 'category'));
     }
 }

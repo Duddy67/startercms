@@ -20,6 +20,7 @@ use App\Http\Controllers\Blog\PostController;
 use App\Http\Controllers\Blog\CategoryController as BlogCategoryController;
 use App\Http\Controllers\Admin\Menus\MenuController;
 use App\Http\Controllers\Admin\Menus\MenuItemController;
+use App\Http\Controllers\SiteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,12 +33,14 @@ use App\Http\Controllers\Admin\Menus\MenuItemController;
 |
 */
 
-Route::get('/', function () {
+/*Route::get('/', function () {
     return view('welcome');
-});
+});*/
+
+Route::get('/', [SiteController::class, 'index'])->name('site.index');
 
 Route::get('/post/{id}/{slug}', [PostController::class, 'show'])->name('blog.post');
-Route::get('/category/{id}/{slug}', [BlogCategoryController::class, 'show'])->name('blog.category');
+Route::get('/category/{id}/{slug}', [BlogCategoryController::class, 'index'])->name('blog.category');
 
 Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');

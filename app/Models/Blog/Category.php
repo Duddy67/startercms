@@ -91,6 +91,11 @@ class Category extends Model
 	}
     }
 
+    public function getUrl()
+    {
+        return '/category/'.$this->id.'/'.$this->slug;
+    }
+
     public function getStatusOptions()
     {
 	return [

@@ -133,7 +133,7 @@ class Menu extends Model
 
     public function getMenuItems()
     {
-	$nodes = MenuItem::where('menu_code', $this->code)->get()->toTree();
+	$nodes = MenuItem::where('menu_code', $this->code)->defaultOrder()->get()->toTree();
 	$menuItems = [];
 
 	$traverse = function ($nodes, $level = 0) use (&$traverse, &$menuItems) {
