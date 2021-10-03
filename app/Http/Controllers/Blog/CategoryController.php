@@ -13,7 +13,7 @@ class CategoryController extends Controller
 {
     public function index(Request $request, $id, $slug)
     {
-        $page = 'category';
+        $page = 'blog.category';
 	$category = Category::where('id', $id)->first();
 	$posts = $category->getPosts($request);
 	$query = array_merge($request->query(), ['id' => $id, 'slug' => $slug]);

@@ -10,7 +10,7 @@ class SiteController extends Controller
 {
     public function index(Request $request)
     {
-        $page = 'home';
+        $page = 'site.home';
 
 	$category = Category::where('id', 5)->first();
 

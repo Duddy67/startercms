@@ -15,7 +15,7 @@
 	<div class="container">
 	    <!-- Header -->
 	    <header id="layout-header">
-                @include('pages.header')
+                @include('pages.site.header')
 	    </header>
 
 	    <!-- Content -->
@@ -25,7 +25,7 @@
 
 	    <!-- Footer -->
 	    <footer id="layout-footer">
-                @include('pages.footer')
+                @include('pages.site.footer')
 	    </footer>
 	</div>
 

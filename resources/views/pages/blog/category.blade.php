@@ -9,7 +9,7 @@
 <ul class="post-list">
     @if (count($posts))
 	@foreach ($posts as $post)
-	    @include ('partials.post')
+	    @include ('partials.blog.post')
         @endforeach
     @else
         <div>No post</div>

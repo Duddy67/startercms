@@ -13,7 +13,7 @@ class PostController extends Controller
     {
 	$post = Post::where('id', $id)->first();
 
-        $page = 'post';
+        $page = 'blog.post';
 
         return view('default', compact('page', 'id', 'slug', 'post'));
     }
