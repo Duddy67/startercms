@@ -5,6 +5,7 @@ namespace App\Models\Blog;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Settings\General;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Blog\Post;
 use Kalnoy\Nestedset\NodeTrait;
 use App\Models\Users\Group;
@@ -94,6 +95,34 @@ class Category extends Model
     public function getUrl()
     {
         return '/category/'.$this->id.'/'.$this->slug;
+    }
+
+    public function getPosts($request)
+    {
+        $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
+        $search = $request->input('search', null);
+
+	$groups = [];
+
+	if (Auth::check()) {
+	    $groups = auth()->user()->getGroupIds();
+	}
+
+	$query = Post::query();
+	$query->select('posts.*', 'users.name as user_name')->leftJoin('users', 'posts.owned_by', '=', 'users.id');
+	// Join the role tables to get the owner's role level.
+	$query->join('model_has_roles', 'posts.owned_by', '=', 'model_id')->join('roles', 'roles.id', '=', 'role_id');
+
+	// Get only the posts related to this category. 
+	$query->whereHas('categories', function ($query) {
+	    $query->where('category_id', $this->id);
+	});
+
+	if ($search !== null) {
+	    $query->where('posts.title', 'like', '%'.$search.'%');
+	}
+
+        return $query->paginate($perPage);
     }
 
     public function getStatusOptions()
