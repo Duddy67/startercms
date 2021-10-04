@@ -12,8 +12,13 @@ class SiteController extends Controller
     {
         $page = 'site.home';
 
-	$category = Category::where('id', 5)->first();
+	if (!$category = Category::where('slug', 'drama')->first()) {
+	    return abort('404');
+	}
 
-        return view('default', compact('page', 'category'));
+	$posts = $category->getPosts($request);
+	$query = $request->query();
+
+        return view('default', compact('page', 'category', 'posts', 'query'));
     }
 }

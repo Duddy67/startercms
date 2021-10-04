@@ -14,7 +14,11 @@ class CategoryController extends Controller
     public function index(Request $request, $id, $slug)
     {
         $page = 'blog.category';
-	$category = Category::where('id', $id)->first();
+
+	if (!$category = Category::where('id', $id)->first()) {
+	    return abort('404');
+	}
+
 	$posts = $category->getPosts($request);
 	$query = array_merge($request->query(), ['id' => $id, 'slug' => $slug]);
 

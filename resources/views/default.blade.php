@@ -4,11 +4,12 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Laravel</title>
+        <title>Starter CMS</title>
 
 	<!-- Bootstrap CSS file -->
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="{{ url('/') }}/css/style.css">
     </head>
     <body>
 
@@ -19,12 +20,12 @@
 	    </header>
 
 	    <!-- Content -->
-	    <section id="layout-content">
+	    <section id="layout-content" class="pt-4">
                 @include('pages.'.$page)
 	    </section>
 
 	    <!-- Footer -->
-	    <footer id="layout-footer">
+	    <footer id="layout-footer" class="page-footer pt-4">
                 @include('pages.site.footer')
 	    </footer>
 	</div>

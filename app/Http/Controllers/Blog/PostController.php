@@ -11,7 +11,9 @@ class PostController extends Controller
 {
     public function show($id, $slug)
     {
-	$post = Post::where('id', $id)->first();
+	if (!$post = Post::where('id', $id)->first()) {
+	    return abort('404');
+	}
 
         $page = 'blog.post';
 
