@@ -100,11 +100,16 @@ class Role extends SpatieRole
 	    $date = Carbon::now();
 
 	    Role::insert([
-		['name' => 'super-admin', 'guard_name' => 'web', 'role_type' => 'super-admin', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
-		['name' => 'admin', 'guard_name' => 'web', 'role_type' => 'admin', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
-		['name' => 'manager', 'guard_name' => 'web', 'role_type' => 'manager', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
-		['name' => 'assistant', 'guard_name' => 'web', 'role_type' => 'assistant', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
-		['name' => 'registered', 'guard_name' => 'web', 'role_type' => 'registered', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()]
+	        ['name' => 'super-admin', 'guard_name' => 'web', 'role_type' => 'super-admin', 'owned_by' => 1,
+	         'access_level' => 'public_ro', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
+		['name' => 'admin', 'guard_name' => 'web', 'role_type' => 'admin', 'owned_by' => 1,
+		 'access_level' => 'public_ro', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
+		['name' => 'manager', 'guard_name' => 'web', 'role_type' => 'manager', 'owned_by' => 1,
+		 'access_level' => 'public_ro', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
+		['name' => 'assistant', 'guard_name' => 'web', 'role_type' => 'assistant', 'owned_by' => 1,
+		 'access_level' => 'public_ro', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
+		['name' => 'registered', 'guard_name' => 'web', 'role_type' => 'registered', 'owned_by' => 1,
+		 'access_level' => 'public_ro', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()]
 	    ]);
 	}
     }
