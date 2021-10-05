@@ -179,7 +179,7 @@ class Permission extends SpatiePermission
 
 	foreach ($permList as $permissions) {
 	    foreach ($permissions as $permission) {
-	        $roles = explode('|', $permission->default);
+	        $roles = explode('|', $permission->roles);
 
 		foreach ($roles as $role) {
 		    if (!empty($role)) {
