@@ -33,11 +33,11 @@ use App\Http\Controllers\SiteController;
 |
 */
 
-Route::get('/', function () {
+/*Route::get('/', function () {
     return view('welcome');
-});
+});*/
 
-//Route::get('/', [SiteController::class, 'index'])->name('site.index');
+Route::get('/', [SiteController::class, 'index'])->name('site.index');
 
 Route::get('/post/{id}/{slug}', [PostController::class, 'show'])->name('blog.post');
 Route::get('/category/{id}/{slug}', [BlogCategoryController::class, 'index'])->name('blog.category');

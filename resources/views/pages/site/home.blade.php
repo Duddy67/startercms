@@ -1,13 +1,16 @@
-<ul class="post-list">
-    @if (count($posts))
-	@foreach ($posts as $post)
-	    @include ('partials.blog.post')
-        @endforeach
-    @else
-        <div>No post</div>
-    @endif
-</ul>
 
+@if ($category)
+    <ul class="post-list">
+	@if (count($posts))
+	    @foreach ($posts as $post)
+		@include ('partials.blog.post')
+	    @endforeach
+	@else
+	    <div>No post</div>
+	@endif
+    </ul>
+@endif
 
-<script type="text/javascript" src="{{ url('/') }}/vendor/adminlte/plugins/jquery/jquery.min.js"></script>
-<script type="text/javascript" src="{{ url('/') }}/js/blog/category.js"></script>
+@push ('scripts')
+    <script type="text/javascript" src="{{ $public }}/js/blog/category.js"></script>
+@endpush

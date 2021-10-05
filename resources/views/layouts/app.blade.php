@@ -9,16 +9,18 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
+    @php $public = url('/'); @endphp
+
     <!-- Scripts -->
-    <script src="{{ asset('vendor/jquery-3.6.0/jquery-3.6.0.min.js') }}" defer></script>
-    <script src="{{ asset('vendor/bootstrap-4.5.3/js/bootstrap.min.js') }}" defer></script>
+    <script src="{{ $public }}/vendor/adminlte/plugins/jquery/jquery.min.js"></script>
+    <script src="{{ $public }}/vendor/adminlte/plugins/bootstrap/js/bootstrap.min.js"></script>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
     <!-- Styles -->
-    <link href="{{ asset('vendor/bootstrap-4.5.3/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ $public }}/vendor/adminlte/dist/css/adminlte.min.css">
 </head>
 <body>
     <div id="app">

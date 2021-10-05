@@ -6,10 +6,13 @@
 
         <title>Starter CMS</title>
 
+        @php $public = url('/'); @endphp
+
 	<!-- Bootstrap CSS file -->
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="{{ $public }}/vendor/adminlte/dist/css/adminlte.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-	<link rel="stylesheet" href="{{ url('/') }}/css/style.css">
+	<!-- Starter CMS CSS file -->
+	<link rel="stylesheet" href="{{ $public }}/css/style.css">
     </head>
     <body>
 
@@ -31,7 +34,9 @@
 	</div>
 
     <!-- JS files: jQuery first, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="{{ $public }}/vendor/adminlte/plugins/jquery/jquery.min.js"></script>
+    <script src="{{ $public }}/vendor/adminlte/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <!-- Adds possible extra js scripts pushed by pages and partials. -->
+    @stack ('scripts')
     </body>
 </html>

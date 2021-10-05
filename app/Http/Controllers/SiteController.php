@@ -11,12 +11,12 @@ class SiteController extends Controller
     public function index(Request $request)
     {
         $page = 'site.home';
+	$posts = null;
 
-	if (!$category = Category::where('slug', 'drama')->first()) {
-	    return abort('404');
+	if ($category = Category::where('slug', 'drama')->first()) {
+	    $posts = $category->getPosts($request);
 	}
 
-	$posts = $category->getPosts($request);
 	$query = $request->query();
 
         return view('default', compact('page', 'category', 'posts', 'query'));

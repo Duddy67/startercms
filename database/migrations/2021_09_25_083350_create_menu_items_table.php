@@ -16,7 +16,7 @@ class CreateMenuItemsTable extends Migration
         Schema::create('menu_items', function (Blueprint $table) {
             $table->id();
             $table->string('title', 80);
-            $table->string('menu_code', 30);
+            $table->string('menu_code', 30)->nullable();
             $table->string('url');
             $table->char('status', 12);
             $table->char('access_level', 10);
