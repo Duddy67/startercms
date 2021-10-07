@@ -170,7 +170,7 @@ class PostController extends Controller
 	if ($post->canChangeAttachments()) {
 
 	    $post->owned_by = $request->input('owned_by');
-	    // N.B: Get also the private groups (if any) that are not returned by the form (as they're not available).
+	    // N.B: Get also the private groups (if any) that are not returned by the form as they're disabled.
 	    $groups = array_merge($request->input('groups', []), Group::getPrivateGroups($post));
 
 	    if (!empty($groups)) {
@@ -181,7 +181,7 @@ class PostController extends Controller
 		$post->groups()->sync([]);
 	    }
 
-	    // N.B: Get also the private categories (if any) that are not returned by the form (as they're disabled).
+	    // N.B: Get also the private categories (if any) that are not returned by the form as they're disabled.
 	    $categories = array_merge($request->input('categories', []), $post->getPrivateCategories());
 
 	    if (!empty($categories)) {
@@ -230,6 +230,10 @@ class PostController extends Controller
 
 	if ($request->input('groups') !== null) {
 	    $post->groups()->attach($request->input('groups'));
+	}
+
+	if ($request->input('categories') !== null) {
+	    $post->categories()->attach($request->input('categories'));
 	}
 
 	$post->save();

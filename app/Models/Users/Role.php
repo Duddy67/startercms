@@ -91,31 +91,6 @@ class Role extends SpatieRole
     }
 
     /*
-     * Used only during the very first registration (the super-user) in the CMS.
-     *
-     * @return void
-     */
-    public static function createDefaultRoles()
-    {
-        if (Role::whereIn('name', self::getDefaultRoles())->doesntExist()) {
-	    $date = Carbon::now();
-
-	    Role::insert([
-	        ['name' => 'super-admin', 'guard_name' => 'web', 'role_type' => 'super-admin', 'role_level' => 5, 'owned_by' => 1,
-	         'access_level' => 'public_ro', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
-		['name' => 'admin', 'guard_name' => 'web', 'role_type' => 'admin', 'role_level' => 4, 'owned_by' => 1,
-		 'access_level' => 'public_ro', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
-		['name' => 'manager', 'guard_name' => 'web', 'role_type' => 'manager', 'role_level' => 3, 'owned_by' => 1,
-		 'access_level' => 'public_ro', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
-		['name' => 'assistant', 'guard_name' => 'web', 'role_type' => 'assistant', 'role_level' => 2, 'owned_by' => 1,
-		 'access_level' => 'public_ro', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()],
-		['name' => 'registered', 'guard_name' => 'web', 'role_type' => 'registered', 'role_level' => 1, 'owned_by' => 1,
-		 'access_level' => 'public_ro', 'created_at' => $date->toDateTimeString(), 'updated_at' => $date->toDateTimeString()]
-	    ]);
-	}
-    }
-
-    /*
      * Gets the role items according to the filter, sort and pagination settings.
      *
      * @param  Request  $request

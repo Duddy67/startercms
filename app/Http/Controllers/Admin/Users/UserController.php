@@ -213,15 +213,11 @@ class UserController extends Controller
 	    $user->documents()->save($document);
 	}
 
-	$query = $request->query();
-
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.users.users.index', $query)->with('success', __('messages.users.create_success'));
+	    return redirect()->route('admin.users.users.index', $request->query())->with('success', __('messages.users.create_success'));
 	}
 
-	$query['user'] = $user->id;
-
-	return redirect()->route('admin.users.users.edit', $query)->with('success', __('messages.users.create_success'));
+	return redirect()->route('admin.users.users.edit', array_merge($request->query(), ['user' => $user->id]))->with('success', __('messages.users.create_success'));
     }
 
     /**
@@ -238,6 +234,7 @@ class UserController extends Controller
 	}
 
 	$name = $user->name;
+
 	$user->delete();
 
 	return redirect()->route('admin.users.users.index', $request->query())->with('success', __('messages.users.delete_success', ['name' => $name]));
@@ -252,6 +249,8 @@ class UserController extends Controller
     public function massDestroy(Request $request)
     {
         if ($request->input('ids') !== null) {
+	    // Counter.
+	    $deleted = 0;
 
 	    // Remove the users selected from the list.
 	    foreach ($request->input('ids') as $key => $id) {
@@ -259,15 +258,17 @@ class UserController extends Controller
 
 		// Stop the deletions as soon as the current user is not authorized to delete one of the user in the list.
 		if (!auth()->user()->canDelete($user)) {
-		    // Informs about the users previously deleted.
-		    if ($key > 0) {
-			$request->session()->flash('success', __('messages.users.delete_list_success', ['number' => $key]));
-		    }
-
-		    return redirect()->route('admin.users.users.index')->with('error', __('messages.users.delete_list_not_auth', ['name' => $user->name]));
+		    return redirect()->route('admin.users.user.index', $request->query())->with(
+			[
+			    'error' => __('messages.users.delete_list_not_auth', ['name' => $user->name]),
+			    // Informs about the users previously deleted.
+			    'success' => __('messages.users.delete_list_success', ['number' => $deleted])
+			]);
 		}
 
 		$user->delete();
+
+		$deleted++;
 	    }
 
 	    return redirect()->route('admin.users.users.index', $request->query())->with('success', __('messages.users.delete_list_success', ['number' => count($request->input('ids'))]));
@@ -290,7 +291,7 @@ class UserController extends Controller
     }
 
     /**
-     * Show the batch form (in an iframe).
+     * Show the batch form (into an iframe).
      *
      * @param  Request  $request
      * @return \Illuminate\Contracts\Support\Renderable

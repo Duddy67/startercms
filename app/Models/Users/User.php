@@ -252,6 +252,7 @@ class User extends Authenticatable
 	}
 
 	$hierarchy = Role::getRoleHierarchy();
+
         // Users can only update users lower in the hierarchy.
 	if ($hierarchy[$this->getRoleType()] > $hierarchy[$user->getRoleType()]) {
 	    return true;
@@ -278,6 +279,7 @@ class User extends Authenticatable
 	}
 
 	$hierarchy = Role::getRoleHierarchy();
+
         // Users can only delete users lower in the hierarchy.
 	if ($hierarchy[$this->getRoleType()] > $hierarchy[$user->getRoleType()]) {
 	    return true;

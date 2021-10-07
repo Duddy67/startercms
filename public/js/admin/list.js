@@ -116,7 +116,7 @@
     }
 
     $.fn.massDestroy = function() {
-	if ($.fn.setSelectedItems()) {
+	if ($.fn.setSelectedItems() && window.confirm('Are you sure ?')) {
 	    $('#selectedItems input[name="_method"]').val('delete');
 	    $('#selectedItems').attr('action', $('#destroyItems').val());
 	    $('#selectedItems').submit();

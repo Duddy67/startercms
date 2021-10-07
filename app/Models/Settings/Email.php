@@ -135,6 +135,7 @@ class Email extends Model
     {
 	$email = Email::where('code', $code)->first();
 	$data->subject = self::parseSubject($email->subject, $data);
+
 	// Use the email attribute as recipient in case the recipient attribute doesn't exist.
 	$recipient = (!isset($data->recipient) && isset($data->email)) ? $data->email : $data->recipient;
 	$data->view = 'emails.'.$code;
@@ -149,15 +150,19 @@ class Email extends Model
      */
     public static function parseSubject($subject, $data)
     {
-        if (preg_match_all('#{{\s?\$[a-z0-9_]+\s?}}#U', $subject, $matches)) {
+        // Looks for Blade variables (eg: {{ $data->email }}).
+        if (preg_match_all('#{{\s?[\$a-zA-Z0-9\-\>]+\s?}}#U', $subject, $matches)) {
 	    $results = $matches[0];
 	    $patterns = $replacements = [];
 
 	    foreach ($results as $result) {
-		preg_match('#^{{\s?\$([a-zA-Z0-9_]+)\s?}}$#', $result, $matches);
+	        // Gets the attribute name (eg: email).
+		preg_match('#^{{\s?\$[a-zA-Z0-9_]+->([a-zA-Z0-9_]+)\s?}}$#', $result, $matches);
 		$attribute  = $matches[1];
+		// Stores the variable value.
 		$replacements[] = $data->$attribute;
-		$patterns[] = '#({{\s?\$'.$matches[1].'\s?}})#';
+		// Stores the corresponding Blade variable.
+		$patterns[] = '#({{\s?\$[a-zA-Z0-9_]+->'.$attribute.'\s?}})#';
 	    }
 
 	    return preg_replace($patterns, $replacements, $subject);

@@ -125,14 +125,6 @@ class Category extends Model
         return $query->paginate($perPage);
     }
 
-    public function getStatusOptions()
-    {
-	return [
-	    ['value' => 'published', 'text' => __('labels.generic.published')],
-	    ['value' => 'unpublished', 'text' => __('labels.generic.unpublished')],
-	];
-    }
-
     public function getParentIdOptions()
     {
 	$nodes = Category::get()->toTree();

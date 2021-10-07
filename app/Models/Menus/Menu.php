@@ -182,14 +182,6 @@ class Menu extends Model
 	return $options;
     }
 
-    public function getStatusOptions()
-    {
-	return [
-	    ['value' => 'published', 'text' => __('labels.generic.published')],
-	    ['value' => 'unpublished', 'text' => __('labels.generic.unpublished')],
-	];
-    }
-
     /*
      * Generic function that returns model values which are handled by select inputs. 
      */

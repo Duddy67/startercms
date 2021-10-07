@@ -88,6 +88,14 @@ class General extends Model
       ];
     }
 
+    public static function getStatusOptions()
+    {
+	return [
+	    ['value' => 'published', 'text' => __('labels.generic.published')],
+	    ['value' => 'unpublished', 'text' => __('labels.generic.unpublished')],
+	];
+    }
+
     public static function getSortedByOptions($pluginName, $modelName)
     {
 	$json = file_get_contents(app_path().'/Models/'.ucfirst($pluginName).'/'.$modelName.'/columns.json', true);

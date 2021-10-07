@@ -30,7 +30,6 @@ class StoreRequest extends FormRequest
 		'unique:emails'
 	    ],
 	    'subject' => 'required',
-	    'access_level' => 'required',
 	    'body_html' => 'required_if:format,html',
 	    'body_text' => 'required_if:format,plain_text',
         ];

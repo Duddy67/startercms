@@ -166,6 +166,7 @@ class EmailController extends Controller
 	$email->save();
 
         if ($request->input('_close', null)) {
+	    $email->checkIn();
 	    return redirect()->route('admin.settings.emails.index', $request->query())->with('success', __('messages.emails.update_success'));
 	}
 

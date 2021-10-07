@@ -164,7 +164,7 @@ trait ItemConfig
 	        // Build the function name.
 		$function = 'get'.str_replace('_', '', ucwords($field->name, '_')).'Options';
 
-		if (in_array($field->name, ['access_level', 'groups'])) {
+		if (in_array($field->name, ['access_level', 'groups', 'status'])) {
 		    // Common options.
 		    $options = General::$function();
 		}

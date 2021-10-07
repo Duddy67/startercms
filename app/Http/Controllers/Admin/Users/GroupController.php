@@ -156,9 +156,11 @@ class GroupController extends Controller
 	$group->description = $request->input('description');
 	$group->updated_by = auth()->user()->id;
 
-	// Ensure the current user has a higher role level than the item owner's or the current user is the item owner.
-	if (auth()->user()->getRoleLevel() > $group->getOwnerRoleLevel() || $group->owned_by == auth()->user()->id) {
+	if ($group->canChangeAttachments()) {
 	    $group->owned_by = $request->input('owned_by');
+	}
+
+	if ($group->canChangeAccessLevel()) {
 	    $group->access_level = $request->input('access_level');
 	}
 
@@ -212,7 +214,6 @@ class GroupController extends Controller
 
 	$name = $group->name;
 
-	$group->users()->detach();
 	$group->delete();
 
 	return redirect()->route('admin.users.groups.index', $request->query())->with('success', __('messages.groups.delete_success', ['name' => $name]));
@@ -239,7 +240,6 @@ class GroupController extends Controller
 		  ]);
 	    }
 
-	    $group->users()->detach();
 	    $group->delete();
 
 	    $deleted++;

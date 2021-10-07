@@ -23,7 +23,10 @@
   }
 
   $.fn.destroy = function() {
-      $('#deleteItem').submit();
+      if (window.confirm('Are you sure ?')) {
+	  $('#deleteItem').submit();
+      }
+
       /*alert($('#itemListUrl').val()+'/2');
       $.ajax({
 	  type: 'DELETE',

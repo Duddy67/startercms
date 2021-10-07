@@ -218,7 +218,7 @@ class RoleController extends Controller
      */
     public function store(StoreRequest $request)
     {
-	// Ensure first that an admin doesn't use any level1 permissions. 
+	// Ensure first that an admin doesn't use any level1 permissions (ie: super-admin's permissions). 
 	$level1Perms = Permission::getPermissionNameList(['level2', 'level3']);
 	$count = array_intersect($request->input('permissions', []), $level1Perms);
 

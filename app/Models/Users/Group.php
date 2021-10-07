@@ -72,6 +72,19 @@ class Group extends Model
         return $this->belongsToMany(Menu::class);
     }
 
+    /**
+     * Delete the model from the database (override).
+     *
+     * @return bool|null
+     *
+     * @throws \LogicException
+     */
+    public function delete()
+    {
+	$this->users()->detach();
+        parent::delete();
+    }
+
     /*
      * Gets the group items according to the filter, sort and pagination settings.
      */

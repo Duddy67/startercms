@@ -90,14 +90,6 @@ class MenuItem extends Model
 	}
     }
 
-    public function getStatusOptions()
-    {
-	return [
-	    ['value' => 'published', 'text' => __('labels.generic.published')],
-	    ['value' => 'unpublished', 'text' => __('labels.generic.unpublished')],
-	];
-    }
-
     public function getParentIdOptions()
     {
 	$nodes = MenuItem::get()->toTree();
