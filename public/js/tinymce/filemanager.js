@@ -9,9 +9,11 @@ tinymce.init({
 	editor.ui.registry.addButton('urldialog', {
 	    icon: 'browse',
 	    onAction: function () {
+	        let siteUrl = document.getElementById('siteUrl').value;
+
 		editor.windowManager.openUrl({
 		    title: 'File Manager',
-		    url: 'https://codalia.dubya.net/starter/public/cms/documents',
+		    url: siteUrl+'/cms/documents',
 		    buttons: [
 			{
 			    type: "cancel",
