@@ -18,6 +18,7 @@
     "label": "labels.users.password",
     "type": "password",
     "name": "password",
+    "autocomplete": "false",
     "id": "password"
   },
   {

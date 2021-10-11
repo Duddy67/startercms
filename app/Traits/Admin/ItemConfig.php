@@ -161,21 +161,7 @@ trait ItemConfig
 
 	    // Set the select field types.
 	    if ($field->type == 'select') {
-	        // Build the function name.
-		$function = 'get'.str_replace('_', '', ucwords($field->name, '_')).'Options';
-
-		if (in_array($field->name, ['access_level', 'groups', 'status'])) {
-		    // Common options.
-		    $options = General::$function();
-		}
-		elseif ($field->name == 'parent_id') {
-		    $options = ($item) ? $item->$function() : $this->model->$function();
-		}
-		else {
-		    $options = $this->model->$function();
-		}
-
-		$fields[$key]->options = $options;
+		$fields[$key]->options = $this->getSelectOptions($field);
 	    }
 
 	    if ($item) {
@@ -312,6 +298,57 @@ trait ItemConfig
 	}
 
 	return $actions->{$section};
+    }
+
+    /*
+     * Returns only the fields passed in parameters.
+     *
+     * @param  Array  $fieldNames
+     * @return stdClass Object
+     */  
+    public function getSpecificFields($fieldNames)
+    {
+	$fields = $this->getData('fields');
+
+	foreach ($fields as $key => $field) {
+	    // Keep only the fields passed in parameters.
+	    if (!in_array($field->name, $fieldNames)) {
+	        unset($fields[$key]);
+		continue;
+	    }
+
+	    // Set the select field types.
+	    if ($field->type == 'select') {
+		$fields[$key]->options = $this->getSelectOptions($field);
+	    }
+	}
+
+	return $fields;
+    }
+
+    /*
+     * Returns the options for a given select field.
+     *
+     * @param  Array  $field
+     * @return Array
+     */  
+    private function getSelectOptions($field)
+    {
+	// Build the function name.
+	$function = 'get'.str_replace('_', '', ucwords($field->name, '_')).'Options';
+
+	if (in_array($field->name, ['access_level', 'groups', 'status'])) {
+	    // Common options.
+	    $options = General::$function();
+	}
+	elseif ($field->name == 'parent_id') {
+	    $options = ($item) ? $item->$function() : $this->model->$function();
+	}
+	else {
+	    $options = $this->model->$function();
+	}
+
+	return $options;
     }
 
     /*

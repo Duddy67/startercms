@@ -298,7 +298,7 @@ class UserController extends Controller
      */
     public function batch(Request $request)
     {
-        $fields = $this->getFields(null, ['name', 'email', 'photo', 'created_at', 'updated_at', 'password', 'password_confirmation']);
+        $fields = $this->getSpecificFields(['role', 'groups']);
         $actions = $this->getActions('batch');
 	$query = $request->query();
 
@@ -325,6 +325,17 @@ class UserController extends Controller
 		continue;
 	    }
 
+	    if ($request->input('groups') !== null) {
+		if ($request->input('_selected_groups') == 'add') {
+		    $user->groups()->syncWithoutDetaching($request->input('groups'));
+		}
+		else {
+		    // Remove the selected groups from the current groups and get the remaining groups.
+		    $groups = array_diff($user->getGroupIds(), $request->input('groups'));
+		    $user->groups()->sync($groups);
+		}
+	    }
+
 	    if (!empty($request->input('role'))) {
 
 		if (auth()->user()->id != $user->id) {
@@ -337,14 +348,12 @@ class UserController extends Controller
 		}
 	    }
 
-	    if ($request->input('groups') !== null) {
-		$user->groups()->syncWithoutDetaching($request->input('groups'));
-	    }
-
 	    $updates++;
 	}
 
-	$messages['success'] = __('messages.generic.mass_update_success', ['number' => $updates]);
+	if ($updates) {
+	    $messages['success'] = __('messages.generic.mass_update_success', ['number' => $updates]);
+	}
 
 	return redirect()->route('admin.users.users.index')->with($messages);
     }

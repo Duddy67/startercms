@@ -15,7 +15,8 @@ class Button extends Component
 	'destroy' => 'btn-danger', 
 	'massDestroy' => 'btn-danger', 
 	'batch' => 'btn-primary',
-	'checkin' => 'btn-info'
+	'checkin' => 'btn-info',
+	'massUpdate' => 'btn-primary'
     ];
 
     public $btnIcons = [
@@ -28,7 +29,8 @@ class Button extends Component
 	'batch' => 'fa-copy',
 	'checkin' => 'fa-check-circle',
 	'publish' => 'fa-check-square',
-	'unpublish' => 'fa-circle-blank'
+	'unpublish' => 'fa-circle-blank',
+	'massUpdate' => 'fa-sync'
     ];
 
 

@@ -40,6 +40,10 @@
 	readonly
     @endif
 
+    @if (isset($field->autocomplete))
+	autocomplete="{{ $field->autocomplete }}"
+    @endif
+
     @if ($value)
 	value="{{ $value }}"
     @endif

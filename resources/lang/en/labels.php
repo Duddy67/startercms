@@ -39,6 +39,8 @@ return [
     'groups' => [
 	'create_group' => 'Create a group',
 	'edit_group' => 'Edit a group',
+	'add_selected_groups' => 'Add selected groups',
+	'remove_selected_groups' => 'Remove selected groups',
     ],
     'posts' => [
 	'create_post' => 'Create a post',
@@ -93,6 +95,7 @@ return [
 	'unknown' => 'Unknown',
 	'system' => 'System',
 	'select_option' => '- Select -',
+	'batch_title' => 'Fields to update for the selection of items',
     ],
     'filter' => [
 	'search' => 'Search',

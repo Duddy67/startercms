@@ -27,7 +27,7 @@ tr.clickable-row {
 .modal-content {
   background-color: #fefefe;
   margin: auto;
-  padding: 20px;
+  padding: 10px;
   border: 1px solid #888;
   width: 50%;
   height: 50%;
@@ -65,3 +65,8 @@ tr.clickable-row {
 .indent-5 {
   padding-left: 50px;
 }
+
+#batchForm .select2-container {
+  width: 100% !important;
+}
+
