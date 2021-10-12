@@ -79,6 +79,8 @@ Route::prefix('admin')->group(function () {
 	    Route::resource('users', UserController::class, ['as' => 'admin.users'])->except(['show']);
 	    // Groups
 	    Route::delete('/groups', [GroupController::class, 'massDestroy'])->name('admin.users.groups.massDestroy');
+	    Route::get('/groups/batch', [GroupController::class, 'batch'])->name('admin.users.groups.batch');
+	    Route::put('/groups/batch', [GroupController::class, 'massUpdate'])->name('admin.users.groups.massUpdate');
 	    Route::get('/groups/cancel/{group?}', [GroupController::class, 'cancel'])->name('admin.users.groups.cancel');
 	    Route::put('/groups/checkin', [GroupController::class, 'massCheckIn'])->name('admin.users.groups.massCheckIn');
 	    Route::resource('groups', GroupController::class, ['as' => 'admin.users'])->except(['show']);
@@ -96,6 +98,8 @@ Route::prefix('admin')->group(function () {
 	Route::prefix('blog')->group(function () {
 	    // Posts
 	    Route::delete('/posts', [AdminPostController::class, 'massDestroy'])->name('admin.blog.posts.massDestroy');
+	    Route::get('/posts/batch', [AdminPostController::class, 'batch'])->name('admin.blog.posts.batch');
+	    Route::put('/posts/batch', [AdminPostController::class, 'massUpdate'])->name('admin.blog.posts.massUpdate');
 	    Route::get('/posts/cancel/{post?}', [AdminPostController::class, 'cancel'])->name('admin.blog.posts.cancel');
 	    Route::put('/posts/checkin', [AdminPostController::class, 'massCheckIn'])->name('admin.blog.posts.massCheckIn');
 	    Route::put('/posts/publish', [AdminPostController::class, 'massPublish'])->name('admin.blog.posts.massPublish');

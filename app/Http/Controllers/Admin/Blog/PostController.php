@@ -308,6 +308,79 @@ class PostController extends Controller
     }
 
     /**
+     * Show the batch form (into an iframe).
+     *
+     * @param  Request  $request
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function batch(Request $request)
+    {
+        $fields = $this->getSpecificFields(['access_level', 'owned_by', 'groups']);
+        $actions = $this->getActions('batch');
+	$query = $request->query();
+	$route = 'admin.blog.posts';
+
+        return view('admin.share.batch', compact('fields', 'actions', 'query', 'route'));
+    }
+
+    /**
+     * Updates the access_level and owned_by parameters of one or more posts.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return Response
+     */
+    public function massUpdate(Request $request)
+    {
+        $updates = 0;
+	$messages = [];
+
+        foreach ($request->input('ids') as $key => $id) {
+	    $post = Post::findOrFail($id);
+	    $updated = false;
+
+	    // Check for authorisation.
+	    if (!$post->canEdit()) {
+		$messages['error'] = __('messages.generic.mass_update_not_auth');
+		continue;
+	    }
+
+	    if ($request->input('owned_by') !== null && $post->canChangeAttachments()) {
+		$post->owned_by = $request->input('owned_by');
+		$updated = true;
+	    }
+
+	    if ($request->input('access_level') !== null && $post->canChangeAccessLevel()) {
+		$post->access_level = $request->input('access_level');
+		$updated = true;
+	    }
+
+	    if ($request->input('groups') !== null && $post->canChangeAttachments()) {
+		if ($request->input('_selected_groups') == 'add') {
+		    $post->groups()->syncWithoutDetaching($request->input('groups'));
+		}
+		else {
+		    // Remove the selected groups from the current groups and get the remaining groups.
+		    $groups = array_diff($post->getGroupIds(), $request->input('groups'));
+		    $post->groups()->sync($groups);
+		}
+
+		$updated = true;
+	    }
+
+	    if ($updated) {
+		$post->save();
+		$updates++;
+	    }
+	}
+
+	if ($updates) {
+	    $messages['success'] = __('messages.generic.mass_update_success', ['number' => $updates]);
+	}
+
+	return redirect()->route('admin.blog.posts.index')->with($messages);
+    }
+
+    /**
      * Publishes one or more posts.
      *
      * @param  \Illuminate\Http\Request  $request

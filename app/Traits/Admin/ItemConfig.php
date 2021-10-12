@@ -161,7 +161,7 @@ trait ItemConfig
 
 	    // Set the select field types.
 	    if ($field->type == 'select') {
-		$fields[$key]->options = $this->getSelectOptions($field);
+		$fields[$key]->options = $this->getSelectOptions($field, $item);
 	    }
 
 	    if ($item) {
@@ -330,9 +330,10 @@ trait ItemConfig
      * Returns the options for a given select field.
      *
      * @param  Array  $field
+     * @param A model instance  $item
      * @return Array
      */  
-    private function getSelectOptions($field)
+    private function getSelectOptions($field, $item = null)
     {
 	// Build the function name.
 	$function = 'get'.str_replace('_', '', ucwords($field->name, '_')).'Options';

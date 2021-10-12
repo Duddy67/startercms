@@ -97,11 +97,11 @@ class UserController extends Controller
         $user = User::select('users.*', 'users2.name as modifier_name')->leftJoin('users as users2', 'users.updated_by', '=', 'users2.id')->findOrFail($id);
 
 	if (!auth()->user()->canUpdate($user) && auth()->user()->id != $user->id) {
-	    return redirect()->route('admin.users.users.index')->with('error', __('messages.users.edit_user_not_auth'));
+	    return redirect()->route('admin.users.users.index', array_merge($request->query(), ['user' => $id]))->with('error', __('messages.users.edit_user_not_auth'));
 	}
 
 	if ($user->checked_out && $user->checked_out != auth()->user()->id) {
-	    return redirect()->route('admin.users.users.index')->with('error',  __('messages.generic.checked_out'));
+	    return redirect()->route('admin.users.users.index', array_merge($request->query(), ['user' => $id]))->with('error',  __('messages.generic.checked_out'));
 	}
 
 	$user->checkOut();
@@ -301,8 +301,9 @@ class UserController extends Controller
         $fields = $this->getSpecificFields(['role', 'groups']);
         $actions = $this->getActions('batch');
 	$query = $request->query();
+	$route = 'admin.users.users';
 
-        return view('admin.users.users.batch', compact('fields', 'actions', 'query'));
+        return view('admin.share.batch', compact('fields', 'actions', 'query', 'route'));
     }
 
     /**

@@ -15,7 +15,7 @@ class UpdateRolesTable extends Migration
     {
         Schema::table('roles', function(Blueprint $table)
 	{
-            $table->char('access_level', 10)->after('guard_name');
+            $table->char('access_level', 10)->nullable()->after('guard_name');
             $table->tinyInteger('role_level')->nullable()->after('access_level');
             $table->char('role_type', 11)->nullable()->after('role_level');
             $table->unsignedBigInteger('checked_out')->nullable()->after('role_type');

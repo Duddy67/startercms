@@ -21,7 +21,7 @@
 
     <div class="container-fluid">
         <h4>{{ __('labels.generic.batch_title') }}</h4>
-	<form method="post" action="{{ route('admin.users.users.massUpdate', $query) }}" id="batchForm" target="_parent">
+	<form method="post" action="{{ route($route.'.massUpdate', $query) }}" id="batchForm" target="_parent">
 	    @csrf
 	    @method('put')
 
@@ -45,7 +45,7 @@
 		</div>
 	    @endforeach
 
-	    <input type="hidden" id="itemList" value="{{ route('admin.users.users.index', $query) }}">
+	    <input type="hidden" id="itemList" value="{{ route($route.'.index', $query) }}">
 	</form>
 
 	<div class="form-group batch-actions">

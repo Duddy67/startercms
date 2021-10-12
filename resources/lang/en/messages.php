@@ -53,6 +53,10 @@ return [
         'publish_list_success' => ':number posts have been successfully published.',
         'unpublish_list_success' => ':number posts have been successfully unpublished.',
     ],
+    'categories' => [
+        'create_success' => 'category successfully created.',
+        'update_success' => 'category successfully updated.',
+    ],
     'emails' => [
         'create_success' => 'Email successfully created.',
         'update_success' => 'Email successfully updated.',

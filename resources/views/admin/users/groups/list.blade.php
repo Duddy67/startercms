@@ -35,6 +35,12 @@
 	@method('delete')
 	@csrf
     </form>
+
+    <div id="batch-window" class="modal">
+	<div class="modal-content">
+	    <iframe src="{{ route('admin.users.groups.batch', $query) }}" id="batchIframe" name="batch"></iframe>
+	</div>
+    </div>
 @endsection
 
 @push ('scripts')

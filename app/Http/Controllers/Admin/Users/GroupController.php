@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\Users\Group;
-use App\Models\Users\User;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
 use App\Http\Requests\Users\Group\StoreRequest;
@@ -259,6 +258,74 @@ class GroupController extends Controller
         $messages = CheckInCheckOut::checkInMultiple($request->input('ids'), '\\App\\Models\\Users\\Group');
 
 	return redirect()->route('admin.users.groups.index', $request->query())->with($messages);
+    }
+
+    /**
+     * Show the batch form (into an iframe).
+     *
+     * @param  Request  $request
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function batch(Request $request)
+    {
+        $fields = $this->getSpecificFields(['access_level', 'owned_by']);
+        $actions = $this->getActions('batch');
+	$query = $request->query();
+	$route = 'admin.users.groups';
+
+        return view('admin.share.batch', compact('fields', 'actions', 'query', 'route'));
+    }
+
+    /**
+     * Updates the access_level and owned_by parameters of one or more groups.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return Response
+     */
+    public function massUpdate(Request $request)
+    {
+        $updates = 0;
+	$messages = [];
+
+        foreach ($request->input('ids') as $key => $id) {
+	    $group = Group::findOrFail($id);
+
+	    // Check for authorisation.
+	    if (!$group->canEdit()) {
+		$messages['error'] = __('messages.generic.mass_update_not_auth');
+		continue;
+	    }
+
+	    if ($request->input('owned_by') !== null) {
+
+		if ($group->canChangeAttachments()) {
+		    $group->owned_by = $request->input('owned_by');
+		    $group->save();
+		}
+		else {
+		    $messages['error'] = __('messages.generic.mass_update_not_auth');
+		}
+	    }
+
+	    if ($request->input('access_level') !== null) {
+
+		if ($group->canChangeAccessLevel()) {
+		    $group->access_level = $request->input('access_level');
+		    $group->save();
+		}
+		else {
+		    $messages['error'] = __('messages.generic.mass_update_not_auth');
+		}
+	    }
+
+	    $updates++;
+	}
+
+	if ($updates) {
+	    $messages['success'] = __('messages.generic.mass_update_success', ['number' => $updates]);
+	}
+
+	return redirect()->route('admin.users.groups.index')->with($messages);
     }
 
     /*
