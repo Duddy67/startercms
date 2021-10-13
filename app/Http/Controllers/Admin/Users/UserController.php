@@ -230,7 +230,7 @@ class UserController extends Controller
     public function destroy(Request $request, User $user)
     {
 	if (!auth()->user()->canDelete($user)) {
-	    return redirect()->route('admin.users.users.edit', $user->id)->with('error', __('messages.users.delete_user_not_auth'));
+	    return redirect()->route('admin.users.users.edit', array_merge($request->query(), ['user' => $user->id]))->with('error', __('messages.users.delete_user_not_auth'));
 	}
 
 	$name = $user->name;

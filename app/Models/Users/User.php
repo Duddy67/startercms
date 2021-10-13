@@ -384,6 +384,66 @@ class User extends Authenticatable
     }
 
     /*
+     * Returns the number of posts owned by this user.
+     *
+     * @return integer
+     */
+    public function hasPosts()
+    {
+	return \App\Models\Blog\Post::where('owned_by', $this->id)->count();
+    }
+
+    /*
+     * Returns the number of post categories owned by this user.
+     *
+     * @return integer
+     */
+    public function hasPostCategories()
+    {
+	return \App\Models\Blog\Category::where('owned_by', $this->id)->count();
+    }
+
+    /*
+     * Returns the number of roles owned by this user.
+     *
+     * @return integer
+     */
+    public function hasRoles()
+    {
+	return Role::where('owned_by', $this->id)->count();
+    }
+
+    /*
+     * Returns the number of groups owned by this user.
+     *
+     * @return integer
+     */
+    public function hasGroups()
+    {
+	return Group::where('owned_by', $this->id)->count();
+    }
+
+    /*
+     * Returns the number of menus owned by this user.
+     *
+     * @return integer
+     */
+    public function hasMenus()
+    {
+	return \App\Models\Menus\Menu::where('owned_by', $this->id)->count();
+    }
+
+    /*
+     * Returns the number of menu items owned by this user.
+     *
+     * @return integer
+     */
+    public function hasMenuItems()
+    {
+	return \App\Models\Menus\MenuItem::where('owned_by', $this->id)->count();
+    }
+
+    /*
      * Blade directive
      *
      * @return boolean

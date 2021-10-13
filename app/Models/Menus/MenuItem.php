@@ -129,7 +129,7 @@ class MenuItem extends Model
 
     public function getOwnedByOptions()
     {
-	$users = auth()->user()->getAssignableUsers(['assistant', 'registered']);
+	$users = auth()->user()->getAssignableUsers(['manager', 'assistant', 'registered']);
 	$options = [];
 
 	foreach ($users as $user) {

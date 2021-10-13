@@ -32,6 +32,8 @@ class StoreRequest extends FormRequest
 		'regex:/^[a-z0-9-]{3,}$/',
 		'unique:roles'
 	    ],
+	    'access_level' => 'required',
+	    'owned_by' => 'required',
         ];
     }
 }
