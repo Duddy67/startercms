@@ -233,6 +233,12 @@ class UserController extends Controller
 	    return redirect()->route('admin.users.users.edit', array_merge($request->query(), ['user' => $user->id]))->with('error', __('messages.users.delete_user_not_auth'));
 	}
 
+	if ($dependencies = $user->hasDependencies()) {
+	    return redirect()->route('admin.users.users.edit', array_merge($request->query(), ['user' => $user->id]))
+			     ->with('error', __('messages.users.alert_user_dependencies', ['name' => $user->name, 'number' => $dependencies['nbItems'],
+				    'dependencies' => __('labels.title.'.$dependencies['name'])]));
+	}
+
 	$name = $user->name;
 
 	$user->delete();
@@ -255,15 +261,20 @@ class UserController extends Controller
 	    // Remove the users selected from the list.
 	    foreach ($request->input('ids') as $key => $id) {
 		$user = User::findOrFail($id);
+		// Prepare the message about the users already deleted in case the function has to return an error.
+		$messages = ($deleted) ? ['success' => __('messages.users.delete_list_success', ['number' => $deleted])] : [];
 
-		// Stop the deletions as soon as the current user is not authorized to delete one of the user in the list.
 		if (!auth()->user()->canDelete($user)) {
-		    return redirect()->route('admin.users.user.index', $request->query())->with(
-			[
-			    'error' => __('messages.users.delete_list_not_auth', ['name' => $user->name]),
-			    // Informs about the users previously deleted.
-			    'success' => __('messages.users.delete_list_success', ['number' => $deleted])
-			]);
+		    $messages['error'] = __('messages.users.delete_list_not_auth', ['name' => $user->name]);
+
+		    return redirect()->route('admin.users.user.index', $request->query())->with($messages);
+		}
+
+		if ($dependencies = $user->hasDependencies()) {
+		    $messages['error'] = __('messages.users.alert_user_dependencies', ['name' => $user->name, 'number' => $dependencies['nbItems'],
+										       'dependencies' => __('labels.title.'.$dependencies['name'])]);
+
+		    return redirect()->route('admin.users.users.index', $request->query())->with($messages);
 		}
 
 		$user->delete();

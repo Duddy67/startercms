@@ -384,63 +384,28 @@ class User extends Authenticatable
     }
 
     /*
-     * Returns the number of posts owned by this user.
+     * Returns the number of dependencies (if any) owned by this user.
      *
-     * @return integer
+     * @return Array
      */
-    public function hasPosts()
+    public function hasDependencies()
     {
-	return \App\Models\Blog\Post::where('owned_by', $this->id)->count();
-    }
+        $dependencies = [
+	    'posts' => '\\App\\Models\\Blog\\Post',
+	    'categories' => '\\App\\Models\\Blog\\Category',
+	    'roles' => '\\App\\Models\\Users\\Role',
+	    'groups' => '\\App\\Models\\Users\\Group',
+	    'menus' => '\\App\\Models\\Menus\\Menu',
+	    'menuitems' => '\\App\\Models\\Menus\\MenuItem',
+	];
 
-    /*
-     * Returns the number of post categories owned by this user.
-     *
-     * @return integer
-     */
-    public function hasPostCategories()
-    {
-	return \App\Models\Blog\Category::where('owned_by', $this->id)->count();
-    }
+	foreach ($dependencies as $name => $model) {
+	    if ($nbItems = $model::where('owned_by', $this->id)->count()) {
+	        return ['name' => $name, 'nbItems' => $nbItems];
+	    }
+	}
 
-    /*
-     * Returns the number of roles owned by this user.
-     *
-     * @return integer
-     */
-    public function hasRoles()
-    {
-	return Role::where('owned_by', $this->id)->count();
-    }
-
-    /*
-     * Returns the number of groups owned by this user.
-     *
-     * @return integer
-     */
-    public function hasGroups()
-    {
-	return Group::where('owned_by', $this->id)->count();
-    }
-
-    /*
-     * Returns the number of menus owned by this user.
-     *
-     * @return integer
-     */
-    public function hasMenus()
-    {
-	return \App\Models\Menus\Menu::where('owned_by', $this->id)->count();
-    }
-
-    /*
-     * Returns the number of menu items owned by this user.
-     *
-     * @return integer
-     */
-    public function hasMenuItems()
-    {
-	return \App\Models\Menus\MenuItem::where('owned_by', $this->id)->count();
+	return null;
     }
 
     /*

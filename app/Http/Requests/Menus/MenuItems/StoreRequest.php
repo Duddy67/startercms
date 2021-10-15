@@ -27,6 +27,7 @@ class StoreRequest extends FormRequest
 	    'title' => [
 		'required',
 	    ],
+	    'url' => 'required',
 	    'status' => 'required',
 	    'access_level' => 'required',
 	    'owned_by' => 'required'
