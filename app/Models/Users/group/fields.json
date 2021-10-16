@@ -15,6 +15,14 @@
     "options": [] 
   },
   {
+    "label": "labels.groups.permission",
+    "type": "select",
+    "name": "permission",
+    "id": "permission",
+    "blank": "labels.generic.select_option",
+    "options": [] 
+  },
+  {
     "label": "labels.generic.owned_by",
     "type": "select",
     "name": "owned_by",

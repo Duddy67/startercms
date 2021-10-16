@@ -201,8 +201,8 @@ class Post extends Model
     public function getPrivateCategories()
     {
         return $this->categories()->where([
-					  ['blog_categories.access_level', '=', 'private'], 
-					  ['blog_categories.owned_by', '!=', auth()->user()->id]
+					    ['blog_categories.access_level', '=', 'private'], 
+					    ['blog_categories.owned_by', '!=', auth()->user()->id]
 				      ])->pluck('blog_categories.id')->toArray();
     }
 }

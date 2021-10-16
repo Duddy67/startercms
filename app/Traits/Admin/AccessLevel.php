@@ -95,5 +95,23 @@ trait AccessLevel
         // Use the access level constraints.
 	return $this->canChangeAccessLevel();
     }
+
+    /**
+     * The group ids the item is in.
+     *
+     * @return Array or null if this item has no Group relationship.
+     */
+    public function getGroupIds()
+    {
+        return ($this->groups !== null) ? $this->groups()->pluck('groups.id')->toArray() : null;
+    }
+
+    public function hasCommonGroups()
+    {
+        // Check if the current user and the item share one or more groups.
+        $groups = (Auth::check()) ? array_intersect($this->getGroupIds(), auth()->user()->getGroupIds()) : [];
+
+	return (!empty($groups)) ? true : false;
+    }
 }
 

@@ -42,6 +42,7 @@ return [
 	'edit_group' => 'Edit a group',
 	'add_selected_groups' => 'Add selected groups',
 	'remove_selected_groups' => 'Remove selected groups',
+	'permission' => 'Group permission',
     ],
     'posts' => [
 	'create_post' => 'Create a post',
@@ -82,6 +83,8 @@ return [
 	'private' => 'Private',
 	'public_ro' => 'Public read only',
 	'public_rw' => 'Public read / write',
+	'read_only' => 'Read Only',
+	'read_write' => 'Read Write',
 	'status' => 'Status',
 	'published' => 'Published',
 	'unpublished' => 'Unpublished',

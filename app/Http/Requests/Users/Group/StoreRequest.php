@@ -31,6 +31,7 @@ class StoreRequest extends FormRequest
 		'unique:groups'
 	    ],
 	    'access_level' => 'required',
+	    'permission' => 'required',
 	    'owned_by' => 'required'
         ];
     }

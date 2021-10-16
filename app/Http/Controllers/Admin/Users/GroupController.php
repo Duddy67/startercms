@@ -161,6 +161,7 @@ class GroupController extends Controller
 
 	if ($group->canChangeAccessLevel()) {
 	    $group->access_level = $request->input('access_level');
+	    $group->permission = $request->input('permission');
 	}
 
 	$group->save();
@@ -186,6 +187,7 @@ class GroupController extends Controller
 	  'name' => $request->input('name'), 
 	  'description' => $request->input('description'), 
 	  'access_level' => $request->input('access_level'), 
+	  'permission' => $request->input('permission'),
 	  'owned_by' => $request->input('owned_by'),
 	]);
 

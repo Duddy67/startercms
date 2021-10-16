@@ -38,6 +38,7 @@ class UpdateRequest extends FormRequest
 
 	if (auth()->user()->getRoleLevel() > $this->group->getOwnerRoleLevel() || $this->group->owned_by == auth()->user()->id) {
 	    $rules['access_level'] = 'required';
+	    $rules['permission'] = 'required';
 	    $rules['owned_by'] = 'required';
 	}
 

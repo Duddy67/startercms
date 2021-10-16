@@ -134,19 +134,20 @@ class Group extends Model
 	return $options;
     }
 
+    public function getPermissionOptions()
+    {
+        return [
+            ['value' => 'read_only', 'text' => __('labels.generic.read_only')],
+            ['value' => 'read_write', 'text' => __('labels.generic.read_write')],
+	];
+    }
+
     /*
      * Generic function that returns model values which are handled by select inputs. 
      */
     public function getSelectedValue($fieldName)
     {
-        if ($fieldName == 'owned_by') {
-	    return $this->owned_by;
-	}
-	elseif ($fieldName == 'access_level') {
-	    return $this->access_level;
-	}
-
-	return null;
+	return $this->{$fieldName};
     }
 
     /*
