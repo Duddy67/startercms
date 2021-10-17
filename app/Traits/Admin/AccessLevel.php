@@ -26,7 +26,7 @@ trait AccessLevel
      */
     public function canAccess()
     {
-        return ($this->access_level == 'public_ro' || $this->canEdit()) ? true : false;
+        return ($this->access_level == 'public_ro' || $this->shareGroups() || $this->canEdit()) ? true : false;
     }
 
     /*
@@ -37,7 +37,7 @@ trait AccessLevel
      */
     public function canEdit()
     {
-        if ($this->access_level == 'public_rw' || $this->getOwnerRoleLevel() < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id) {
+        if ($this->access_level == 'public_rw' || $this->getOwnerRoleLevel() < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id || $this->shareReadWriteGroups()) {
 	    return true;
 	}
 
@@ -99,17 +99,43 @@ trait AccessLevel
     /**
      * The group ids the item is in.
      *
-     * @return Array or null if this item has no Group relationship.
+     * @return Array 
      */
     public function getGroupIds()
     {
-        return ($this->groups !== null) ? $this->groups()->pluck('groups.id')->toArray() : null;
+        return $this->groups()->pluck('groups.id')->toArray();
     }
 
-    public function hasCommonGroups()
+    /**
+     * The group ids with read/write permission the item is in.
+     *
+     * @return Array
+     */
+    public function getReadWriteGroupIds()
     {
-        // Check if the current user and the item share one or more groups.
-        $groups = (Auth::check()) ? array_intersect($this->getGroupIds(), auth()->user()->getGroupIds()) : [];
+        return $this->groups()->where('permission', 'read_write')->pluck('groups.id')->toArray();
+    }
+
+    /*
+     * Check if the item share one or more groups with the current user.
+     *
+     * @return boolean
+     */
+    public function shareGroups()
+    {
+        $groups = array_intersect($this->getGroupIds(), auth()->user()->getGroupIds());
+
+	return (!empty($groups)) ? true : false;
+    }
+
+    /*
+     * Check if the item share one or more read/write groups with the current user.
+     *
+     * @return boolean
+     */
+    public function shareReadWriteGroups()
+    {
+        $groups = array_intersect($this->getReadWriteGroupIds(), auth()->user()->getReadWriteGroupIds());
 
 	return (!empty($groups)) ? true : false;
     }

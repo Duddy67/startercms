@@ -21,7 +21,8 @@ class CategoryController extends Controller
 
 	$posts = $category->getPosts($request);
 	$query = array_merge($request->query(), ['id' => $id, 'slug' => $slug]);
+	$canView = (Auth::check() && $category->canAccess()) ? true : false;
 
-        return view('default', compact('page', 'category', 'posts', 'query'));
+        return view('default', compact('page', 'category', 'posts', 'query', 'canView'));
     }
 }

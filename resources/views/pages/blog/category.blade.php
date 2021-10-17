@@ -1,4 +1,4 @@
-@if ($category->canView())
+@if ($canView)
 
     <h3 class="pb-2">{{ $category->name }}</h3>
 

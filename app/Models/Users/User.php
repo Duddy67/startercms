@@ -79,6 +79,16 @@ class User extends Authenticatable
     }
 
     /**
+     * The group ids with read/write permission the user is in.
+     *
+     * @return array
+     */
+    public function getReadWriteGroupIds()
+    {
+        return $this->groups()->where('permission', 'read_write')->pluck('groups.id')->toArray();
+    }
+
+    /**
      * The user's documents.
      */
     public function documents()

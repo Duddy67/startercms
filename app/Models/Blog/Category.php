@@ -67,16 +67,6 @@ class Category extends Model
         return $this->belongsToMany(Group::class, 'blog_category_group');
     }
 
-    /**
-     * The group ids the category is in.
-     *
-     * @return array
-     */
-    public function getGroupIds()
-    {
-        return $this->groups()->pluck('groups.id')->toArray();
-    }
-
     /*
      * Gets the category items as a tree.
      */
@@ -160,17 +150,6 @@ class Category extends Model
 	$traverse($nodes);
 
 	return $options;
-    }
-
-    public function canView()
-    {
-        // Check if the current user and the category share one or more groups.
-        $groups = (Auth::check()) ? array_intersect($this->getGroupIds(), auth()->user()->getGroupIds()) : [];
-        $userId = (Auth::check()) ? auth()->user()->id : null;
-
-	return (in_array($this->access_level, ['public_ro', 'public_rw']) ||
-		($this->access_level == 'private' && $this->owned_by == $userId) ||
-		!empty($groups)) ? true : false;
     }
 
     public function getOwnedByOptions()

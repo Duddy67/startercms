@@ -64,16 +64,6 @@ class MenuItem extends Model
         parent::delete();
     }
 
-    /**
-     * The group ids the menu item is in.
-     *
-     * @return array
-     */
-    public function getGroupIds()
-    {
-        return $this->groups()->pluck('groups.id')->toArray();
-    }
-
     /*
      * Gets the menu items as a tree.
      */

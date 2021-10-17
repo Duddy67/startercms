@@ -59,16 +59,6 @@ class Post extends Model
     }
 
     /**
-     * The group ids the post is in.
-     *
-     * @return array
-     */
-    public function getGroupIds()
-    {
-        return $this->groups()->pluck('groups.id')->toArray();
-    }
-
-    /**
      * Delete the model from the database (override).
      *
      * @return bool|null
