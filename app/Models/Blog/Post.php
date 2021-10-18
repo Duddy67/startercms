@@ -99,35 +99,45 @@ class Post extends Model
 	    $query->orderBy($matches[1], $matches[2]);
 	}
 
+	// Filter by owners
 	if ($ownedBy !== null) {
 	    $query->whereIn('posts.owned_by', $ownedBy);
 	}
 
+	// Filter by groups
 	if (!empty($groups)) {
 	    $query->whereHas('groups', function($query) use($groups) {
 		$query->whereIn('id', $groups);
 	    });
 	}
 
+	// Filter by categories
 	if (!empty($categories)) {
 	    $query->whereHas('categories', function($query) use($categories) {
 		$query->whereIn('id', $categories);
 	    });
 	}
 
+
+	// N.B: Put the following part of the query into brackets.
 	$query->where(function($query) {
-	    $query->where('roles.role_level', '<', auth()->user()->getRoleLevel())
-		  ->orWhereIn('posts.access_level', ['public_ro', 'public_rw'])
-		  ->orWhere('posts.owned_by', auth()->user()->id);
-	});
 
-        $groupIds = auth()->user()->getGroupIds();
-
-	if(!empty($groupIds)) {
-	    $query->orWhereHas('groups', function ($query)  use ($groupIds) {
-		$query->whereIn('id', $groupIds);
+	    // Check for access levels.
+	    $query->where(function($query) {
+		$query->where('roles.role_level', '<', auth()->user()->getRoleLevel())
+		      ->orWhereIn('posts.access_level', ['public_ro', 'public_rw'])
+		      ->orWhere('posts.owned_by', auth()->user()->id);
 	    });
-	}
+
+	    $groupIds = auth()->user()->getGroupIds();
+
+	    if(!empty($groupIds)) {
+		// Check for access through groups.
+		$query->orWhereHas('groups', function ($query)  use ($groupIds) {
+		    $query->whereIn('id', $groupIds);
+		});
+	    }
+	});
 
         return $query->paginate($perPage);
     }

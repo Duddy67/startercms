@@ -58,6 +58,7 @@ class GroupController extends Controller
         $filters = $this->getFilters($request);
 	$items = $this->model->getItems($request);
 	$rows = $this->getRows($columns, $items);
+	$this->setRowValues($rows, $columns, $items);
 	$query = $request->query();
 	$url = ['route' => 'admin.users.groups', 'item_name' => 'group', 'query' => $query];
 
@@ -328,6 +329,25 @@ class GroupController extends Controller
 	}
 
 	return redirect()->route('admin.users.groups.index')->with($messages);
+    }
+
+    /*
+     * Sets the row values specific to the Group model.
+     *
+     * @param  Array  $rows
+     * @param  Array of stdClass Objects  $columns
+     * @param  \Illuminate\Pagination\LengthAwarePaginator  $groups
+     * @return void
+     */
+    private function setRowValues(&$rows, $columns, $groups)
+    {
+        foreach ($groups as $key => $group) {
+	    foreach ($columns as $column) {
+	        if ($column->name == 'permission') {
+		    $rows[$key]->permission = __('labels.generic.'.$group->permission);
+		}
+	    }
+	}
     }
 
     /*

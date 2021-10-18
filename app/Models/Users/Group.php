@@ -94,6 +94,7 @@ class Group extends Model
         $search = $request->input('search', null);
         $sortedBy = $request->input('sorted_by', null);
         $ownedBy = $request->input('owned_by', null);
+        $permission = $request->input('permission', null);
 
 	$query = Group::query();
 	$query->select('groups.*', 'users.name as user_name')->leftJoin('users', 'groups.owned_by', '=', 'users.id');
@@ -111,6 +112,10 @@ class Group extends Model
 
 	if ($ownedBy !== null) {
 	    $query->whereIn('groups.owned_by', $ownedBy);
+	}
+
+	if ($permission !== null) {
+	    $query->where('groups.permission', $permission);
 	}
 
 	$query->where(function($query) {

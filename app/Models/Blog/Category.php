@@ -92,12 +92,6 @@ class Category extends Model
         $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
         $search = $request->input('search', null);
 
-	$groups = [];
-
-	if (Auth::check()) {
-	    $groups = auth()->user()->getGroupIds();
-	}
-
 	$query = Post::query();
 	$query->select('posts.*', 'users.name as user_name')->leftJoin('users', 'posts.owned_by', '=', 'users.id');
 	// Join the role tables to get the owner's role level.
@@ -105,11 +99,37 @@ class Category extends Model
 
 	// Get only the posts related to this category. 
 	$query->whereHas('categories', function ($query) {
-	    $query->where('category_id', $this->id);
+	    $query->where('id', $this->id);
 	});
 
 	if ($search !== null) {
 	    $query->where('posts.title', 'like', '%'.$search.'%');
+	}
+
+	if (Auth::check()) {
+
+	    // N.B: Put the following part of the query into brackets.
+	    $query->where(function($query) {
+
+		// Check for access levels.
+		$query->where(function($query) {
+		    $query->where('roles.role_level', '<', auth()->user()->getRoleLevel())
+			  ->orWhereIn('posts.access_level', ['public_ro', 'public_rw'])
+			  ->orWhere('posts.owned_by', auth()->user()->id);
+		});
+
+		$groupIds = auth()->user()->getGroupIds();
+
+		if(!empty($groupIds)) {
+		    // Check for access through groups.
+		    $query->orWhereHas('groups', function ($query)  use ($groupIds) {
+			$query->whereIn('id', $groupIds);
+		    });
+		}
+	    });
+	}
+	else {
+	    $query->whereIn('posts.access_level', ['public_ro', 'public_rw']);
 	}
 
         return $query->paginate($perPage);
