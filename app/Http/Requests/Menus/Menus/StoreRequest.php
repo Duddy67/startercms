@@ -25,6 +25,11 @@ class StoreRequest extends FormRequest
     {
         return [
 	    'title' => 'required',
+	    'code' => [
+		'required',
+		'regex:/^[a-z0-9-]{3,}$/',
+		'unique:menus'
+	    ],
 	    'status' => 'required',
 	    'access_level' => 'required',
 	    'owned_by' => 'required',

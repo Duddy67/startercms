@@ -1,14 +1,15 @@
 @inject ('menu', 'App\Models\Menus\Menu')
-@php $menuItems = $menu::getMenu('main-menu')->getMenuItems(); @endphp
 
 <nav class="navbar navbar-expand-md navbar-light bg-light">
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-	    @foreach ($menuItems as $menuItem)
-		@include ('partials.menuitems')
-	    @endforeach
-        </ul>
-  </div>
+  @if ($menu = $menu::getMenu('main-menu'))
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+	    <ul class="navbar-nav mr-auto">
+		@foreach ($menu->getMenuItems() as $menuItem)
+		    @include ('partials.menuitems')
+		@endforeach
+	    </ul>
+      </div>
+  @endif
 
   @if (Route::has('login'))
       <div class="hidden fixed top-0 right-0 px-6 py-4 sm:block">

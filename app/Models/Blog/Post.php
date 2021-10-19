@@ -131,7 +131,7 @@ class Post extends Model
 
 	    $groupIds = auth()->user()->getGroupIds();
 
-	    if(!empty($groupIds)) {
+	    if (!empty($groupIds)) {
 		// Check for access through groups.
 		$query->orWhereHas('groups', function ($query)  use ($groupIds) {
 		    $query->whereIn('id', $groupIds);

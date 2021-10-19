@@ -55,6 +55,10 @@ return [
 	'edit_category' => 'Edit a category',
 	'parent_category' => 'Parent category',
     ],
+    'menus' => [
+	'create_menu' => 'Create a menu',
+	'edit_menu' => 'Edit a menu',
+    ],
     'menuitems' => [
 	'create_menu_item' => 'Create a menu item',
 	'edit_menu_item' => 'Edit a menu item',

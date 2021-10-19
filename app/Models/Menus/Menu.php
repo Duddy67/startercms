@@ -9,6 +9,7 @@ use App\Models\Menus\MenuItem;
 use App\Models\Settings\General;
 use App\Traits\Admin\AccessLevel;
 use App\Traits\Admin\CheckInCheckOut;
+use Illuminate\Support\Facades\Auth;
 
 
 class Menu extends Model
@@ -58,6 +59,14 @@ class Menu extends Model
     public function delete()
     {
         $this->groups()->detach();
+
+	// Get the parent menu items linked to this menu.
+	$menuItems = MenuItem::where(['menu_code' => $this->code, 'parent_id' => 1])->get();
+
+	foreach ($menuItems as $menuItem) {
+	    // Delete the parent menu item as well as its children (if any).
+	    $menuItem->delete();
+	}
 
         parent::delete();
     }
@@ -194,26 +203,47 @@ class Menu extends Model
 	return $this->{$fieldName};
     }
 
+    /*
+     * Returns the menus according to the current user's role level and groups.
+     */
     public static function getMenus()
     {
-        return Menu::all();
-    }
+	$query = Menu::query();
+	// Join the role tables to get the owner's role level.
+	$query->select('menus.*')->join('model_has_roles', 'menus.owned_by', '=', 'model_id')
+			         ->join('roles', 'roles.id', '=', 'role_id');
 
-    public static function getMenu($code)
-    {
-        return Menu::where('code', $code)->first();
-    }
+	// Check for access levels.
+	$query->where(function($query) {
+	    $query->where('roles.role_level', '<', auth()->user()->getRoleLevel())
+		  ->orWhereIn('menus.access_level', ['public_ro', 'public_rw'])
+		  ->orWhere('menus.owned_by', auth()->user()->id);
+	});
 
-    public static function makeCodeUnique($code)
-    {
-        $counter = 1;
-	$original = $code;
+	$groupIds = auth()->user()->getGroupIds();
 
-        while (Menu::where('code', $code)->first()) {
-	    $code = $original.'-'.$counter;
-	    $counter++;
+	if (!empty($groupIds)) {
+	    // Check for access through groups.
+	    $query->orWhereHas('groups', function ($query)  use ($groupIds) {
+		$query->whereIn('id', $groupIds);
+	    });
 	}
 
-	return $code;
+	return $query->get();
+    }
+
+    /*
+     * Returns the menu corresponding to the given code.
+     */
+    public static function getMenu($code)
+    {
+        if ($menu = Menu::where(['code' => $code, 'status' => 'published'])->first()) {
+
+	    if (in_array($menu->access_level, ['public_ro', 'public_rw']) || (Auth::check() && $menu->canAccess())) {
+		return $menu;
+	    }
+	}
+
+	return null;
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use App\Models\Menus\Menu;
 
 class AdminMenusMenuItems
 {
@@ -17,6 +18,16 @@ class AdminMenusMenuItems
     public function handle(Request $request, Closure $next)
     {
 	$routeName = $request->route()->getName();
+
+        // Check first for a valid menu code.
+	if (!$menu = Menu::where('code', $request->route()->parameter('code'))->first()) {
+	    return abort('404');
+	}
+
+        // Now check if the current user has access to the corresponding menu.
+	if (!$menu->canAccess()) {
+	    return redirect()->route('admin')->with('error', __('messages.generic.access_not_auth'));
+	}
 
         $create = ['admin.menus.menuitems.index', 'admin.menus.menuitems.create', 'admin.menus.menuitems.store'];
         $update = ['admin.menus.menuitems.update', 'admin.menus.menuitems.edit'];

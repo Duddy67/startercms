@@ -12,6 +12,7 @@ use App\Http\Requests\Menus\Menus\StoreRequest;
 use App\Http\Requests\Menus\Menus\UpdateRequest;
 use Illuminate\Support\Str;
 
+use App\Models\Menus\MenuItem;
 
 class MenuController extends Controller
 {
@@ -202,12 +203,9 @@ class MenuController extends Controller
      */
     public function store(StoreRequest $request)
     {
-	$code = ($request->input('code')) ? Str::slug($request->input('code'), '-') : Str::slug($request->input('title'), '-');
-	$code = Menu::makeCodeUnique($code);
-
 	$menu = Menu::create([
 	  'title' => $request->input('title'), 
-	  'code' => $code,
+	  'code' => $request->input('code'), 
 	  'status' => $request->input('status'), 
 	  'access_level' => $request->input('access_level'), 
 	  'owned_by' => $request->input('owned_by'),
@@ -216,8 +214,6 @@ class MenuController extends Controller
 	if ($request->input('groups') !== null) {
 	    $menu->groups()->attach($request->input('groups'));
 	}
-
-	$menu->save();
 
         if ($request->input('_close', null)) {
 	    return redirect()->route('admin.menus.menus.index', $request->query())->with('success', __('messages.menus.create_success'));
@@ -235,11 +231,13 @@ class MenuController extends Controller
      */
     public function destroy(Request $request, Menu $menu)
     {
-	if (!$menu->canDelete()) {
+        // Prevent the main menu to be deleted. 
+	if (!$menu->canDelete() || $menu->code == 'main-menu') {
 	    return redirect()->route('admin.menus.menus.edit', array_merge($request->query(), ['menu' => $menu->id]))->with('error',  __('messages.generic.delete_not_auth'));
 	}
 
 	$name = $menu->name;
+
 	$menu->delete();
 
 	return redirect()->route('admin.menus.menus.index', $request->query())->with('success', __('messages.menus.delete_success', ['name' => $name]));
@@ -254,17 +252,22 @@ class MenuController extends Controller
     public function massDestroy(Request $request)
     {
         $deleted = 0;
+	$messages = [];
 
         // Remove the menus selected from the list.
         foreach ($request->input('ids') as $id) {
 	    $menu = Menu::findOrFail($id);
 
-	    if (!$menu->canDelete()) {
-	      return redirect()->route('admin.menus.menus.index', $request->query())->with(
-		  [
-		      'error' => __('messages.generic.delete_not_auth'), 
-		      'success' => __('messages.menus.delete_list_success', ['number' => $deleted])
-		  ]);
+	    // Prevent the main menu to be deleted. 
+	    if (!$menu->canDelete() || $menu->code == 'main-menu') {
+
+	        $messages['error'] = __('messages.generic.delete_not_auth'); 
+
+		if ($deleted) {
+		    $messages['success'] = __('messages.menus.mass_delete_success', ['number' => $deleted]);
+		}
+
+		return redirect()->route('admin.menus.menus.index', $request->query())->with($messages);
 	    }
 
 	    $menu->delete();
