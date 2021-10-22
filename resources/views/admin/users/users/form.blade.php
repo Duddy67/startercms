@@ -60,6 +60,7 @@
     <link rel="stylesheet" href="{{ url('/') }}/vendor/adminlte/plugins/jquery-ui/jquery-ui.min.css"></script>
     <script type="text/javascript" src="{{ url('/') }}/js/admin/datepicker.js"></script>
     <script type="text/javascript" src="{{ url('/') }}/js/admin/form.js"></script>
+    <script type="text/javascript" src="{{ asset('/js/admin/set.private.groups.js') }}"></script>
     <script type="text/javascript" src="{{ url('/') }}/js/admin/disable.toolbars.js"></script>
 @endpush
 

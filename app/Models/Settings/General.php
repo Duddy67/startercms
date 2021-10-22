@@ -117,20 +117,33 @@ class General extends Model
      *
      * @return Array
      */
-    public static function getGroupsOptions()
+    public static function getGroupsOptions($item = null)
     {
         $groups = Group::all();
 	$options = [];
+	// Check whether the dropdown list is used as a filter on the item list view.
+        $isFilter = ($item && debug_backtrace()[1]['function'] == 'getFilters') ? true : false; 
 
 	foreach ($groups as $group) {
+	    // Get the owner of this group.
 	    $owner = ($group->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($group->owned_by);
+	    $extra = [];
 
 	    // Ensure the current user can use this group.
 	    if ($group->access_level == 'private' && $owner->getRoleLevel() >= auth()->user()->getRoleLevel() && $group->owned_by != auth()->user()->id) {
-		continue;
+                // The item is part of this private group. 
+		if ($item && in_array($group->id, $item->getGroupIds())) {
+		    // Show the group.
+		    // N.B: This option is disabled for the form field.
+		    $extra[] = ($isFilter) ? null : 'disabled';
+		}
+		else {
+		    // Don't show the group.
+		    continue;
+		}
 	    }
 
-	    $options[] = ['value' => $group->id, 'text' => $group->name];
+	    $options[] = ['value' => $group->id, 'text' => $group->name, 'extra' => $extra];
 	}
 
 	return $options;

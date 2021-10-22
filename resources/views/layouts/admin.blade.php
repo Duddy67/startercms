@@ -17,7 +17,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <!-- Theme style -->
   <link rel="stylesheet" href="{{ asset('/vendor/adminlte/dist/css/adminlte.min.css') }}">
   <!-- Select2 plugin style -->
-  <link rel="stylesheet" href="{{ asset('/vendor/adminlte/plugins/select2/css/select2.min.css') }}"></script>
+  <link rel="stylesheet" href="{{ asset('/vendor/adminlte/plugins/select2/css/select2.min.css') }}">
   <!-- Custom style -->
   <link rel="stylesheet" href="{{ asset('/css/admin/style.css') }}">
   <!-- Additional style sheets -->

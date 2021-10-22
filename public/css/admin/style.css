@@ -43,6 +43,10 @@ tr.clickable-row {
   display: none!important;
 }
 
+.private-tag {
+  background-color: #f6f6f6 !important;
+}
+
 .indent-0 {
 }
 

@@ -258,7 +258,7 @@ trait ItemConfig
 		    $options = General::$function($this->model->getTable());
 		}
 		elseif ($filter->name == 'groups') {
-		    $options = General::$function();
+		    $options = General::$function(auth()->user());
 		}
 		// Specific to the model.
 		else {
@@ -340,7 +340,7 @@ trait ItemConfig
 
 	if (in_array($field->name, ['access_level', 'groups', 'status'])) {
 	    // Common options.
-	    $options = General::$function();
+	    $options = ($field->name == 'groups') ? General::$function($item) : General::$function();
 	}
 	elseif ($field->name == 'parent_id') {
 	    $options = ($item) ? $item->$function() : $this->model->$function();

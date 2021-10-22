@@ -165,13 +165,6 @@ class PostController extends Controller
 
 	if ($post->canChangeAccessLevel()) {
 	    $post->access_level = $request->input('access_level');
-	}
-
-	if ($post->canChangeAttachments()) {
-
-	    $post->owned_by = $request->input('owned_by');
-	    // N.B: Get also the private groups (if any) that are not returned by the form as they're disabled.
-	    $groups = array_merge($request->input('groups', []), Group::getPrivateGroups($post));
 
 	    if (!empty($groups)) {
 		$post->groups()->sync($groups);
@@ -180,6 +173,13 @@ class PostController extends Controller
 		// Remove all groups for this post.
 		$post->groups()->sync([]);
 	    }
+	}
+
+	if ($post->canChangeAttachments()) {
+
+	    $post->owned_by = $request->input('owned_by');
+	    // N.B: Get also the private groups (if any) that are not returned by the form as they're disabled.
+	    $groups = array_merge($request->input('groups', []), Group::getPrivateGroups($post));
 
 	    // N.B: Get also the private categories (if any) that are not returned by the form as they're disabled.
 	    $categories = array_merge($request->input('categories', []), $post->getPrivateCategories());
@@ -235,8 +235,6 @@ class PostController extends Controller
 	if ($request->input('categories') !== null) {
 	    $post->categories()->attach($request->input('categories'));
 	}
-
-	$post->save();
 
         if ($request->input('_close', null)) {
 	    return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.create_success'));
@@ -354,7 +352,7 @@ class PostController extends Controller
 		$updated = true;
 	    }
 
-	    if ($request->input('groups') !== null && $post->canChangeAttachments()) {
+	    if ($request->input('groups') !== null && $post->canChangeAccessLevel()) {
 		if ($request->input('_selected_groups') == 'add') {
 		    $post->groups()->syncWithoutDetaching($request->input('groups'));
 		}

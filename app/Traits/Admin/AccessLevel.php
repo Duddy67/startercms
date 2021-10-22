@@ -86,7 +86,7 @@ trait AccessLevel
 
     /*
      * Checks whether the current user is allowed to change the owner,
-     * groups, categories or parent category of a given item.
+     * categories or parent category of a given item.
      *
      * @return boolean
      */
