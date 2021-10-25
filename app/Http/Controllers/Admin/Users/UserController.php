@@ -408,17 +408,20 @@ class UserController extends Controller
 	        if ($column->name == 'groups') {
 		    $groups = [];
 
-	            $user->groups()->each(function ($group, $key) use(&$groups) {
-		        //
+	            $user->groups()->each(function ($group, $key) use(&$groups, $user) {
+		        // Check for private groups.
                         if ($group->access_level == 'private' && $group->owned_by != auth()->user()->id && auth()->user()->getRoleLevel() <= $group->getOwnerRoleLevel()) {
-			    // continue
-			    return; 
+			    // Don't show this private group if the item user is not part of it.
+			    if (!in_array($group->id, $user->getGroupIds())) {
+				// N.B: same as 'continue' with each().
+				return; 
+			    }
 			} 
 
 			$groups[] = $group->name;
 		    });
 
-		    $groups = (!empty($groups)) ? implode(',', $groups) : '-';
+		    $groups = (!empty($groups)) ? implode(', ', $groups) : '-';
 		    $rows[$key]->groups = $groups;
 		}
 	    }

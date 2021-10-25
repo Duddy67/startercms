@@ -255,7 +255,7 @@ trait ItemConfig
 		    $options = General::$function($this->pluginName, $this->modelName);
 		}
 		elseif ($filter->name == 'owned_by') {
-		    $options = General::$function($this->model->getTable());
+		    $options = General::$function($this->model);
 		}
 		elseif ($filter->name == 'groups') {
 		    $options = General::$function(auth()->user());
@@ -338,15 +338,17 @@ trait ItemConfig
 	// Build the function name.
 	$function = 'get'.str_replace('_', '', ucwords($field->name, '_')).'Options';
 
+	// Common options.
 	if (in_array($field->name, ['access_level', 'groups', 'status'])) {
-	    // Common options.
+	    // Pass the current item object if available.
 	    $options = ($field->name == 'groups') ? General::$function($item) : General::$function();
 	}
 	elseif ($field->name == 'parent_id') {
 	    $options = ($item) ? $item->$function() : $this->model->$function();
 	}
 	else {
-	    $options = $this->model->$function();
+	    // Pass the current item object if available.
+	    $options = ($field->name == 'owned_by' && $item) ? $this->model->$function($item) : $this->model->$function();
 	}
 
 	return $options;

@@ -166,6 +166,9 @@ class PostController extends Controller
 	if ($post->canChangeAccessLevel()) {
 	    $post->access_level = $request->input('access_level');
 
+	    // N.B: Get also the private groups (if any) that are not returned by the form as they're disabled.
+	    $groups = array_merge($request->input('groups', []), Group::getPrivateGroups($post));
+
 	    if (!empty($groups)) {
 		$post->groups()->sync($groups);
 	    }
@@ -178,8 +181,6 @@ class PostController extends Controller
 	if ($post->canChangeAttachments()) {
 
 	    $post->owned_by = $request->input('owned_by');
-	    // N.B: Get also the private groups (if any) that are not returned by the form as they're disabled.
-	    $groups = array_merge($request->input('groups', []), Group::getPrivateGroups($post));
 
 	    // N.B: Get also the private categories (if any) that are not returned by the form as they're disabled.
 	    $categories = array_merge($request->input('categories', []), $post->getPrivateCategories());

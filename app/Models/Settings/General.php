@@ -149,15 +149,46 @@ class General extends Model
 	return $options;
     }
 
-    public static function getOwnedByOptions($table)
+    /*
+     * Returns the users who own a given item model according to its access level and
+     * to the current user's role level and groups.
+     * N.B: Dropdown list used as a filter.
+     *
+     * @param  Object  $model
+     * @return Array 
+     */  
+    public static function getOwnedByOptions($model)
     {
-	$owners = DB::table($table)->leftJoin('users', $table.'.owned_by', '=', 'users.id')
-				   ->join('model_has_roles', $table.'.owned_by', '=', 'model_id')
-				   ->join('roles', 'roles.id', '=', 'role_id')
-				   ->select(['users.id', 'users.name'])
-				   ->whereIn($table.'.access_level', ['public_ro', 'public_rw'])
-				   ->orWhere('roles.role_level', '<', auth()->user()->getRoleLevel())
-				   ->orWhere($table.'.owned_by', auth()->user()->id)->distinct()->get();
+	$table = $model->getTable();
+	$query = get_class($model)::query();
+
+	$query->select(['users.id', 'users.name'])
+	      ->leftJoin('users', $table.'.owned_by', '=', 'users.id')
+	      ->join('model_has_roles', $table.'.owned_by', '=', 'model_id')
+	      ->join('roles', 'roles.id', '=', 'role_id');
+
+	// N.B: Put the following part of the query into brackets.
+	$query->where(function($query) use($table) {
+
+	    // Check for access levels.
+	    $query->where(function($query) use($table) {
+		$query->where('roles.role_level', '<', auth()->user()->getRoleLevel())
+		      ->orWhereIn($table.'.access_level', ['public_ro', 'public_rw'])
+		      ->orWhere($table.'.owned_by', auth()->user()->id);
+	    });
+
+	    $groupIds = auth()->user()->getGroupIds();
+
+	    if (!empty($groupIds)) {
+		// Check for access through groups.
+		$query->orWhereHas('groups', function ($query)  use ($groupIds) {
+		    $query->whereIn('id', $groupIds);
+		});
+	    }
+	});
+
+	$owners = $query->distinct()->get();
+
 	$options = [];
 
 	foreach ($owners as $owner) {

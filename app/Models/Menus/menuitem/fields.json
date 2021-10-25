@@ -55,7 +55,7 @@
     "label": "labels.users.groups",
     "type": "select",
     "name": "groups",
-    "extra": ["multiple"],
+    "extra": ["multiple","title_as_id"],
     "id": "groups",
     "class": "_locked",
     "blank": "labels.generic.select_option",

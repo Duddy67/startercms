@@ -172,13 +172,28 @@ class Category extends Model
 	return $options;
     }
 
-    public function getOwnedByOptions()
+    public function getOwnedByOptions($category = null)
     {
 	$users = auth()->user()->getAssignableUsers(['assistant', 'registered']);
 	$options = [];
 
 	foreach ($users as $user) {
-	    $options[] = ['value' => $user->id, 'text' => $user->name];
+	    $extra = [];
+
+	    // The user is a manager who doesn't have the create-blog-category permission (anymore).
+	    if ($user->getRoleType() == 'manager' && !$user->can('create-blog-category')) {
+                // The user owns this category.
+		if ($category && $user->id == $category->getSelectedValue('owned_by')) {
+		    // Prevent this user to be selected again.
+		    $extra[] = 'disabled';
+		}
+		else {
+		    // Don't show this user.
+		    continue;
+		}
+	    }
+
+	    $options[] = ['value' => $user->id, 'text' => $user->name, 'extra' => $extra];
 	}
 
 	return $options;

@@ -181,7 +181,7 @@ class Menu extends Model
 
     public function getOwnedByOptions()
     {
-	$users = auth()->user()->getAssignableUsers();
+	$users = auth()->user()->getAssignableUsers(['manager', 'assistant', 'registered']);
 	$options = [];
 
 	foreach ($users as $user) {
