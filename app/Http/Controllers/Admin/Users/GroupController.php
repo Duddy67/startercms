@@ -91,7 +91,8 @@ class GroupController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        $group = Group::select('groups.*', 'users.name as owner_name', 'users2.name as modifier_name')
+        $group = Group::select('groups.*', 'users.name as owner_name')
+			->selectRaw('IFNULL(users2.name, ?) as modifier_name', [__('labels.generic.unknown_user')])
 			->leftJoin('users', 'groups.owned_by', '=', 'users.id')
 			->leftJoin('users as users2', 'groups.updated_by', '=', 'users2.id')
 			->findOrFail($id);

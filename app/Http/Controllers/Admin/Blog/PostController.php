@@ -93,7 +93,8 @@ class PostController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        $post = Post::select('posts.*', 'users.name as owner_name', 'users2.name as modifier_name')
+        $post = Post::select('posts.*', 'users.name as owner_name')
+			->selectRaw('IFNULL(users2.name, ?) as modifier_name', [__('labels.generic.unknown_user')])
 			->leftJoin('users', 'posts.owned_by', '=', 'users.id')
 			->leftJoin('users as users2', 'posts.updated_by', '=', 'users2.id')
 			->findOrFail($id);

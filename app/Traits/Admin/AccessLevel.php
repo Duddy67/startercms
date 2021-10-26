@@ -103,7 +103,7 @@ trait AccessLevel
      */
     public function getGroupIds()
     {
-        return $this->groups()->pluck('groups.id')->toArray();
+        return ($this->groups !== null) ? $this->groups()->pluck('groups.id')->toArray() : [];
     }
 
     /**
@@ -113,7 +113,7 @@ trait AccessLevel
      */
     public function getReadWriteGroupIds()
     {
-        return $this->groups()->where('permission', 'read_write')->pluck('groups.id')->toArray();
+        return ($this->groups !== null) ? $this->groups()->where('permission', 'read_write')->pluck('groups.id')->toArray() : [];
     }
 
     /*

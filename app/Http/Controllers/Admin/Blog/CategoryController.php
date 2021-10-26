@@ -91,7 +91,8 @@ class CategoryController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        $category = Category::select('blog_categories.*', 'users.name as owner_name', 'users2.name as modifier_name')
+        $category = Category::select('blog_categories.*', 'users.name as owner_name')
+			      ->selectRaw('IFNULL(users2.name, ?) as modifier_name', [__('labels.generic.unknown_user')])
 			      ->leftJoin('users', 'blog_categories.owned_by', '=', 'users.id')
 			      ->leftJoin('users as users2', 'blog_categories.updated_by', '=', 'users2.id')
 			      ->findOrFail($id);

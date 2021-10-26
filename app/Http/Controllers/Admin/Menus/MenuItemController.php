@@ -94,7 +94,8 @@ class MenuItemController extends Controller
      */
     public function edit(Request $request, $code, $id)
     {
-        $menuItem = MenuItem::select('menu_items.*', 'users.name as owner_name', 'users2.name as modifier_name')
+        $menuItem = MenuItem::select('menu_items.*', 'users.name as owner_name')
+			      ->selectRaw('IFNULL(users2.name, ?) as modifier_name', [__('labels.generic.unknown_user')])
 			      ->leftJoin('users', 'menu_items.owned_by', '=', 'users.id')
 			      ->leftJoin('users as users2', 'menu_items.updated_by', '=', 'users2.id')
 			      ->findOrFail($id);

@@ -101,6 +101,7 @@ return [
 	'format' => 'Format',
 	'none' => 'None',
 	'unknown' => 'Unknown',
+	'unknown_user' => 'Unknown user',
 	'system' => 'System',
 	'select_option' => '- Select -',
 	'batch_title' => 'Fields to update for the selection of items',

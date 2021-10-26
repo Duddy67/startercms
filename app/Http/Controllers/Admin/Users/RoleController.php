@@ -96,7 +96,8 @@ class RoleController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        $role = Role::select('roles.*', 'users.name as owner_name', 'users2.name as modifier_name')
+        $role = Role::select('roles.*', 'users.name as owner_name')
+		      ->selectRaw('IFNULL(users2.name, ?) as modifier_name', [__('labels.generic.unknown_user')])
 		      ->leftJoin('users', 'roles.owned_by', '=', 'users.id')
 		      ->leftJoin('users as users2', 'roles.updated_by', '=', 'users2.id')
 		      ->findOrFail($id);
