@@ -1,0 +1,10 @@
+[
+  {
+    "label": "labels.settings.timezone",
+    "type": "select",
+    "name": "post_ordering",
+    "id": "postOrdering",
+    "group": "app",
+    "options": [] 
+  }
+]

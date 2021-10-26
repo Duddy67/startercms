@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\Blog\PostController as AdminPostController;
 use App\Http\Controllers\Admin\Blog\CategoryController as AdminBlogCategoryController;
 use App\Http\Controllers\Blog\PostController;
 use App\Http\Controllers\Blog\CategoryController as BlogCategoryController;
+use App\Http\Controllers\Admin\Blog\SettingController as AdminBlogSettingController;
 use App\Http\Controllers\Admin\Menus\MenuController;
 use App\Http\Controllers\Admin\Menus\MenuItemController;
 use App\Http\Controllers\SiteController;
@@ -114,6 +115,9 @@ Route::prefix('admin')->group(function () {
 	    Route::get('/categories/{category}/up', [AdminBlogCategoryController::class, 'up'])->name('admin.blog.categories.up');
 	    Route::get('/categories/{category}/down', [AdminBlogCategoryController::class, 'down'])->name('admin.blog.categories.down');
 	    Route::resource('categories', AdminBlogCategoryController::class, ['as' => 'admin.blog'])->except(['show']);
+	    // Settings
+	    Route::get('/settings', [AdminBlogSettingController::class, 'index'])->name('admin.blog.settings.index');
+	    Route::patch('/settings', [AdminBlogSettingController::class, 'update'])->name('admin.blog.settings.update');
 	});
 
 	Route::prefix('menus')->group(function () {

@@ -152,6 +152,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			    @lang ('labels.title.categories')
 			  </x-menu-item>
 		      @endallowto
+		      @allowto ('blog-settings')
+			  @php $active = (request()->is('admin/blog/settings*')) ? true : false @endphp
+			  <x-menu-item href="{{ route('admin.blog.settings.index') }}" :sub=true :active="$active">
+			    @lang ('labels.title.settings')
+			  </x-menu-item>
+		      @endallowto
 		  </ul>
 	      </li>
 	  @endallowto
@@ -194,11 +200,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			    @php $active = (request()->is('admin/settings/general*')) ? true : false @endphp
 			    <x-menu-item href="{{ route('admin.settings.general.index') }}" :sub=true :active="$active">
 			      @lang ('labels.title.general')
-			    </x-menu-item>
-			@endallowto
-			@allowto ('blog-settings')
-			    <x-menu-item href="#" :sub=true :active=false>
-			      Blog
 			    </x-menu-item>
 			@endallowto
 			@allowto ('update-email')
