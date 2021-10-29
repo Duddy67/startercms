@@ -346,6 +346,14 @@ trait ItemConfig
 	elseif ($field->name == 'parent_id') {
 	    $options = ($item) ? $item->$function() : $this->model->$function();
 	}
+	// Sets the yes/no select lists. 
+	elseif (isset($field->extra) && in_array('yes_no', $field->extra)) {
+	    $options = General::getYesNoOptions();
+
+	    if (in_array('global_setting', $field->extra)) {
+	        $options[] = ['value' => 'global_setting', 'text' => __('labels.generic.global_setting')];
+	    }
+	}
 	else {
 	    // Pass the current item object if available.
 	    $options = ($field->name == 'owned_by' && $item) ? $this->model->$function($item) : $this->model->$function();

@@ -96,6 +96,14 @@ class General extends Model
 	];
     }
 
+    public static function getYesNoOptions()
+    {
+	return [
+	    ['value' => 1, 'text' => __('labels.generic.yes')],
+	    ['value' => 0, 'text' => __('labels.generic.no')],
+	];
+    }
+
     public static function getSortedByOptions($pluginName, $modelName)
     {
 	$json = file_get_contents(app_path().'/Models/'.ucfirst($pluginName).'/'.$modelName.'/columns.json', true);
@@ -152,7 +160,7 @@ class General extends Model
     /*
      * Returns the users who own a given item model according to its access level and
      * to the current user's role level and groups.
-     * N.B: Dropdown list used as a filter.
+     * N.B: This dropdown list is used as a filter.
      *
      * @param  Object  $model
      * @return Array 

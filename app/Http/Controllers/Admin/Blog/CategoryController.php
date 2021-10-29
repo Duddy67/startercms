@@ -108,7 +108,7 @@ class CategoryController extends Controller
 	$category->checkOut();
 
         // Gather the needed data to build the form.
-	
+
 	$except = (auth()->user()->getRoleLevel() > $category->getOwnerRoleLevel() || $category->owned_by == auth()->user()->id) ? ['owner_name'] : ['owned_by'];
 
 	if ($category->updated_by === null) {
@@ -174,6 +174,7 @@ class CategoryController extends Controller
 	$category->name = $request->input('name');
 	$category->slug = ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('name'), '-');
 	$category->description = $request->input('description');
+	$category->settings = $request->input('settings');
 	$category->updated_by = auth()->user()->id;
 
 	if ($category->canChangeAttachments()) {
@@ -457,6 +458,10 @@ class CategoryController extends Controller
 		        $field->options[$key]['extra'] = ['disabled'];
 		    }
 		}
+	    }
+
+	    if (isset($field->group) && $field->group == 'settings') {
+	        $field->value = $category->settings[$field->name];
 	    }
         }
     }

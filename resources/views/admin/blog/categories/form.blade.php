@@ -11,10 +11,27 @@
 	    @method('put')
 	@endif
 
-        @foreach ($fields as $field)
-	    @php $value = (isset($category)) ? old($field->name, $field->value) : old($field->name); @endphp
-	    <x-input :field="$field" :value="$value" />
-        @endforeach
+	<nav class="nav nav-tabs">
+	    <a class="nav-item nav-link active" href="#details" data-toggle="tab">@php echo __('labels.generic.details'); @endphp</a>
+	    <a class="nav-item nav-link" href="#settings" data-toggle="tab">@php echo __('labels.title.settings'); @endphp</a>
+	</nav>
+
+	<div class="tab-content">
+	    @foreach ($fields as $key => $field)
+	        @if ($key == 0)
+		    <div class="tab-pane active" id="details">
+	        @endif
+
+		@php $value = (isset($category)) ? old($field->name, $field->value) : old($field->name); @endphp
+		<x-input :field="$field" :value="$value" />
+
+	        @if ($field->name == 'description')
+		    </div>
+		    <div class="tab-pane" id="settings">
+	        @endif
+	    @endforeach
+	    </div>
+	</div>
 
 	<input type="hidden" id="cancelEdit" value="{{ route('admin.blog.categories.cancel', $query) }}">
 	<input type="hidden" id="close" name="_close" value="0">

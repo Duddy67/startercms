@@ -86,5 +86,40 @@
     "type": "textarea",
     "name": "description",
     "id": "description"
+  },
+  {
+    "label": "labels.generic.show_name",
+    "type": "select",
+    "name": "show_name",
+    "id": "show_name",
+    "extra": ["yes_no", "global_setting"],
+    "group": "settings",
+    "options": [] 
+  },
+  {
+    "label": "labels.generic.show_search",
+    "type": "select",
+    "name": "show_search",
+    "id": "show_search",
+    "extra": ["yes_no", "global_setting"],
+    "group": "settings",
+    "options": [] 
+  },
+  {
+    "label": "labels.generic.show_description",
+    "type": "select",
+    "name": "show_description",
+    "id": "show_description",
+    "extra": ["yes_no", "global_setting"],
+    "group": "settings",
+    "options": [] 
+  },
+  {
+    "label": "labels.blog.post_ordering",
+    "type": "select",
+    "name": "post_ordering",
+    "id": "post_ordering",
+    "group": "settings",
+    "options": [] 
   }
 ]

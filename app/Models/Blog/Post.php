@@ -41,6 +41,15 @@ class Post extends Model
         'checked_out_time'
     ];
 
+    /**
+     * The attributes that should be casted.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'settings' => 'array'
+    ];
+
 
     /**
      * The categories that belong to the post.

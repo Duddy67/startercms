@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Settings\General;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Blog\Post;
+use App\Models\Blog\Setting;
 use Kalnoy\Nestedset\NodeTrait;
 use App\Models\Users\Group;
 use App\Traits\Admin\TreeAccessLevel;
@@ -50,6 +51,14 @@ class Category extends Model
         'checked_out_time'
     ];
 
+    /**
+     * The attributes that should be casted.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'settings' => 'array'
+    ];
 
     /**
      * The posts that belong to the category.
@@ -180,21 +189,29 @@ class Category extends Model
 	foreach ($users as $user) {
 	    $extra = [];
 
-	    // The user is a manager who doesn't have the create-blog-category permission (anymore).
+	    // The user is a manager who doesn't or no longer have the create-blog-category permission.
 	    if ($user->getRoleType() == 'manager' && !$user->can('create-blog-category')) {
                 // The user owns this category.
-		if ($category && $user->id == $category->getSelectedValue('owned_by')) {
-		    // Prevent this user to be selected again.
-		    $extra[] = 'disabled';
-		}
-		else {
+	        // N.B: A new owner will be required when updating this category. 
+		if ($category && $category->access_level != 'private') {
 		    // Don't show this user.
 		    continue;
 		}
+
+		// If the user owns a private category his name wil be shown until the category is no longer private.
 	    }
 
 	    $options[] = ['value' => $user->id, 'text' => $user->name, 'extra' => $extra];
 	}
+
+	return $options;
+    }
+
+    public function getPostOrderingOptions()
+    {
+        $options = Setting::getPostOrderingOptions();
+
+	$options[] = ['value' => 'global_setting', 'text' => __('labels.generic.global_setting')];
 
 	return $options;
     }
