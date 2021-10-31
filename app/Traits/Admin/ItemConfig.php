@@ -102,7 +102,7 @@ trait ItemConfig
 		    $row->{$column->name} = $item->{$column->name}->toFormattedDateString();
 		}
 		elseif ($column->name == 'owned_by') {
-		    $row->owned_by = $item->user_name;
+		    $row->owned_by = $item->owner_name;
 		}
 		elseif ($column->name == 'access_level') {
 		    $row->access_level = __('labels.generic.'.$item->access_level);

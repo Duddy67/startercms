@@ -38,6 +38,7 @@ class Category extends Model
         'description',
         'access_level',
         'parent_id',
+        'settings',
     ];
 
     /**
@@ -87,7 +88,7 @@ class Category extends Model
 	    return Category::where('name', 'like', '%'.$search.'%')->get();
 	}
 	else {
-	    return Category::select('blog_categories.*', 'users.name as user_name')->leftJoin('users', 'blog_categories.owned_by', '=', 'users.id')->defaultOrder()->get()->toTree();
+	    return Category::select('blog_categories.*', 'users.name as owner_name')->leftJoin('users', 'blog_categories.owned_by', '=', 'users.id')->defaultOrder()->get()->toTree();
 	}
     }
 
@@ -102,7 +103,7 @@ class Category extends Model
         $search = $request->input('search', null);
 
 	$query = Post::query();
-	$query->select('posts.*', 'users.name as user_name')->leftJoin('users', 'posts.owned_by', '=', 'users.id');
+	$query->select('posts.*', 'users.name as owner_name')->leftJoin('users', 'posts.owned_by', '=', 'users.id');
 	// Join the role tables to get the owner's role level.
 	$query->join('model_has_roles', 'posts.owned_by', '=', 'model_id')->join('roles', 'roles.id', '=', 'role_id');
 

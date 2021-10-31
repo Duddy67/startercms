@@ -51,6 +51,18 @@ class Setting extends Model
 	return $data;
     }
 
+    public static function getDataByGroup($group)
+    {
+        $results = Setting::where('group', $group)->get();
+	$data = [];
+
+	foreach ($results as $param) {
+	    $data[$param->key] = $param->value;
+	}
+
+	return $data;
+    }
+
     public static function getPostOrderingOptions()
     {
       return [

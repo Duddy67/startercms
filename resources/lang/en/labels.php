@@ -49,9 +49,14 @@ return [
 	'edit_post' => 'Edit a post',
 	'slug' => 'Slug',
 	'content' => 'Content',
+	'excerpt' => 'Excerpt',
+	'show_excerpt' => 'Show excerpt',
     ],
     'blog' => [
+	'blog_global_settings' => 'Blog global settings',
 	'post_ordering' => 'Post ordering',
+	'show_post_excerpt' => 'Show post excerpt',
+	'show_post_categories' => 'Show post categories',
     ],
     'categories' => [
 	'create_category' => 'Create a category',
@@ -125,6 +130,9 @@ return [
 	'show_name' => 'Show name',
 	'show_search' => 'Show search',
 	'show_description' => 'Show description',
+	'show_categories' => 'Show categories',
+	'show_owner' => 'Show owner',
+	'show_created_at' => 'Show created at',
     ],
     'filter' => [
 	'search' => 'Search',

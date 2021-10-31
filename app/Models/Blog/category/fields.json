@@ -4,6 +4,7 @@
     "type": "text",
     "name": "name",
     "id": "name",
+    "tab": "details",
     "placeholder": "labels.generic.name"
   },
   {
@@ -85,6 +86,7 @@
     "label": "labels.generic.description",
     "type": "textarea",
     "name": "description",
+    "class": "tinymce-texteditor",
     "id": "description"
   },
   {
@@ -93,6 +95,7 @@
     "name": "show_name",
     "id": "show_name",
     "extra": ["yes_no", "global_setting"],
+    "tab": "settings",
     "group": "settings",
     "options": [] 
   },
@@ -110,6 +113,24 @@
     "type": "select",
     "name": "show_description",
     "id": "show_description",
+    "extra": ["yes_no", "global_setting"],
+    "group": "settings",
+    "options": [] 
+  },
+  {
+    "label": "labels.blog.show_post_excerpt",
+    "type": "select",
+    "name": "show_post_excerpt",
+    "id": "show_post_excerpt",
+    "extra": ["yes_no", "global_setting"],
+    "group": "settings",
+    "options": [] 
+  },
+  {
+    "label": "labels.blog.show_post_categories",
+    "type": "select",
+    "name": "show_post_categories",
+    "id": "show_post_categories",
     "extra": ["yes_no", "global_setting"],
     "group": "settings",
     "options": [] 

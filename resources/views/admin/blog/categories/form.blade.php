@@ -18,19 +18,19 @@
 
 	<div class="tab-content">
 	    @foreach ($fields as $key => $field)
-	        @if ($key == 0)
-		    <div class="tab-pane active" id="details">
-	        @endif
+		@if (isset($field->tab))
+		    @php $active = ($key == 0) ? ' active' : ''; @endphp
+		    <div class="tab-pane{{ $active }}" id="{{ $field->tab }}">
+		@endif
+
 
 		@php $value = (isset($category)) ? old($field->name, $field->value) : old($field->name); @endphp
 		<x-input :field="$field" :value="$value" />
 
-	        @if ($field->name == 'description')
+		@if (!next($fields) || isset($fields[$key + 1]->tab))
 		    </div>
-		    <div class="tab-pane" id="settings">
-	        @endif
+		@endif
 	    @endforeach
-	    </div>
 	</div>
 
 	<input type="hidden" id="cancelEdit" value="{{ route('admin.blog.categories.cancel', $query) }}">

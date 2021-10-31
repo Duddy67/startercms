@@ -118,6 +118,7 @@ class PostController extends Controller
 	}
 
         $fields = $this->getFields($post, $except);
+	$this->setFieldValues($fields, $post);
 	$except = (!$post->canEdit()) ? ['destroy', 'save', 'saveClose'] : [];
         $actions = $this->getActions('form', $except);
 	// Add the id parameter to the query.
@@ -162,6 +163,8 @@ class PostController extends Controller
 	$post->title = $request->input('title');
 	$post->slug = ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('title'), '-');
 	$post->content = $request->input('content');
+	$post->excerpt = $request->input('excerpt');
+	$post->settings = $request->input('settings');
 	$post->updated_by = auth()->user()->id;
 
 	if ($post->canChangeAccessLevel()) {
@@ -228,6 +231,8 @@ class PostController extends Controller
 	  'access_level' => $request->input('access_level'), 
 	  'owned_by' => $request->input('owned_by'),
 	  'main_cat_id' => $request->input('main_cat_id'),
+	  'settings' => $request->input('settings'),
+	  'excerpt' => $request->input('excerpt'),
 	]);
 
 	if ($request->input('groups') !== null) {
@@ -451,6 +456,10 @@ class PostController extends Controller
      */
     private function setFieldValues(&$fields, $post)
     {
-        // code...
+        foreach ($fields as $field) {
+	    if (isset($field->group) && $field->group == 'settings') {
+		$field->value = (isset($post->settings[$field->name])) ? $post->settings[$field->name] : null;
+	    }
+	}
     }
 }

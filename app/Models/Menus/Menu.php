@@ -83,7 +83,7 @@ class Menu extends Model
         $groups = $request->input('groups', []);
 
 	$query = Menu::query();
-	$query->select('menus.*', 'users.name as user_name')->leftJoin('users', 'menus.owned_by', '=', 'users.id');
+	$query->select('menus.*', 'users.name as owner_name')->leftJoin('users', 'menus.owned_by', '=', 'users.id');
 	// Join the role tables to get the owner's role level.
 	$query->join('model_has_roles', 'menus.owned_by', '=', 'model_id')->join('roles', 'roles.id', '=', 'role_id');
 

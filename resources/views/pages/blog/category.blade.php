@@ -1,12 +1,20 @@
 @if ($canView)
 
-    <h3 class="pb-2">{{ $category->name }}</h3>
+    @if ($settings['show_name'])
+	<h3 class="pb-2">{{ $category->name }}</h3>
+    @endif
 
-    <div class="card">
-	<div class="card-body">
-	    @include('partials.filters')
+    @if ($settings['show_description'])
+	<div>{!! $category->description !!}</div>
+    @endif
+
+    @if ($settings['show_search'])
+	<div class="card">
+	    <div class="card-body">
+		@include('partials.filters')
+	    </div>
 	</div>
-    </div>
+    @endif
 
     <ul class="post-list pt-4">
 	@if (count($posts))

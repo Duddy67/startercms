@@ -1,20 +1,39 @@
 @extends ('layouts.admin')
 
 @section ('main')
+    <h3>@php echo __('labels.blog.blog_global_settings'); @endphp</h3>
+
     <form method="post" action="{{ route('admin.blog.settings.update', $query ) }}" id="itemForm">
         @csrf
 	@method('patch')
 
-        @foreach ($fields as $field)
-	    @php if (isset($data[$field->group][$field->name])) { 
-		     $value = old($field->name, $data[$field->group][$field->name]);
-		 }
-		 else {
-		     $value = old($field->name);
-		 }
-	    @endphp
-	    <x-input :field="$field" :value="$value" />
-        @endforeach
+	<nav class="nav nav-tabs">
+	    <a class="nav-item nav-link active" href="#posts" data-toggle="tab">@php echo __('labels.title.posts'); @endphp</a>
+	    <a class="nav-item nav-link" href="#category" data-toggle="tab">@php echo __('labels.generic.category'); @endphp</a>
+	</nav>
+
+	<div class="tab-content">
+	    @foreach ($fields as $key => $field)
+		@php if (isset($data[$field->group][$field->name])) { 
+			 $value = old($field->name, $data[$field->group][$field->name]);
+		     }
+		     else {
+			 $value = old($field->name);
+		     }
+		@endphp
+
+		@if (isset($field->tab))
+		    @php $active = ($key == 0) ? ' active' : ''; @endphp
+		    <div class="tab-pane{{ $active }}" id="{{ $field->tab }}">
+		@endif
+
+		<x-input :field="$field" :value="$value" />
+
+		@if (!next($fields) || isset($fields[$key + 1]->tab))
+		    </div>
+		@endif
+	    @endforeach
+	</div>
     </form>
 
     <div class="form-group">

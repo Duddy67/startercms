@@ -4,6 +4,7 @@
     "type": "text",
     "name": "title",
     "id": "title",
+    "tab": "details",
     "placeholder": "labels.generic.title"
   },
   {
@@ -92,6 +93,52 @@
     "label": "labels.posts.content",
     "type": "textarea",
     "name": "content",
-    "id": "texteditor"
+    "class": "tinymce-texteditor",
+    "id": "content"
+  },
+  {
+    "label": "labels.posts.excerpt",
+    "type": "textarea",
+    "name": "excerpt",
+    "class": "tinymce-texteditor",
+    "tab": "excerpt",
+    "id": "excerpt"
+  },
+  {
+    "label": "labels.generic.show_owner",
+    "type": "select",
+    "name": "show_owner",
+    "id": "show_owner",
+    "extra": ["yes_no", "global_setting"],
+    "tab": "settings",
+    "group": "settings",
+    "options": [] 
+  },
+  {
+    "label": "labels.generic.show_created_at",
+    "type": "select",
+    "name": "show_created_at",
+    "id": "show_created_at",
+    "extra": ["yes_no", "global_setting"],
+    "group": "settings",
+    "options": [] 
+  },
+  {
+    "label": "labels.posts.show_excerpt",
+    "type": "select",
+    "name": "show_excerpt",
+    "id": "show_excerpt",
+    "extra": ["yes_no", "global_setting"],
+    "group": "settings",
+    "options": [] 
+  },
+  {
+    "label": "labels.generic.show_categories",
+    "type": "select",
+    "name": "show_categories",
+    "id": "show_categories",
+    "extra": ["yes_no", "global_setting"],
+    "group": "settings",
+    "options": [] 
   }
 ]

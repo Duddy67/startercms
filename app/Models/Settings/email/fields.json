@@ -41,12 +41,13 @@
   {
     "type": "textarea",
     "name": "body_html",
-    "id": "texteditor"
+    "class": "tinymce-texteditor",
+    "id": "body_html"
   },
   {
     "type": "textarea",
     "name": "body_text",
-    "id": "bodytext",
+    "id": "body_text",
     "rows": "15"
   }
 ]

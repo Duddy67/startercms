@@ -1,6 +1,6 @@
 
 tinymce.init({
-    selector: '#texteditor',
+    selector: '.tinymce-texteditor',
     plugins: 'code',
     toolbar: 'urldialog|code',
     height: 500,

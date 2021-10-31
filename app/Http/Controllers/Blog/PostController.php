@@ -11,7 +11,13 @@ class PostController extends Controller
 {
     public function show($id, $slug)
     {
-	if (!$post = Post::where('id', $id)->first()) {
+        $post = Post::select('posts.*', 'users.name as owner_name')
+			->selectRaw('IFNULL(users2.name, ?) as modifier_name', [__('labels.generic.unknown_user')])
+			->leftJoin('users', 'posts.owned_by', '=', 'users.id')
+			->leftJoin('users as users2', 'posts.updated_by', '=', 'users2.id')
+			->where('posts.id', $id)->first();
+
+	if (!$post) {
 	    return abort('404');
 	}
 

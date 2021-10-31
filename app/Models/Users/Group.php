@@ -97,7 +97,7 @@ class Group extends Model
         $permission = $request->input('permission', null);
 
 	$query = Group::query();
-	$query->select('groups.*', 'users.name as user_name')->leftJoin('users', 'groups.owned_by', '=', 'users.id');
+	$query->select('groups.*', 'users.name as owner_name')->leftJoin('users', 'groups.owned_by', '=', 'users.id');
 	// Join the role tables to get the owner's role level.
 	$query->join('model_has_roles', 'groups.owned_by', '=', 'model_id')->join('roles', 'roles.id', '=', 'role_id');
 

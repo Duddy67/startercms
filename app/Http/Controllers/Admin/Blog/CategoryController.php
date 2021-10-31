@@ -267,6 +267,7 @@ class CategoryController extends Controller
 	    'access_level' => $request->input('access_level'), 
 	    'owned_by' => $request->input('owned_by'),
 	    'parent_id' => (empty($request->input('parent_id'))) ? null : $request->input('parent_id'),
+	    'settings' => $request->input('settings'),
 	]);
 
         if ($category->parent_id) {
@@ -461,7 +462,7 @@ class CategoryController extends Controller
 	    }
 
 	    if (isset($field->group) && $field->group == 'settings') {
-	        $field->value = $category->settings[$field->name];
+	        $field->value = (isset($category->settings[$field->name])) ? $category->settings[$field->name] : null;
 	    }
         }
     }

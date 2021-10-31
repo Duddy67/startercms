@@ -64,7 +64,7 @@
 	    @if ($multiple)
 		@php $selected = ($value !== null && in_array($option['value'], $value)) ? 'selected=selected' : '' @endphp
 	    @else
-		@php $selected = ($option['value'] == $value) ? 'selected="selected"' : '' @endphp
+		@php $selected = ($value !== null && $option['value'] == $value) ? 'selected=selected' : '' @endphp
 	    @endif
 
 	    @php $disabled = (isset($option['extra']) && in_array('disabled', $option['extra'])) ? 'disabled=disabled locked=locked' : '' @endphp
@@ -107,7 +107,7 @@
 	<label class="form-check-label" for="{{ $field->id }}">{{ $field->label }}</label>
     @endif
 @elseif ($field->type == 'textarea')
-    <textarea id="{{ $field->id }}" class="form-control"
+    <textarea id="{{ $field->id }}" class="form-control {{ $class }}"
 
     @if ($name)
 	name="{{ $name }}"

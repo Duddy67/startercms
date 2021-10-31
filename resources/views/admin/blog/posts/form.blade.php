@@ -11,10 +11,27 @@
 	    @method('put')
 	@endif
 
-        @foreach ($fields as $field)
-	    @php $value = (isset($post)) ? old($field->name, $field->value) : old($field->name); @endphp
-	    <x-input :field="$field" :value="$value" />
-        @endforeach
+	<nav class="nav nav-tabs">
+	    <a class="nav-item nav-link active" href="#details" data-toggle="tab">@php echo __('labels.generic.details'); @endphp</a>
+	    <a class="nav-item nav-link" href="#excerpt" data-toggle="tab">@php echo __('labels.posts.excerpt'); @endphp</a>
+	    <a class="nav-item nav-link" href="#settings" data-toggle="tab">@php echo __('labels.title.settings'); @endphp</a>
+	</nav>
+
+	<div class="tab-content">
+	    @foreach ($fields as $key => $field)
+		@if (isset($field->tab))
+		    @php $active = ($key == 0) ? ' active' : ''; @endphp
+		    <div class="tab-pane{{ $active }}" id="{{ $field->tab }}">
+		@endif
+
+		@php $value = (isset($post)) ? old($field->name, $field->value) : old($field->name); @endphp
+		<x-input :field="$field" :value="$value" />
+
+		@if (!next($fields) || isset($fields[$key + 1]->tab))
+		    </div>
+		@endif
+	    @endforeach
+	</div>
 
 	<input type="hidden" id="cancelEdit" value="{{ route('admin.blog.posts.cancel', $query) }}">
 	<input type="hidden" id="close" name="_close" value="0">

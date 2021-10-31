@@ -75,7 +75,7 @@ class MenuItem extends Model
 	    return MenuItem::where('title', 'like', '%'.$search.'%')->get();
 	}
 	else {
-	  return MenuItem::select('menu_items.*', 'users.name as user_name')->leftJoin('users', 'menu_items.owned_by', '=', 'users.id')
+	  return MenuItem::select('menu_items.*', 'users.name as owner_name')->leftJoin('users', 'menu_items.owned_by', '=', 'users.id')
 								            ->where('menu_code', $code)->defaultOrder()->get()->toTree();
 	}
     }

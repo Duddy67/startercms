@@ -102,7 +102,7 @@ class Role extends SpatieRole
         $search = $request->input('search', null);
 
 	$query = Role::query();
-	$query->select('roles.*', 'users.name as user_name')->leftJoin('users', 'roles.owned_by', '=', 'users.id');
+	$query->select('roles.*', 'users.name as owner_name')->leftJoin('users', 'roles.owned_by', '=', 'users.id');
 
 	if ($search !== null) {
 	    $query->where('roles.name', 'like', '%'.$search.'%');
