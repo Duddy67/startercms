@@ -101,8 +101,14 @@
     "type": "textarea",
     "name": "excerpt",
     "class": "tinymce-texteditor",
-    "tab": "excerpt",
+    "tab": "extra",
     "id": "excerpt"
+  },
+  {
+    "label": "labels.generic.image",
+    "type": "file",
+    "name": "image",
+    "id": "image"
   },
   {
     "label": "labels.generic.show_owner",

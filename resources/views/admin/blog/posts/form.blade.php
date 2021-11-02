@@ -4,7 +4,7 @@
     <h3>@php echo (isset($post)) ? __('labels.posts.edit_post') : __('labels.posts.create_post'); @endphp</h3>
 
     @php $action = (isset($post)) ? route('admin.blog.posts.update', $query) : route('admin.blog.posts.store', $query) @endphp
-    <form method="post" action="{{ $action }}" id="itemForm">
+    <form method="post" action="{{ $action }}" id="itemForm" enctype="multipart/form-data">
         @csrf
 
 	@if (isset($post))
@@ -13,7 +13,7 @@
 
 	<nav class="nav nav-tabs">
 	    <a class="nav-item nav-link active" href="#details" data-toggle="tab">@php echo __('labels.generic.details'); @endphp</a>
-	    <a class="nav-item nav-link" href="#excerpt" data-toggle="tab">@php echo __('labels.posts.excerpt'); @endphp</a>
+	    <a class="nav-item nav-link" href="#extra" data-toggle="tab">@php echo __('labels.generic.extra'); @endphp</a>
 	    <a class="nav-item nav-link" href="#settings" data-toggle="tab">@php echo __('labels.title.settings'); @endphp</a>
 	</nav>
 
@@ -26,6 +26,12 @@
 
 		@php $value = (isset($post)) ? old($field->name, $field->value) : old($field->name); @endphp
 		<x-input :field="$field" :value="$value" />
+
+		@if ($field->name == 'image')
+		    @if (isset($post) && $post->image) 
+			<img src="{{ url('/').$post->image->getThumbnailUrl() }}" >
+		    @endif
+		@endif
 
 		@if (!next($fields) || isset($fields[$key + 1]->tab))
 		    </div>

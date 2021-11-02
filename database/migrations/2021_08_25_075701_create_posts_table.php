@@ -18,7 +18,7 @@ class CreatePostsTable extends Migration
             $table->string('title', 80);
             $table->string('slug', 80);
             $table->text('content');
-            $table->tinyText('excerpt')->nullable();
+            $table->text('excerpt')->nullable();
             $table->char('status', 12);
             $table->unsignedBigInteger('main_cat_id')->nullable();
             $table->char('access_level', 10);

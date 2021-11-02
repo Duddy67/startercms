@@ -3,6 +3,7 @@
 namespace App\Traits\Admin;
 
 use App\Models\Users\User;
+use Illuminate\Support\Facades\Auth;
 
 
 trait AccessLevel
@@ -26,7 +27,7 @@ trait AccessLevel
      */
     public function canAccess()
     {
-        return ($this->access_level == 'public_ro' || $this->shareGroups() || $this->canEdit()) ? true : false;
+        return (in_array($this->access_level, ['public_ro', 'public_rw']) || $this->shareGroups() || $this->canEdit()) ? true : false;
     }
 
     /*
@@ -37,6 +38,11 @@ trait AccessLevel
      */
     public function canEdit()
     {
+        if (!Auth::check()) {
+	    // The user must be authenticated to edit.
+	    return false;
+	}
+
         if ($this->access_level == 'public_rw' || $this->getOwnerRoleLevel() < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id || $this->shareReadWriteGroups()) {
 	    return true;
 	}
@@ -123,6 +129,11 @@ trait AccessLevel
      */
     public function shareGroups()
     {
+        if (!Auth::check()) {
+	    // The user must be authenticated to share groups.
+	    return false;
+	}
+
         $groups = array_intersect($this->getGroupIds(), auth()->user()->getGroupIds());
 
 	return (!empty($groups)) ? true : false;

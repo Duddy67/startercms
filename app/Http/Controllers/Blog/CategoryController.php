@@ -20,6 +20,10 @@ class CategoryController extends Controller
 	    return abort('404');
 	}
 
+	if (!$category->canAccess()) {
+	    return abort('403');
+	}
+
 	$globalSettings = Setting::getDataByGroup('category');
 	$settings = [];
 
@@ -34,8 +38,7 @@ class CategoryController extends Controller
 
 	$posts = $category->getPosts($request);
 	$query = array_merge($request->query(), ['id' => $id, 'slug' => $slug]);
-	$canView = (Auth::check() && $category->canAccess()) ? true : false;
 
-        return view('default', compact('page', 'category', 'settings', 'posts', 'query', 'canView'));
+        return view('default', compact('page', 'category', 'settings', 'posts', 'query'));
     }
 }

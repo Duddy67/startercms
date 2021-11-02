@@ -93,7 +93,7 @@ class User extends Authenticatable
      */
     public function documents()
     {
-        return $this->HasMany(Document::class, 'item_id');
+        return $this->HasMany(Document::class, 'item_id')->where('item_type', 'user');
     }
 
     /**

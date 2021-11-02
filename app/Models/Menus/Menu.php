@@ -9,7 +9,6 @@ use App\Models\Menus\MenuItem;
 use App\Models\Settings\General;
 use App\Traits\Admin\AccessLevel;
 use App\Traits\Admin\CheckInCheckOut;
-use Illuminate\Support\Facades\Auth;
 
 
 class Menu extends Model
@@ -148,10 +147,11 @@ class Menu extends Model
 	$traverse = function ($nodes, $level = 0) use (&$traverse, &$menuItems) {
 
 	    foreach ($nodes as $node) {
-		/*if ($this->access_level == 'private' && $item->access_level == 'private') {
-		      // Only the menu item's owner can access it.
-		      //$extra = ($menuItem->owned_by == auth()->user()->id) ? [] : ['disabled'];
-	          }*/
+		/*if (!$node->canAccess()) {
+		    continue;
+		  // Only the menu item's owner can access it.
+		  //$extra = ($menuItem->owned_by == auth()->user()->id) ? [] : ['disabled'];
+	        }*/
 
 	        $item = new \stdClass();
 		$item->id = $node->id;
@@ -239,7 +239,7 @@ class Menu extends Model
     {
         if ($menu = Menu::where(['code' => $code, 'status' => 'published'])->first()) {
 
-	    if (in_array($menu->access_level, ['public_ro', 'public_rw']) || (Auth::check() && $menu->canAccess())) {
+	    if ($menu->canAccess()) {
 		return $menu;
 	    }
 	}

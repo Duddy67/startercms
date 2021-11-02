@@ -13,6 +13,7 @@ use App\Traits\Admin\CheckInCheckOut;
 use App\Http\Requests\Blog\Post\StoreRequest;
 use App\Http\Requests\Blog\Post\UpdateRequest;
 use Illuminate\Support\Str;
+use App\Models\Cms\Document;
 
 
 class PostController extends Controller
@@ -206,6 +207,15 @@ class PostController extends Controller
 
 	$post->save();
 
+	if ($image = $this->uploadImage($request)) {
+	    // Delete the previous post image if any.
+	    if ($post->image) {
+	        $post->image->delete();
+	    }
+
+	    $post->image()->save($image);
+	}
+
         if ($request->input('_close', null)) {
 	    $post->checkIn();
 	    // Redirect to the list.
@@ -241,6 +251,10 @@ class PostController extends Controller
 
 	if ($request->input('categories') !== null) {
 	    $post->categories()->attach($request->input('categories'));
+	}
+
+	if ($image = $this->uploadImage($request)) {
+	    $post->image()->save($image);
 	}
 
         if ($request->input('_close', null)) {
@@ -445,6 +459,24 @@ class PostController extends Controller
 	}
 
 	return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.unpublish_list_success', ['number' => $unpublished]));
+    }
+
+    /*
+     * Creates a Document associated with the uploaded image file.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \App\Models\Cms\Document
+     */
+    private function uploadImage($request)
+    {
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+	    $image = new Document;
+	    $image->upload($request->file('image'), 'post', 'image');
+
+	    return $image;
+	}
+
+	return null;
     }
 
     /*

@@ -9,6 +9,7 @@ use App\Models\Blog\Category;
 use App\Models\Users\Group;
 use App\Traits\Admin\AccessLevel;
 use App\Traits\Admin\CheckInCheckOut;
+use App\Models\Cms\Document;
 
 
 class Post extends Model
@@ -70,6 +71,14 @@ class Post extends Model
     }
 
     /**
+     * Get the image associated with the post.
+     */
+    public function image()
+    {
+        return $this->HasOne(Document::class, 'item_id')->where('item_type', 'post');
+    }
+
+    /**
      * Delete the model from the database (override).
      *
      * @return bool|null
@@ -80,6 +89,10 @@ class Post extends Model
     {
         $this->categories()->detach();
         $this->groups()->detach();
+
+	if ($this->image) {
+	    $this->image->delete();
+	}
 
         parent::delete();
     }
