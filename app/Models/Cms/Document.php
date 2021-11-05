@@ -58,9 +58,9 @@ class Document extends Model
     }
 
     /*
-     * Gets the document items according to the filter, sort and pagination settings.
+     * Gets the current user's document items according to the filter, sort and pagination settings.
      */
-    public function getItems($request)
+    public function getFileManagerItems($request)
     {
         $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
         $search = $request->input('search', null);
@@ -68,7 +68,7 @@ class Document extends Model
         $types = $request->input('types', []);
 
 	$query = Document::query();
-	$query->where(['item_type' => 'user', 'item_id' => auth()->user()->id, 'is_public' => 1]);
+	$query->where(['item_type' => 'user', 'item_id' => auth()->user()->id, 'field' => 'file_manager', 'is_public' => 1]);
 
 	if ($search !== null) {
 	    $query->where('file_name', 'like', '%'.$search.'%');
@@ -98,6 +98,13 @@ class Document extends Model
 	}
 
 	return $items;
+    }
+
+    /*
+     * Gets the document items uploaded by the all the users from the file manager.
+     */
+    public function getAllFileManagerItems($request)
+    {
     }
 
     /*

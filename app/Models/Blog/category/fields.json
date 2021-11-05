@@ -127,6 +127,15 @@
     "options": [] 
   },
   {
+    "label": "labels.blog.show_post_image",
+    "type": "select",
+    "name": "show_post_image",
+    "id": "show_post_image",
+    "extra": ["yes_no", "global_setting"],
+    "group": "settings",
+    "options": [] 
+  },
+  {
     "label": "labels.blog.show_post_categories",
     "type": "select",
     "name": "show_post_categories",
@@ -140,6 +149,7 @@
     "type": "select",
     "name": "post_ordering",
     "id": "post_ordering",
+    "extra": ["global_setting"],
     "group": "settings",
     "options": [] 
   }

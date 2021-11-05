@@ -211,6 +211,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		  </ul>
 	      </li>
 	  @endallowto
+	  <li class="nav-item">
+	      @php $active = (request()->is('admin/files*')) ? 'active' : '' @endphp
+	      <a href="{{ route('admin.files.index') }}" class="nav-link {{ $active }}">
+		<i class="nav-icon fas fa-copy"></i>
+		  <p>@lang ('labels.title.files')</p>
+	      </a>
+          </li>
         </ul>
       </nav>
       <!-- /.sidebar-menu -->

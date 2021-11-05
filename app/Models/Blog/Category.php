@@ -210,11 +210,7 @@ class Category extends Model
 
     public function getPostOrderingOptions()
     {
-        $options = Setting::getPostOrderingOptions();
-
-	$options[] = ['value' => 'global_setting', 'text' => __('labels.generic.global_setting')];
-
-	return $options;
+        return Setting::getPostOrderingOptions();
     }
 
     /*

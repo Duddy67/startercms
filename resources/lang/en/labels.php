@@ -17,6 +17,7 @@ return [
 	'categories' => 'Categories',
 	'menus' => 'Menus',
 	'menuitems' => 'Menu items',
+	'files' => 'Files',
     ],
     'users' => [
 	'email' => 'Email',
@@ -57,6 +58,7 @@ return [
 	'post_ordering' => 'Post ordering',
 	'show_post_excerpt' => 'Show post excerpt',
 	'show_post_categories' => 'Show post categories',
+	'show_post_image' => 'Show post image',
     ],
     'categories' => [
 	'create_category' => 'Create a category',
@@ -136,6 +138,7 @@ return [
 	'show_categories' => 'Show categories',
 	'show_owner' => 'Show owner',
 	'show_created_at' => 'Show created at',
+	'show_image' => 'Show image',
     ],
     'filter' => [
 	'search' => 'Search',

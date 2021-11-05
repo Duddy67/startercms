@@ -13,7 +13,7 @@ tinymce.init({
 
 		editor.windowManager.openUrl({
 		    title: 'File Manager',
-		    url: siteUrl+'/cms/documents',
+		    url: siteUrl+'/cms/filemanager',
 		    buttons: [
 			{
 			    type: "cancel",

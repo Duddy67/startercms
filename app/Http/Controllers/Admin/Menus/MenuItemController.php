@@ -117,7 +117,9 @@ class MenuItemController extends Controller
 	if ($menuItem->updated_by === null) {
 	    array_push($except, 'updated_by', 'updated_at');
 	}
-
+//$target = MenuItem::targets()['blog.category']::where('id', 8)->first();
+$target = MenuItem::getTarget('blog.category', $menuItem->url);
+echo $target->name;
         $fields = $this->getFields($menuItem, $except);
 	$this->setFieldValues($fields, $menuItem);
 	$except = (!$menuItem->canEdit()) ? ['destroy', 'save', 'saveClose'] : [];

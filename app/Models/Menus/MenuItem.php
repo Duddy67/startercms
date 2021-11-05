@@ -42,6 +42,14 @@ class MenuItem extends Model
     ];
 
 
+    public static function targets()
+    {
+	return [
+	    'blog.post' => 'App\\Models\\Blog\\Post',
+	    'blog.category' => 'App\\Models\\Blog\\Category',
+	];
+    }
+
     /**
      * The groups that belong to the menu item.
      */
@@ -115,6 +123,61 @@ class MenuItem extends Model
 	$traverse($nodes);
 
 	return $options;
+    }
+
+    public function getTargetOptions()
+    {
+        return [['value' => 'blog.post', 'text' => 'Post'], ['value' => 'blog.category', 'text' => 'Category']];
+    }
+
+    public static function checkTargetUrl($routeName, $url)
+    {
+	$uri = app('router')->getRoutes()->getByName($routeName)->uri;
+	// Add a slash at the start of the uri to match the url array that must always starts with a slash.
+	$uri = (substr($uri, 0, 1) === '/') ? $uri : '/'.$uri;
+	$uri = explode('/', $uri);
+	$url = explode('/', $url);
+
+	if (!preg_match('#\?#', end($uri) && count($url) != count($uri))) {
+	    return false;
+	}
+
+	// Loops through the uri segments.
+	foreach ($uri as $key => $segment) {
+	    if ($key == 1 && $url[1] != $segment) {
+		return false;
+	    }
+
+	    if ($segment == '{id}' && !ctype_digit($url[$key])) {
+		return false;
+	    }
+	}
+
+	return true;
+    }
+
+    public static function getTarget($routeName, $url)
+    {
+	$uri = app('router')->getRoutes()->getByName($routeName)->uri;
+	// Add a slash at the start of the uri to match the url array that must always starts with a slash.
+	$uri = (substr($uri, 0, 1) === '/') ? $uri : '/'.$uri;
+	$uri = explode('/', $uri);
+	$url = explode('/', $url);
+	$targetId = 0;
+
+	// Loops through the uri segments.
+	foreach ($uri as $key => $segment) {
+	    if ($segment == '{id}') {
+		$targetId = $url[$key];
+		break;
+	    }
+	}
+
+	if (!$targetId || !$target = MenuItem::targets()[$routeName]::where('id', $targetId)->first()) {
+	    return false;
+	}
+
+	return $target;
     }
 
     public function getOwnedByOptions()

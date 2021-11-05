@@ -8,7 +8,18 @@
     <div>{{ $post->owner_name }}</div>
 @endif
 
-<p class="content">{!! $post->content !!}</p>
+@if ($settings['show_excerpt'])
+    <div class="excerpt">
+        {!! $post->excerpt !!}
+    </div>
+@endif
+
+<div class="content">
+    @if ($settings['show_image'] && $post->image)
+	<img class="post-image" src="{{ url('/').$post->image->getThumbnailUrl() }}" >
+    @endif
+    {!! $post->content !!}
+</div>
 
 @if ($settings['show_categories'])
     <p class="categories">

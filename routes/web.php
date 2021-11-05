@@ -13,7 +13,8 @@ use App\Http\Controllers\Admin\Users\PermissionController;
 use App\Http\Controllers\Admin\Users\GroupController;
 use App\Http\Controllers\Admin\Settings\GeneralController;
 use App\Http\Controllers\Admin\Settings\EmailController;
-use App\Http\Controllers\Cms\DocumentController;
+use App\Http\Controllers\Cms\FileManagerController;
+use App\Http\Controllers\Cms\FileController;
 use App\Http\Controllers\Admin\Blog\PostController as AdminPostController;
 use App\Http\Controllers\Admin\Blog\CategoryController as AdminBlogCategoryController;
 use App\Http\Controllers\Blog\PostController;
@@ -48,12 +49,12 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/cms/documents', [DocumentController::class, 'index'])->name('cms.documents.index');
-Route::post('/cms/documents', [DocumentController::class, 'upload']);
-Route::delete('/cms/documents', [DocumentController::class, 'destroy'])->name('cms.documents.destroy');
+Route::get('/cms/filemanager', [FileManagerController::class, 'index'])->name('cms.filemanager.index');
+Route::post('/cms/filemanager', [FileManagerController::class, 'upload']);
+Route::delete('/cms/filemanager', [FileManagerController::class, 'destroy'])->name('cms.filemanager.destroy');
 
 Route::get('/expired', function () {
-    return view('cms.documents.expired');
+    return view('cms.filemanager.expired');
 })->name('expired');
 
 Route::middleware(['guest'])->group(function () {
@@ -69,6 +70,12 @@ Route::prefix('admin')->group(function () {
 
     Route::middleware(['admin'])->group(function () {
 	Route::get('/', [AdminController::class, 'index'])->name('admin');
+
+	// Files
+	Route::get('/files', [FileController::class, 'index'])->name('admin.files.index');
+	Route::delete('/files', [FileController::class, 'massDestroy'])->name('admin.files.massDestroy');
+	Route::get('/users/batch', [FileController::class, 'batch'])->name('admin.files.batch');
+	Route::put('/users/batch', [FileController::class, 'massUpdate'])->name('admin.files.massUpdate');
 
 	Route::prefix('users')->group(function () {
 	    // Users

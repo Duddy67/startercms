@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Cms\Document;
 use App\Traits\Admin\ItemConfig;
 
-class DocumentController extends Controller
+class FileManagerController extends Controller
 {
     use ItemConfig;
 
@@ -47,24 +47,24 @@ class DocumentController extends Controller
     {
         $columns = $this->getColumns();
         $filters = $this->getFilters($request);
-	$items = $this->model->getItems($request);
+	$items = $this->model->getFileManagerItems($request);
 	$rows = $this->getRows($columns, $items);
 	$query = $request->query();
 
-	$url = ['route' => 'cms.documents', 'item_name' => 'document', 'query' => $query];
+	$url = ['route' => 'cms.filemanager', 'item_name' => 'document', 'query' => $query];
 
-        return view('cms.documents.list', compact('items', 'columns', 'rows', 'query', 'url', 'filters'));
+        return view('cms.filemanager.list', compact('items', 'columns', 'rows', 'query', 'url', 'filters'));
     }
 
     public function upload(Request $request)
     {
         if ($request->hasFile('upload') && $request->file('upload')->isValid()) {
 	    $document = new Document;
-	    $document->upload($request->file('upload'), 'user', 'upload');
+	    $document->upload($request->file('upload'), 'user', 'file_manager');
 	    auth()->user()->documents()->save($document);
 	}
 
-	return redirect()->route('cms.documents.index')->with('success', __('messages.documents.create_success'));
+	return redirect()->route('cms.filemanager.index')->with('success', __('messages.documents.create_success'));
     }
 
     public function destroy(Request $request)
@@ -80,7 +80,6 @@ class DocumentController extends Controller
 	    $query['page'] = 1;
 	}
 
-	return redirect()->route('cms.documents.index', $query)->with('success', __('messages.documents.delete_success', ['name' => $name]));
+	return redirect()->route('cms.filemanager.index', $query)->with('success', __('messages.documents.delete_success', ['name' => $name]));
     }
-
 }

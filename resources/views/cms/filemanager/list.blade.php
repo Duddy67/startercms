@@ -27,7 +27,7 @@
 	    </div>
 	</div>
 
-	<form method="post" action="{{ route('cms.documents.index') }}" id="itemForm" enctype="multipart/form-data">
+	<form method="post" action="{{ route('cms.filemanager.index') }}" id="itemForm" enctype="multipart/form-data">
 	    @csrf
 	    @method('post')
 	    <input type="file" name="upload">
@@ -89,7 +89,7 @@
 
 	<x-pagination :items=$items />
 
-	<form id="deleteDocument" action="{{ route('cms.documents.index', $query) }}" method="post">
+	<form id="deleteDocument" action="{{ route('cms.filemanager.index', $query) }}" method="post">
 	    @method('delete')
 	    @csrf
 	    <input type="hidden" id="documentId" name="document_id" value="">

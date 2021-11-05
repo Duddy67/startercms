@@ -7,6 +7,14 @@
     "placeholder": "labels.generic.title"
   },
   {
+    "label": "labels.menuitems.target",
+    "type": "select",
+    "name": "target",
+    "id": "target",
+    "blank": "labels.generic.select_option",
+    "options": [] 
+  },
+  {
     "label": "labels.menuitems.url",
     "type": "text",
     "name": "url",
