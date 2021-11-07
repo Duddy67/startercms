@@ -13,13 +13,20 @@ trait ItemConfig
     /*
      * Returns the column data for an item list.
      *
+     * @param Array  $except 
      * @return Array of stdClass Objects
      */  
-    public function getColumns()
+    public function getColumns($except = [])
     {
 	$columns = $this->getData('columns');
 
-	// Possible operations here...
+	foreach ($columns as $key => $column) {
+	    // Remove unwanted columns if any.
+	    if (in_array($column->name, $except)) {
+	        unset($columns[$key]);
+		continue;
+	    }
+	}
 
 	return $columns;
     }
@@ -146,6 +153,7 @@ trait ItemConfig
      * Returns the field data for an item form.
      *
      * @param A model instance  $item
+     * @param Array  $except 
      * @return Array of stdClass Objects
      */  
     public function getFields($item = null, $except = [])
@@ -228,13 +236,21 @@ trait ItemConfig
      * Returns the filter data for an item list.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param Array  $except 
      * @return Array of stdClass Objects
      */  
-    public function getFilters($request)
+    public function getFilters($request, $except = [])
     {
 	$filters = $this->getData('filters');
 
 	foreach ($filters as $key => $filter) {
+
+	    // Remove unwanted filters if any.
+	    if (in_array($filter->name, $except)) {
+	        unset($filters[$key]);
+		continue;
+	    }
+
 	    if ($filter->type == 'button') {
 	        continue;
 	    }
@@ -254,7 +270,7 @@ trait ItemConfig
 		elseif ($filter->name == 'sorted_by') {
 		    $options = General::$function($this->pluginName, $this->modelName);
 		}
-		elseif ($filter->name == 'owned_by') {
+		elseif ($filter->name == 'owned_by' && $this->modelName != 'document') {
 		    $options = General::$function($this->model);
 		}
 		elseif ($filter->name == 'groups') {

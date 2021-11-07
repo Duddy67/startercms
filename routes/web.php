@@ -74,8 +74,8 @@ Route::prefix('admin')->group(function () {
 	// Files
 	Route::get('/files', [FileController::class, 'index'])->name('admin.files.index');
 	Route::delete('/files', [FileController::class, 'massDestroy'])->name('admin.files.massDestroy');
-	Route::get('/users/batch', [FileController::class, 'batch'])->name('admin.files.batch');
-	Route::put('/users/batch', [FileController::class, 'massUpdate'])->name('admin.files.massUpdate');
+	Route::get('/files/batch', [FileController::class, 'batch'])->name('admin.files.batch');
+	Route::put('/files/batch', [FileController::class, 'massUpdate'])->name('admin.files.massUpdate');
 
 	Route::prefix('users')->group(function () {
 	    // Users

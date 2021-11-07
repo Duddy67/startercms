@@ -105,6 +105,58 @@ class Document extends Model
      */
     public function getAllFileManagerItems($request)
     {
+        $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
+        $search = $request->input('search', null);
+        $sortedBy = $request->input('sorted_by', null);
+        $types = $request->input('types', []);
+        $owners = $request->input('owned_by', []);
+
+	$query = Document::query();
+	$query->select('documents.*', 'users.name as owner_name')
+	      ->leftJoin('users', 'documents.item_id', '=', 'users.id')
+	      ->join('model_has_roles', 'documents.item_id', '=', 'model_id')
+	      ->join('roles', 'roles.id', '=', 'role_id');
+
+	$query->where(['item_type' => 'user', 'field' => 'file_manager', 'is_public' => 1]);
+
+	// Check for role levels.
+	$query->where(function($query) {
+	    $query->where('roles.role_level', '<', auth()->user()->getRoleLevel())
+		  ->orWhere('documents.item_id', auth()->user()->id);
+	});
+
+	if ($search !== null) {
+	    $query->where('file_name', 'like', '%'.$search.'%');
+	}
+
+	if (!empty($types)) {
+	    $query->where('content_type', 'regexp', '^('.implode('|', $types).')');
+	}
+
+	if (!empty($owners)) {
+	    $query->whereIn('item_id', $owners);
+	}
+
+	if ($sortedBy !== null) {
+	    preg_match('#^([a-z0-9_]+)_(asc|desc)$#', $sortedBy, $matches);
+	    $query->orderBy($matches[1], $matches[2]);
+	}
+
+        $items = $query->paginate($perPage);
+
+	foreach ($items as $key => $item) {
+	    // Set the file url.
+	    $items[$key]->url = url('/').'/storage/'.$item->disk_name;
+
+	    // Set the thumbnail url for images. 
+	    if (preg_match('#^image\/#', $item->content_type)) {
+		$items[$key]->thumbnail = url('/').'/storage/thumbnails/'.$item->disk_name;
+	    }
+
+	    $items[$key]->file_size = $this->formatSizeUnits($items[$key]->file_size);
+	}
+
+	return $items;
     }
 
     /*
@@ -117,6 +169,33 @@ class Document extends Model
 
 	foreach ($types as $type) {
 	    $options[] = ['value' => $type, 'text' => $type];
+	}
+
+	return $options;
+    }
+
+    public function getOwnedByOptions()
+    {
+	$query = Document::query();
+	$query->select(['users.id', 'users.name'])
+	      ->leftJoin('users', 'documents.item_id', '=', 'users.id')
+	      ->join('model_has_roles', 'documents.item_id', '=', 'model_id')
+	      ->join('roles', 'roles.id', '=', 'role_id');
+
+	//$query->where(['item_type' => 'user', 'field' => 'file_manager', 'is_public' => 1]);
+
+	// Check for access levels.
+	$query->where(function($query) {
+	    $query->where('roles.role_level', '<', auth()->user()->getRoleLevel())
+		  ->orWhere('documents.item_id', auth()->user()->id);
+	});
+
+	$owners = $query->distinct()->get();
+
+	$options = [];
+
+	foreach ($owners as $owner) {
+	    $options[] = ['value' => $owner->id, 'text' => $owner->name];
 	}
 
 	return $options;

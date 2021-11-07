@@ -45,10 +45,11 @@ class FileManagerController extends Controller
      */
     public function index(Request $request)
     {
-        $columns = $this->getColumns();
-        $filters = $this->getFilters($request);
+        $columns = $this->getColumns(['owned_by']);
+        $filters = $this->getFilters($request, ['owned_by']);
 	$items = $this->model->getFileManagerItems($request);
 	$rows = $this->getRows($columns, $items);
+	$this->setRowValues($rows, $columns, $items);
 	$query = $request->query();
 
 	$url = ['route' => 'cms.filemanager', 'item_name' => 'document', 'query' => $query];
@@ -81,5 +82,28 @@ class FileManagerController extends Controller
 	}
 
 	return redirect()->route('cms.filemanager.index', $query)->with('success', __('messages.documents.delete_success', ['name' => $name]));
+    }
+
+    /*
+     * Sets the row values specific to the Document model.
+     *
+     * @param  Array  $rows
+     * @param  Array of stdClass Objects  $columns
+     * @param  \Illuminate\Pagination\LengthAwarePaginator  $groups
+     * @return void
+     */
+    private function setRowValues(&$rows, $columns, $documents)
+    {
+        foreach ($documents as $key => $document) {
+	    foreach ($columns as $column) {
+	        /*if ($column->name == 'file_name') {
+		    $rows[$key]->file_name = '<a href="'.url('/').$document->getUrl().'" target="_blank">'.$document->file_name.'</a>';
+	          }*/
+
+	        if ($column->name == 'preview') {
+		    $rows[$key]->preview = view('partials.documents.preview', compact('documents', 'key'));
+		}
+	    }
+	}
     }
 }

@@ -42,7 +42,12 @@
 			@php $indent = (in_array($column->name, ['name', 'title']) && preg_match('#^(-{1,}) #', $row->{$column->name}, $matches)) ? strlen($matches[1]) : 0; @endphp
 			<td>
 			    @php echo (in_array($column->name, ['name', 'title', 'code'])) ? '<a href="'.route($url['route'].'.edit', $query).'">' : ''; @endphp
-			    <span class="indent-{{ $indent }}"></span>{{ $row->{$column->name} }}
+			    <span class="indent-{{ $indent }}"></span>
+			    @if (isset($column->extra) && in_array('raw', $column->extra))
+                                {!! $row->{$column->name} !!}
+			    @else
+                                {{ $row->{$column->name} }}
+			    @endif
 			    @php echo (in_array($column->name, ['name', 'title', 'code'])) ? '</a>' : ''; @endphp
 			</td>
 		    @endif

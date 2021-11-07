@@ -109,6 +109,7 @@ return [
 	'ordering' => 'Ordering',
 	'type' => 'Type',
 	'format' => 'Format',
+	'preview' => 'Preview',
 	'none' => 'None',
 	'unknown' => 'Unknown',
 	'unknown_user' => 'Unknown user',
