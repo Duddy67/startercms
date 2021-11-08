@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Cms\Document;
 use App\Traits\Admin\ItemConfig;
+use App\Models\Users\User;
 
 
 class FileController extends Controller
@@ -76,7 +77,7 @@ class FileController extends Controller
     }
 
     /**
-     * Updates the owned_by (ie: item_id) parameter of one or more documents.
+     * Updates the owned_by parameter of one or more documents.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return Response
@@ -88,16 +89,60 @@ class FileController extends Controller
 
         foreach ($request->input('ids') as $key => $id) {
 	    $document = Document::findOrFail($id);
-	    $document->item_id = $request->input('owned_by');
+
+	    if (!$owner = User::find($document->owned_by)) {
+		$messages['error'] = __('messages.users.unknown_user');
+		break;
+	    }
+
+	    if (auth()->user()->getRoleLevel() < $owner->getRoleLevel()) {
+		$messages['error'] = __('messages.generic.edit_not_auth');
+		break;
+	    }
+
+	    $document->owned_by = $request->input('owned_by');
 	    $document->save();
+
 	    $updates++;
 	}
 
-	$messages['success'] = __('messages.generic.mass_update_success', ['number' => $updates]);
+	if ($updates) {
+	    $messages['success'] = __('messages.generic.mass_update_success', ['number' => $updates]);
+	}
 
 	return redirect()->route('admin.files.index')->with($messages);
     }
 
+    /**
+     * Removes one or more documents from storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return Response
+     */
+    public function massDestroy(Request $request)
+    {
+        $deleted = 0;
+
+        // Remove the documents selected from the list.
+        foreach ($request->input('ids') as $id) {
+	    $document = Document::findOrFail($id);
+	    $owner = User::find($document->owned_by);
+
+	    if ($owner && auth()->user()->getRoleLevel() < $owner->getRoleLevel()) {
+		return redirect()->route('admin.files.index', $request->query())->with(
+		    [
+			'error' => __('messages.generic.delete_not_auth'), 
+			'success' => __('messages.generic.mass_delete_success', ['number' => $deleted])
+		    ]);
+	    }
+
+	    $document->delete();
+
+	    $deleted++;
+	}
+
+	return redirect()->route('admin.files.index', $request->query())->with('success', __('messages.generic.mass_delete_success', ['number' => $deleted]));
+    }
 
     /*
      * Sets the row values specific to the Document model.

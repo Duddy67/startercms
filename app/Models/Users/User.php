@@ -93,7 +93,7 @@ class User extends Authenticatable
      */
     public function documents()
     {
-        return $this->HasMany(Document::class, 'item_id')->where('item_type', 'user');
+        return $this->HasMany(Document::class, 'owned_by')->where('item_type', 'user');
     }
 
     /**
@@ -239,7 +239,7 @@ class User extends Authenticatable
      */
     public function getThumbnail()
     {
-        $document = Document::where(['item_type' => 'user', 'field' => 'photo', 'item_id' => $this->id])->orderBy('created_at', 'desc')->first();
+        $document = Document::where(['item_type' => 'user', 'field' => 'photo', 'owned_by' => $this->id])->orderBy('created_at', 'desc')->first();
 
 	if ($document) {
 	    return $document->getThumbnailUrl();
@@ -407,9 +407,20 @@ class User extends Authenticatable
 	    'groups' => '\\App\\Models\\Users\\Group',
 	    'menus' => '\\App\\Models\\Menus\\Menu',
 	    'menuitems' => '\\App\\Models\\Menus\\MenuItem',
+	    'documents' => '\\App\\Models\\Cms\\Document',
 	];
 
 	foreach ($dependencies as $name => $model) {
+	    if ($name == 'documents') {
+                // Search for the documents uploaded by this user from the file manager.
+	        if ($nbItems = $model::where(['owned_by' => $this->id, 'item_type' => 'user', 'field' => 'file_manager'])->count()) {
+		    return ['name' => 'files', 'nbItems' => $nbItems];
+		}
+		else {
+		    continue;
+		}
+	    }
+
 	    if ($nbItems = $model::where('owned_by', $this->id)->count()) {
 	        return ['name' => $name, 'nbItems' => $nbItems];
 	    }

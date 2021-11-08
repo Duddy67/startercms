@@ -68,7 +68,7 @@ class Document extends Model
         $types = $request->input('types', []);
 
 	$query = Document::query();
-	$query->where(['item_type' => 'user', 'item_id' => auth()->user()->id, 'field' => 'file_manager', 'is_public' => 1]);
+	$query->where(['item_type' => 'user', 'owned_by' => auth()->user()->id, 'field' => 'file_manager', 'is_public' => 1]);
 
 	if ($search !== null) {
 	    $query->where('file_name', 'like', '%'.$search.'%');
@@ -113,8 +113,8 @@ class Document extends Model
 
 	$query = Document::query();
 	$query->select('documents.*', 'users.name as owner_name')
-	      ->leftJoin('users', 'documents.item_id', '=', 'users.id')
-	      ->join('model_has_roles', 'documents.item_id', '=', 'model_id')
+	      ->leftJoin('users', 'documents.owned_by', '=', 'users.id')
+	      ->join('model_has_roles', 'documents.owned_by', '=', 'model_id')
 	      ->join('roles', 'roles.id', '=', 'role_id');
 
 	$query->where(['item_type' => 'user', 'field' => 'file_manager', 'is_public' => 1]);
@@ -122,7 +122,7 @@ class Document extends Model
 	// Check for role levels.
 	$query->where(function($query) {
 	    $query->where('roles.role_level', '<', auth()->user()->getRoleLevel())
-		  ->orWhere('documents.item_id', auth()->user()->id);
+		  ->orWhere('documents.owned_by', auth()->user()->id);
 	});
 
 	if ($search !== null) {
@@ -134,7 +134,7 @@ class Document extends Model
 	}
 
 	if (!empty($owners)) {
-	    $query->whereIn('item_id', $owners);
+	    $query->whereIn('owned_by', $owners);
 	}
 
 	if ($sortedBy !== null) {
@@ -178,8 +178,8 @@ class Document extends Model
     {
 	$query = Document::query();
 	$query->select(['users.id', 'users.name'])
-	      ->leftJoin('users', 'documents.item_id', '=', 'users.id')
-	      ->join('model_has_roles', 'documents.item_id', '=', 'model_id')
+	      ->leftJoin('users', 'documents.owned_by', '=', 'users.id')
+	      ->join('model_has_roles', 'documents.owned_by', '=', 'model_id')
 	      ->join('roles', 'roles.id', '=', 'role_id');
 
 	//$query->where(['item_type' => 'user', 'field' => 'file_manager', 'is_public' => 1]);
@@ -187,7 +187,7 @@ class Document extends Model
 	// Check for access levels.
 	$query->where(function($query) {
 	    $query->where('roles.role_level', '<', auth()->user()->getRoleLevel())
-		  ->orWhere('documents.item_id', auth()->user()->id);
+		  ->orWhere('documents.owned_by', auth()->user()->id);
 	});
 
 	$owners = $query->distinct()->get();

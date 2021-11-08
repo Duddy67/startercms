@@ -14,6 +14,7 @@ return [
         'delete_user_not_auth' => 'You are not authorised to delete this user.',
         'delete_list_not_auth' => 'You are not authorised to delete this user: :name',
         'alert_user_dependencies' => 'You cannot delete this user: :name as he/she owns :number :dependencies. Please modify these dependencies accordingly then try again.',
+        'unknown_user' => 'Unknown user.',
     ],
     'roles' => [
         'create_success' => 'Role successfully created.',

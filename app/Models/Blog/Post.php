@@ -75,7 +75,7 @@ class Post extends Model
      */
     public function image()
     {
-        return $this->HasOne(Document::class, 'item_id')->where('item_type', 'post');
+        return $this->HasOne(Document::class, 'owned_by')->where('item_type', 'post');
     }
 
     /**

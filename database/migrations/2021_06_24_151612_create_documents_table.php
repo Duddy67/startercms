@@ -20,7 +20,7 @@ class CreateDocumentsTable extends Migration
             $table->unsignedInteger('file_size')->nullable();
 	    $table->string('content_type', 50)->nullable();
 	    $table->string('field', 30)->nullable();
-            $table->unsignedInteger('item_id')->nullable();
+            $table->unsignedInteger('owned_by')->nullable();
             $table->string('item_type')->nullable();
             $table->boolean('is_public')->nullable();
             $table->timestamps();
