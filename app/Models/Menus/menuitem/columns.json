@@ -22,14 +22,9 @@
     "type": "string"
   },
   {
-    "label": "labels.generic.access_level",
-    "name": "access_level",
+    "label": "labels.menuitems.url",
+    "name": "url",
     "extra": ["sortable"],
-    "type": "string"
-  },
-  {
-    "label": "labels.generic.owned_by",
-    "name": "owned_by",
     "type": "string"
   },
   {

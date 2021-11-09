@@ -7,14 +7,6 @@
     "placeholder": "labels.generic.title"
   },
   {
-    "label": "labels.menuitems.target",
-    "type": "select",
-    "name": "target",
-    "id": "target",
-    "blank": "labels.generic.select_option",
-    "options": [] 
-  },
-  {
     "label": "labels.menuitems.url",
     "type": "text",
     "name": "url",
@@ -33,39 +25,6 @@
     "type": "select",
     "name": "status",
     "id": "status",
-    "blank": "labels.generic.select_option",
-    "options": [] 
-  },
-  {
-    "label": "labels.generic.access_level",
-    "type": "select",
-    "name": "access_level",
-    "id": "access_level",
-    "blank": "labels.generic.select_option",
-    "options": [] 
-  },
-  {
-    "label": "labels.generic.owned_by",
-    "type": "select",
-    "name": "owned_by",
-    "id": "owned_by",
-    "blank": "labels.generic.select_option",
-    "options": [] 
-  },
-  {
-    "label": "labels.generic.owned_by",
-    "type": "text",
-    "name": "owner_name",
-    "id": "owner_name",
-    "extra": ["disabled"]
-  },
-  {
-    "label": "labels.users.groups",
-    "type": "select",
-    "name": "groups",
-    "extra": ["multiple","title_as_id"],
-    "id": "groups",
-    "class": "_locked",
     "blank": "labels.generic.select_option",
     "options": [] 
   },

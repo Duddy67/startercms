@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Menus;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Menus\MenuItem;
+use App\Models\Menus\Menu;
 use App\Models\Users\Group;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
@@ -31,17 +32,24 @@ class MenuItemController extends Controller
      */
     protected $pluginName = 'menus';
 
+    /*
+     * The parent menu.
+     */
+    protected $menu;
+
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(Request $request)
     {
         $this->middleware('auth');
         $this->middleware('admin.menus.menuitems');
 	$this->model = new MenuItem;
+	// Rely on the parent menu for authorisations (NB: A valid menu code is checked in advance in the middleware).
+	$this->menu = Menu::where('code', $request->route()->parameter('code'))->first(); 
     }
 
     /**
@@ -55,7 +63,13 @@ class MenuItemController extends Controller
     {
         // Gather the needed data to build the item list.
         $columns = $this->getColumns();
-        $actions = $this->getActions('list');
+	$except = (!$this->menu->canEdit()) ? ['create', 'publish', 'unpublish'] : [];
+
+	if (!$this->menu->canDelete()) {
+	    $except[] = 'massDestroy';
+	}
+
+        $actions = $this->getActions('list', $except);
         $filters = $this->getFilters($request);
 	$items = $this->model->getItems($request, $code);
 	$rows = $this->getRowTree($columns, $items);
@@ -94,35 +108,33 @@ class MenuItemController extends Controller
      */
     public function edit(Request $request, $code, $id)
     {
-        $menuItem = MenuItem::select('menu_items.*', 'users.name as owner_name')
-			      ->selectRaw('IFNULL(users2.name, ?) as modifier_name', [__('labels.generic.unknown_user')])
-			      ->leftJoin('users', 'menu_items.owned_by', '=', 'users.id')
-			      ->leftJoin('users as users2', 'menu_items.updated_by', '=', 'users2.id')
+        $menuItem = MenuItem::select('menu_items.*')
+			      ->selectRaw('IFNULL(users.name, ?) as modifier_name', [__('labels.generic.unknown_user')])
+			      ->leftJoin('users as users', 'menu_items.updated_by', '=', 'users.id')
 			      ->findOrFail($id);
 
-	if (!$menuItem->canAccess()) {
-	    return redirect()->route('admin.menus.menuitems.index')->with('error',  __('messages.generic.access_not_auth'));
-	}
-
 	if ($menuItem->checked_out && $menuItem->checked_out != auth()->user()->id) {
-	    return redirect()->route('admin.menus.menuitems.index')->with('error',  __('messages.generic.checked_out'));
+	    return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with('error',  __('messages.generic.checked_out'));
 	}
 
 	$menuItem->checkOut();
 
         // Gather the needed data to build the form.
 	
-	$except = (auth()->user()->getRoleLevel() > $menuItem->getOwnerRoleLevel() || $menuItem->owned_by == auth()->user()->id) ? ['owner_name'] : ['owned_by'];
+	$except = [];
 
 	if ($menuItem->updated_by === null) {
 	    array_push($except, 'updated_by', 'updated_at');
 	}
-//$target = MenuItem::targets()['blog.category']::where('id', 8)->first();
-$target = MenuItem::getTarget('blog.category', $menuItem->url);
-echo $target->name;
+
         $fields = $this->getFields($menuItem, $except);
 	$this->setFieldValues($fields, $menuItem);
-	$except = (!$menuItem->canEdit()) ? ['destroy', 'save', 'saveClose'] : [];
+	$except = (!$this->menu->canEdit()) ? ['destroy', 'save', 'saveClose'] : [];
+
+	if (!$this->menu->canDelete()) {
+	    $except[] = 'destroy';
+	}
+
         $actions = $this->getActions('form', $except);
 	// Add the id parameter to the query.
 	$query = array_merge($request->query(), ['code' => $code, 'menuItem' => $id]);
@@ -157,11 +169,11 @@ echo $target->name;
     public function update(UpdateRequest $request, $code, MenuItem $menuItem)
     {
 	if ($menuItem->checked_out != auth()->user()->id) {
-	    return redirect()->route('admin.menus.menuitems.index', $request->query())->with('error',  __('messages.generic.user_id_does_not_match'));
+	    return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with('error',  __('messages.generic.user_id_does_not_match'));
 	}
 
-	if (!$menuItem->canEdit()) {
-	    return redirect()->route('admin.menus.menuitems.index', $request->query())->with('error',  __('messages.generic.edit_not_auth'));
+	if (!$this->menu->canEdit()) {
+	    return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with('error',  __('messages.generic.edit_not_auth'));
 	}
 
 	$query = array_merge($request->query(), ['code' => $code, 'menuItem' => $menuItem->id]);
@@ -173,59 +185,9 @@ echo $target->name;
 	    return redirect()->route('admin.menus.menuitems.edit', $query)->with('error',  __('messages.generic.must_not_be_descendant'));
 	}
 
-	if ($parent->access_level == 'private' && $parent->owned_by != auth()->user()->id) {
-	    return redirect()->route('admin.menus.menuitems.edit', $query)->with('error',  __('messages.generic.item_is_private', ['name' => $parent->name]));
-	}
-
 	$menuItem->title = $request->input('title');
 	$menuItem->url = $request->input('url');
 	$menuItem->updated_by = auth()->user()->id;
-
-	if ($menuItem->canChangeAttachments()) {
-
-	    if ($menuItem->access_level != 'private') {
-		$menuItem->owned_by = $request->input('owned_by');
-	    }
-
-	    $groups = array_merge($request->input('groups', []), Group::getPrivateGroups($menuItem));
-
-	    if (!empty($groups)) {
-		$menuItem->groups()->sync($groups);
-	    }
-	    else {
-		// Remove all groups for this post.
-		$menuItem->groups()->sync([]);
-	    }
-	}
-
-	if ($menuItem->canChangeAccessLevel()) {
-
-	    if ($menuItem->access_level != 'private') {
-		// The access level has just been set to private. Check first for descendants.
-		if ($request->input('access_level') == 'private' && !$menuItem->canDescendantsBePrivate()) {
-		    return redirect()->route('admin.menus.menuitems.edit', $query)->with('error',  __('messages.generic.descendants_cannot_be_private'));
-		}
-
-		if ($request->input('access_level') == 'private' && $menuItem->anyDescendantCheckedOut()) {
-		    return redirect()->route('admin.menus.menuitems.edit', $query)->with('error',  __('messages.generic.descendants_checked_out'));
-		}
-
-		if ($request->input('access_level') == 'private') {
-		    $menuItem->setDescendantAccessToPrivate();
-		}
-	    }
-
-	    if ($menuItem->access_level != 'private' || ($menuItem->access_level == 'private' && !$menuItem->isParentPrivate())) {
-		$menuItem->access_level = $request->input('access_level');
-		// N.B: The nested set model is updated automatically.
-		$menuItem->parent_id = $request->input('parent_id');
-	    }
-
-	    if ($menuItem->access_level == 'private' && $menuItem->isParentPrivate() && $menuItem->owned_by == auth()->user()->id) {
-		// Only the owner of the descendants private items can change their parents.
-		$menuItem->parent_id = $request->input('parent_id');
-	    }
-	}
 
 	$menuItem->save();
 
@@ -247,34 +209,24 @@ echo $target->name;
      */
     public function store(StoreRequest $request, $code)
     {
+        // The user cannot create an item if he cannot edit it.
+	if (!$this->menu->canEdit()) {
+	    return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with('error',  __('messages.generic.create_not_auth'));
+	}
+
         // Check first for parent id. (N.B: menu items cannot be null as they have a root parent id by default).
 	$parent = MenuItem::findOrFail($request->input('parent_id'));
-
-	if ($parent->access_level == 'private' && $parent->owned_by != auth()->user()->id) {
-	    return redirect()->route('admin.menus.menuitems.create', array_merge($request->query(), ['code' => $code]))->with('error',  __('messages.generic.item_is_private', ['name' => $parent->name]));
-	}
-
-	if ($parent->access_level == 'private' && $request->input('access_level') != 'private') {
-	    return redirect()->route('admin.menus.menuitems.create', array_merge($request->query(), ['code' => $code]))->with('error',  __('messages.generic.access_level_must_be_private'));
-	}
-
-	if ($parent->access_level == 'private' && $request->input('owned_by') != $parent->owned_by) {
-	    return redirect()->route('admin.menus.menuitems.create', array_merge($request->query(), ['code' => $code]))->with('error',  __('messages.generic.owner_must_match_parent_menu_item'));
-	}
 
 	$menuItem = MenuItem::create([
 	    'title' => $request->input('title'), 
 	    'url' => $request->input('url'), 
-	    'status' => $request->input('status'), 
-	    'access_level' => $request->input('access_level'), 
-	    'owned_by' => $request->input('owned_by'),
-	    'parent_id' => (empty($request->input('parent_id'))) ? null : $request->input('parent_id'),
+	    'status' => ($parent->status == 'unpublished') ? 'unpublished' : $request->input('status'), 
+	    'parent_id' => $request->input('parent_id'),
 	]);
 
-	$parent = MenuItem::findOrFail($menuItem->parent_id);
 	$parent->appendNode($menuItem);
-
 	$menuItem->menu_code = $code;
+
 	$menuItem->save();
 
         if ($request->input('_close', null)) {
@@ -294,14 +246,13 @@ echo $target->name;
      */
     public function destroy(Request $request, $code, MenuItem $menuItem)
     {
-	if (!$menuItem->canDelete() || !$menuItem->canDeleteDescendants()) {
-	    return redirect()->route('admin.menus.menuitems.edit', array_merge($request->query(), ['code' => $code, 'menuItem' => $menuItem->id]))->with('error',  __('messages.generic.delete_not_auth'));
+	if (!$this->menu->canDelete()) {
+	    return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with('error',  __('messages.generic.delete_not_auth'));
 	}
 
 	$name = $menuItem->name;
 
-	//$menuItem->menuitems()->detach();
-	//$menuItem->delete();
+	$menuItem->delete();
 
 	return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with('success', __('messages.menuitems.delete_success', ['name' => $name]));
     }
@@ -315,22 +266,16 @@ echo $target->name;
      */
     public function massDestroy(Request $request, $code)
     {
+	if (!$this->menu->canDelete()) {
+	    return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with('error',  __('messages.generic.delete_not_auth'));
+	}
+
         $deleted = 0;
         // Remove the menu items selected from the list.
         foreach ($request->input('ids') as $id) {
 	    $menuItem = MenuItem::findOrFail($id);
 
-	    if (!$menuItem->canDelete() || !$menuItem->canDeleteDescendants()) {
-	      return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with(
-		  [
-		      'error' => __('messages.generic.delete_not_auth'), 
-		      'success' => __('messages.menuitems.delete_list_success', ['number' => $deleted])
-		  ]);
-	    }
-
-	    //$menuItem->menuitems()->detach();
 	    $menuItem->delete();
-
 	    $deleted++;
 	}
 
@@ -353,6 +298,10 @@ echo $target->name;
 
     public function massPublish(Request $request, $code)
     {
+	if (!$this->menu->canChangeStatus()) {
+	    return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with('error',  __('messages.generic.change_status_not_auth'));
+	}
+
         $changed = 0;
 
         foreach ($request->input('ids') as $id) {
@@ -360,16 +309,6 @@ echo $target->name;
 	    // Cannot published a menu item if its parent is unpublished.
 	    if ($menuItem->parent && $menuItem->parent->status == 'unpublished') {
 	        continue;
-	    }
-
-	    if (!$menuItem->canChangeStatus()) {
-	      $messages = ['error' => __('messages.generic.change_status_not_auth')];
-
-	      if ($changed) {
-		  $messages['success'] = __('messages.menuitems.change_status_list_success', ['number' => $changed]);
-	      }
-
-	      return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with($messages);
 	    }
 
 	    $menuItem->status = 'published';
@@ -383,6 +322,10 @@ echo $target->name;
 
     public function massUnpublish(Request $request, $code)
     {
+	if (!$this->menu->canChangeStatus()) {
+	    return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with('error',  __('messages.generic.change_status_not_auth'));
+	}
+
         $treated = [];
         $changed = 0;
 
@@ -393,16 +336,6 @@ echo $target->name;
 	    }
 
 	    $menuItem = MenuItem::findOrFail($id);
-
-	    if (!$menuItem->canChangeStatus()) {
-	      $messages = ['error' => __('messages.generic.change_status_not_auth')];
-
-	      if ($changed) {
-		  $messages['success'] = __('messages.menuitems.change_status_list_success', ['number' => $changed]);
-	      }
-
-	      return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with($messages);
-	    }
 
 	    $menuItem->status = 'unpublished';
 	    $menuItem->save();
@@ -430,6 +363,10 @@ echo $target->name;
      */
     public function up(Request $request, $code, MenuItem $menuItem)
     {
+	if (!$this->menu->canChangeStatus()) {
+	    return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with('error',  __('messages.generic.change_order_not_auth'));
+	}
+
 	$menuItem->up();
 	return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]));
     }
@@ -443,6 +380,10 @@ echo $target->name;
      */
     public function down(Request $request, $code, MenuItem $menuItem)
     {
+	if (!$this->menu->canChangeStatus()) {
+	    return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]))->with('error',  __('messages.generic.change_order_not_auth'));
+	}
+
 	$menuItem->down();
 	return redirect()->route('admin.menus.menuitems.index', array_merge($request->query(), ['code' => $code]));
     }

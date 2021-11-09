@@ -147,12 +147,6 @@ class Menu extends Model
 	$traverse = function ($nodes, $level = 0) use (&$traverse, &$menuItems) {
 
 	    foreach ($nodes as $node) {
-		/*if (!$node->canAccess()) {
-		    continue;
-		  // Only the menu item's owner can access it.
-		  //$extra = ($menuItem->owned_by == auth()->user()->id) ? [] : ['disabled'];
-	        }*/
-
 	        $item = new \stdClass();
 		$item->id = $node->id;
 		$item->title = $node->title;

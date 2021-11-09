@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
 	  'title' => 'Main menu',
 	  'code' => 'main-menu',
 	  'status' => 'published',
-	  'access_level' => 'public_ro',
+	  'access_level' => 'public_rw',
 	  'owned_by' => 1,
 	]);
 
@@ -29,8 +29,6 @@ class DatabaseSeeder extends Seeder
 	$node->menu_code = 'root';
 	$node->url = 'root';
 	$node->status = 'published';
-	$node->access_level = 'public_ro';
-	$node->owned_by = 1;
         // Saved as root
 	$node->save();
 
@@ -38,8 +36,6 @@ class DatabaseSeeder extends Seeder
 	    'title' => 'Home',
 	    'url' => '/',
 	    'status' => 'published',
-	    'access_level' => 'public_ro',
-	    'owned_by' => 1,
 	    'parent_id' => 1,
 	]);
 

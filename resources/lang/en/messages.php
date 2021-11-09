@@ -72,13 +72,19 @@ return [
         'create_success' => 'Document successfully created.',
         'delete_success' => 'The document ":name" has been successfully deleted.',
     ],
+    'menus' => [
+        'menu_not_found' => 'The menu with the code: :code cannot be found.',
+    ],
     'general' => [
         'update_success' => 'Parameters successfully saved.',
     ],
     'generic' => [
         'access_not_auth' => 'You are not authorised to access this resource.',
         'edit_not_auth' => 'You are not authorised to edit this resource.',
+        'create_not_auth' => 'You are not authorised to create a resource.',
         'delete_not_auth' => 'You are not authorised to delete this resource.',
+        'change_status_not_auth' => 'You are not authorised to change the status of this resource.',
+        'change_order_not_auth' => 'You are not authorised to change the order of this resource.',
         'user_id_does_not_match' => 'The id of the user supposed to edit this item doesn\'t match with your id. Or may be you\'ve been checked in by an administrator.',
         'owner_not_valid' => 'The owner of the item is not valid.',
         'no_item_selected' => 'No item selected.',

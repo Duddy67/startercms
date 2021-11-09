@@ -29,8 +29,6 @@ class StoreRequest extends FormRequest
 	    ],
 	    'url' => 'required',
 	    'status' => 'required',
-	    'access_level' => 'required',
-	    'owned_by' => 'required'
         ];
     }
 }
