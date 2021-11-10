@@ -49,7 +49,7 @@ class MenuItemController extends Controller
         $this->middleware('admin.menus.menuitems');
 	$this->model = new MenuItem;
 	// Rely on the parent menu for authorisations (NB: A valid menu code is checked in advance in the middleware).
-	$this->menu = Menu::where('code', $request->route()->parameter('code'))->first(); 
+	$this->menu = ($request->route()) ? Menu::where('code', $request->route()->parameter('code'))->first() : null; 
     }
 
     /**
