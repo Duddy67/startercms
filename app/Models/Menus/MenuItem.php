@@ -9,6 +9,7 @@ use App\Models\Menus\Menu;
 use Kalnoy\Nestedset\NodeTrait;
 use App\Models\Users\Group;
 use App\Traits\Admin\CheckInCheckOut;
+use Request;
 
 
 class MenuItem extends Model
@@ -56,10 +57,13 @@ class MenuItem extends Model
 
     public function getParentIdOptions()
     {
-	$nodes = MenuItem::get()->toTree();
-	$options = [];
+        // Get the parent menu code.
+        $code = Request::route()->parameter('code');
+
+	$nodes = MenuItem::whereIn('menu_code', ['root', $code])->get()->toTree();
 	// Defines the state of the current instance.
 	$isNew = ($this->id) ? false : true;
+	$options = [];
 
 	$traverse = function ($menuItems, $prefix = '-') use (&$traverse, &$options, $isNew) {
 
