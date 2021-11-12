@@ -56,10 +56,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4" id="layout-sidebar">
+    @inject ('general', 'App\Models\Settings\General')
     <!-- Brand Logo -->
     <a href="index3.html" class="brand-link">
       <img src="{{ asset('/images/starter-cms-logo.png') }}" alt="StarterCMS Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">Starter CMS</span>
+      <span class="brand-text font-weight-light">{{ $general::getGeneralValue('app', 'name') }}</span>
     </a>
 
     <!-- Sidebar -->
