@@ -13,20 +13,20 @@ class SiteController extends Controller
     {
         $page = 'site.home';
 	$posts = null;
-
-	if ($category = Category::where('slug', 'drama')->first()) {
-	    $posts = $category->getPosts($request);
-	}
-
-	$globalSettings = Setting::getDataByGroup('category');
 	$settings = [];
 
-	foreach ($category->settings as $key => $value) {
-	    if ($value == 'global_setting') {
-	        $settings[$key] = $globalSettings[$key];
-	    }
-	    else {
-	        $settings[$key] = $category->settings[$key];
+	if ($category = Category::where('slug', 'foo-bar')->first()) {
+	    $posts = $category->getPosts($request);
+
+	    $globalSettings = Setting::getDataByGroup('category');
+
+	    foreach ($category->settings as $key => $value) {
+		if ($value == 'global_setting') {
+		    $settings[$key] = $globalSettings[$key];
+		}
+		else {
+		    $settings[$key] = $category->settings[$key];
+		}
 	    }
 	}
 

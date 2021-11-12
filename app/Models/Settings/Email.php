@@ -20,7 +20,6 @@ class Email extends Model
      */
     protected $fillable = [
         'code',
-        'file_name',
         'subject',
         'body_html',
         'body_text',
@@ -70,6 +69,10 @@ class Email extends Model
      */
     private function setViewFiles()
     {
+        if (!file_exists(resource_path().'/views/emails')) {
+	    mkdir(resource_path().'/views/emails', 0755, true);
+	}
+
         // Name the email template after the code attribute.
 	$html = resource_path().'/views/emails/'.$this->code.'.blade.php';
 	$text = resource_path().'/views/emails/'.$this->code.'_plain.blade.php';

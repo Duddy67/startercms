@@ -61,7 +61,7 @@ trait RegistersUsers
      */
     protected function registered(Request $request, $user)
     {
-        if ($user->id === 1) {
+        if ($user->id == 1) {
 	    // The very first registered user is the super-admin.
 	    $user->assignRole('super-admin');
 	}
