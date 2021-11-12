@@ -36,8 +36,6 @@ trait RegistersUsers
 
         $this->guard()->login($user);
 
-	Email::sendEmail('user_registration', $user);
-
         return $this->registered($request, $user)
                         ?: redirect($this->redirectPath());
     }
@@ -68,5 +66,7 @@ trait RegistersUsers
 	else {
 	    $user->assignRole('registered');
 	}
+
+	Email::sendEmail('user_registration', $user);
     }
 }
