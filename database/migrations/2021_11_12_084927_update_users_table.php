@@ -18,7 +18,7 @@ class UpdateUsersTable extends Migration
             $table->unsignedBigInteger('checked_out')->nullable()->after('remember_token');
             $table->timestamp('checked_out_time')->nullable()->after('checked_out');
             $table->unsignedBigInteger('updated_by')->nullable()->after('checked_out_time');
-	}
+	});
     }
 
     /**
@@ -33,6 +33,6 @@ class UpdateUsersTable extends Migration
 	    $table->dropColumn('checked_out');
 	    $table->dropColumn('checked_out_time');
 	    $table->dropColumn('updated_by');
-	}
+	});
     }
 }
