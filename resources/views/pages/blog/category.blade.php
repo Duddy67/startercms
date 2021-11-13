@@ -26,6 +26,8 @@
 
 <x-pagination :items=$posts />
 
+@include ('partials.blog.subcategories')
+
 @push ('scripts')
     <script type="text/javascript" src="{{ $public }}/js/blog/category.js"></script>
 @endpush

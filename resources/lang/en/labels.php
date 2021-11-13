@@ -18,6 +18,7 @@ return [
 	'menus' => 'Menus',
 	'menuitems' => 'Menu items',
 	'files' => 'Files',
+	'subcategories' => 'Sub-categories',
     ],
     'users' => [
 	'email' => 'Email',

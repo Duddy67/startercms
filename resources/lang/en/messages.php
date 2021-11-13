@@ -59,6 +59,7 @@ return [
         'create_success' => 'category successfully created.',
         'update_success' => 'category successfully updated.',
         'change_status_list_success' => 'category statuses successfully changed.',
+	'no_subcategories' => 'No sub-categories',
     ],
     'emails' => [
         'create_success' => 'Email successfully created.',
