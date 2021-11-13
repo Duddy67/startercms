@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Blog\Category;
 use App\Models\Blog\Setting;
+use App\Models\Settings\General;
 
 
 class SiteController extends Controller
@@ -14,6 +15,7 @@ class SiteController extends Controller
         $page = 'site.home';
 	$posts = null;
 	$settings = [];
+	$general = new General;
 
 	if ($category = Category::where('slug', 'foo-bar')->first()) {
 	    $posts = $category->getPosts($request);
@@ -32,6 +34,6 @@ class SiteController extends Controller
 
 	$query = $request->query();
 
-        return view('default', compact('page', 'category', 'settings', 'posts', 'query'));
+        return view('default', compact('page', 'category', 'settings', 'posts', 'general', 'query'));
     }
 }

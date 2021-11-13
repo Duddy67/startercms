@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Starter CMS</title>
+        <title>{{ $general::getGeneralValue('app', 'name') }}</title>
 
         @php $public = url('/'); @endphp
 
