@@ -26,7 +26,9 @@
 
 <x-pagination :items=$posts />
 
-@include ('partials.blog.subcategories')
+@if ($settings['show_subcategories'])
+    @include ('partials.blog.subcategories')
+@endif
 
 @push ('scripts')
     <script type="text/javascript" src="{{ $public }}/js/blog/category.js"></script>

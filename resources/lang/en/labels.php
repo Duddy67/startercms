@@ -138,6 +138,7 @@ return [
 	'show_search' => 'Show search',
 	'show_description' => 'Show description',
 	'show_categories' => 'Show categories',
+	'show_subcategories' => 'Show sub-categories',
 	'show_owner' => 'Show owner',
 	'show_created_at' => 'Show created at',
 	'show_image' => 'Show image',

@@ -206,6 +206,11 @@ class Post extends Model
 	return $options;
     }
 
+    public function getSettings()
+    {
+        return Setting::getItemSettings($this, 'posts');
+    }
+
     /*
      * Generic function that returns model values which are handled by select inputs. 
      */

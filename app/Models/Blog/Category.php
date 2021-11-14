@@ -101,6 +101,7 @@ class Category extends Model
     {
         $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
         $search = $request->input('search', null);
+	$settings = $this->getSettings();
 
 	$query = Post::query();
 	$query->select('posts.*', 'users.name as owner_name')->leftJoin('users', 'posts.owned_by', '=', 'users.id');
@@ -130,7 +131,7 @@ class Category extends Model
 
 		$groupIds = auth()->user()->getGroupIds();
 
-		if(!empty($groupIds)) {
+		if (!empty($groupIds)) {
 		    // Check for access through groups.
 		    $query->orWhereHas('groups', function ($query)  use ($groupIds) {
 			$query->whereIn('id', $groupIds);
@@ -141,6 +142,13 @@ class Category extends Model
 	else {
 	    $query->whereIn('posts.access_level', ['public_ro', 'public_rw']);
 	}
+
+	$query->where('posts.status', 'published');
+
+	// Extract the ordering name and direction from the setting value.
+	preg_match('#^([a-z-0-9_]+)_(asc|desc)$#', $settings['post_ordering'], $ordering);
+
+	$query->orderBy($ordering[1], $ordering[2]);
 
         return $query->paginate($perPage);
     }
@@ -206,6 +214,11 @@ class Category extends Model
 	}
 
 	return $options;
+    }
+
+    public function getSettings()
+    {
+        return Setting::getItemSettings($this, 'category');
     }
 
     public function getPostOrderingOptions()

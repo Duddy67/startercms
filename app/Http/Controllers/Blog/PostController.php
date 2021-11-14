@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Blog;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Blog\Post;
-use App\Models\Blog\Setting;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -29,18 +28,7 @@ class PostController extends Controller
 
         $page = 'blog.post';
 
-	$globalSettings = Setting::getDataByGroup('posts');
-	$settings = [];
-
-	foreach ($post->settings as $key => $value) {
-	    if ($value == 'global_setting') {
-	        $settings[$key] = $globalSettings[$key];
-	    }
-	    else {
-	        $settings[$key] = $post->settings[$key];
-	    }
-	}
-
+	$settings = $post->getSettings();
 	$query = array_merge($request->query(), ['id' => $id, 'slug' => $slug]);
 
         return view('default', compact('page', 'id', 'slug', 'post', 'settings', 'query'));
