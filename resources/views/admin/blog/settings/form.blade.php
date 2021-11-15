@@ -8,7 +8,7 @@
 	@method('patch')
 
 	<nav class="nav nav-tabs">
-	    <a class="nav-item nav-link active" href="#posts" data-toggle="tab">@php echo __('labels.title.posts'); @endphp</a>
+	    <a class="nav-item nav-link" href="#posts" data-toggle="tab">@php echo __('labels.title.posts'); @endphp</a>
 	    <a class="nav-item nav-link" href="#category" data-toggle="tab">@php echo __('labels.generic.category'); @endphp</a>
 	</nav>
 
@@ -23,7 +23,7 @@
 		@endphp
 
 		@if (isset($field->tab))
-		    @php $active = ($key == 0) ? ' active' : ''; @endphp
+		    @php $active = ($field->tab == $tab) ? ' active' : ''; @endphp
 		    <div class="tab-pane{{ $active }}" id="{{ $field->tab }}">
 		@endif
 
@@ -34,6 +34,8 @@
 		@endif
 	    @endforeach
 	</div>
+
+	<input type="hidden" id="activeTab" name="_tab" value="{{ $tab }}">
     </form>
 
     <div class="form-group">

@@ -12,14 +12,14 @@
 	@endif
 
 	<nav class="nav nav-tabs">
-	    <a class="nav-item nav-link active" href="#details" data-toggle="tab">@php echo __('labels.generic.details'); @endphp</a>
+	    <a class="nav-item nav-link" href="#details" data-toggle="tab">@php echo __('labels.generic.details'); @endphp</a>
 	    <a class="nav-item nav-link" href="#settings" data-toggle="tab">@php echo __('labels.title.settings'); @endphp</a>
 	</nav>
 
 	<div class="tab-content">
 	    @foreach ($fields as $key => $field)
 		@if (isset($field->tab))
-		    @php $active = ($key == 0) ? ' active' : ''; @endphp
+		    @php $active = ($field->tab == $tab) ? ' active' : ''; @endphp
 		    <div class="tab-pane{{ $active }}" id="{{ $field->tab }}">
 		@endif
 
@@ -35,6 +35,7 @@
 
 	<input type="hidden" id="cancelEdit" value="{{ route('admin.blog.categories.cancel', $query) }}">
 	<input type="hidden" id="close" name="_close" value="0">
+	<input type="hidden" id="activeTab" name="_tab" value="{{ $tab }}">
     </form>
     <x-toolbar :items=$actions />
 

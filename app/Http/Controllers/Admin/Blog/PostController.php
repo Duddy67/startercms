@@ -92,7 +92,7 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function edit(Request $request, $id)
+    public function edit(Request $request, $id, $tab = null)
     {
         $post = Post::select('posts.*', 'users.name as owner_name')
 			->selectRaw('IFNULL(users2.name, ?) as modifier_name', [__('labels.generic.unknown_user')])
@@ -124,8 +124,9 @@ class PostController extends Controller
         $actions = $this->getActions('form', $except);
 	// Add the id parameter to the query.
 	$query = array_merge($request->query(), ['post' => $id]);
+	$tab = ($tab) ? $tab : 'details';
 
-        return view('admin.blog.posts.form', compact('post', 'fields', 'actions', 'query'));
+        return view('admin.blog.posts.form', compact('post', 'fields', 'actions', 'tab', 'query'));
     }
 
     /**
@@ -222,7 +223,7 @@ class PostController extends Controller
 	    return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.update_success'));
 	}
 
-	return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id]))->with('success', __('messages.posts.update_success'));
+	return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id, 'tab' => $request->input('_tab')]))->with('success', __('messages.posts.update_success'));
     }
 
     /**

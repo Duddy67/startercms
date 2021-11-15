@@ -89,7 +89,7 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function edit(Request $request, $id)
+    public function edit(Request $request, $id, $tab = null)
     {
         $category = Category::select('blog_categories.*', 'users.name as owner_name')
 			      ->selectRaw('IFNULL(users2.name, ?) as modifier_name', [__('labels.generic.unknown_user')])
@@ -121,8 +121,9 @@ class CategoryController extends Controller
         $actions = $this->getActions('form', $except);
 	// Add the id parameter to the query.
 	$query = array_merge($request->query(), ['category' => $id]);
+	$tab = ($tab) ? $tab : 'details';
 
-        return view('admin.blog.categories.form', compact('category', 'fields', 'actions', 'query'));
+        return view('admin.blog.categories.form', compact('category', 'fields', 'actions', 'tab', 'query'));
     }
 
     /**
@@ -231,7 +232,7 @@ class CategoryController extends Controller
 	    return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.update_success'));
 	}
 
-	return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('success', __('messages.categories.update_success'));
+	return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id, 'tab' => $request->input('_tab')]))->with('success', __('messages.categories.update_success'));
     }
 
     /**

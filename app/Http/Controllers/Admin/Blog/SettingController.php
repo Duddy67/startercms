@@ -50,14 +50,15 @@ class SettingController extends Controller
      * @param  Request  $request
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index(Request $request)
+    public function index(Request $request, $tab = null)
     {
         $fields = $this->getFields();
         $actions = $this->getActions('form');
 	$query = $request->query();
 	$data = Setting::getData();
+	$tab = ($tab) ? $tab : 'posts';
 
-        return view('admin.blog.settings.form', compact('fields', 'actions', 'data', 'query'));
+        return view('admin.blog.settings.form', compact('fields', 'actions', 'data', 'tab', 'query'));
     }
 
     /**
@@ -68,7 +69,7 @@ class SettingController extends Controller
      */
     public function update(Request $request)
     {
-        $post = $request->except('_token', '_method');
+        $post = $request->except('_token', '_method', '_tab');
 	$this->truncateSettings();
 
 	foreach ($post as $group => $params) {
@@ -77,7 +78,7 @@ class SettingController extends Controller
 	  }
 	}
 
-	return redirect()->route('admin.blog.settings.index', $request->query())->with('success', __('messages.general.update_success'));
+	return redirect()->route('admin.blog.settings.index', array_merge($request->query(), ['tab' => $request->input('_tab')]))->with('success', __('messages.general.update_success'));
     }
 
     /**

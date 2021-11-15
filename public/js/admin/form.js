@@ -7,6 +7,12 @@
       actions.forEach(function (action) {
 	  $('#'+action).click( function() { $.fn[action](); });
       });
+
+      if ($('#activeTab').length) {
+	  $.fn.setActiveTab($('#activeTab').val());
+      }
+
+      $('.nav-tabs a').click( function() { $.fn.setLastActiveTab($(this).attr('href')); });
   });
 
   $.fn.save = function() {
@@ -33,6 +39,17 @@
 	  url: $('#itemListUrl').val()+'/2',
 	  headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 	});*/
+  }
+
+  $.fn.setActiveTab = function(tab) {
+    let link = $('a[href="#'+tab+'"]');
+    link.addClass('active');
+  }
+
+  $.fn.setLastActiveTab = function(tab) {
+    // Remove the # character at the start of the string.
+    tab = tab.substring(1);
+    $('#activeTab').val(tab);
   }
 
   if (jQuery.fn.select2) {
