@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
+use App\Models\Settings\General;
+
 
 class BladeServiceProvider extends ServiceProvider
 {
@@ -63,5 +65,20 @@ class BladeServiceProvider extends ServiceProvider
 	Blade::directive('endsuperadmin', function () {
             return "<?php endif; ?>";
         });
+
+	/**
+	 * @date blade directive
+	 * use as @date($object->datefield)
+	 * or with a format @date($object->datefield,'m/d/Y')
+	 */
+	Blade::directive('date', function ($expression) {
+	    // Set default format if not present in $expression
+	    $default = "'".General::getValue('app', 'date_format')."'";
+
+	    $parts = str_getcsv($expression);
+	    $parts[1] = (isset($parts[1]))?$parts[1]:$default;
+
+	    return '<?php if(' . $parts[0] . '){ echo e(' . $parts[0] . '->format(' . $parts[1] . ')); } ?>';
+	});
     }
 }

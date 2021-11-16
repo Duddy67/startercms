@@ -102,7 +102,7 @@ class Post extends Model
      */
     public function getItems($request)
     {
-        $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
+        $perPage = $request->input('per_page', General::getValue('pagination', 'per_page'));
         $search = $request->input('search', null);
         $sortedBy = $request->input('sorted_by', null);
         $ownedBy = $request->input('owned_by', null);

@@ -62,7 +62,7 @@ class Document extends Model
      */
     public function getFileManagerItems($request)
     {
-        $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
+        $perPage = $request->input('per_page', General::getValue('pagination', 'per_page'));
         $search = $request->input('search', null);
         $sortedBy = $request->input('sorted_by', null);
         $types = $request->input('types', []);
@@ -105,7 +105,7 @@ class Document extends Model
      */
     public function getAllFileManagerItems($request)
     {
-        $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
+        $perPage = $request->input('per_page', General::getValue('pagination', 'per_page'));
         $search = $request->input('search', null);
         $sortedBy = $request->input('sorted_by', null);
         $types = $request->input('types', []);

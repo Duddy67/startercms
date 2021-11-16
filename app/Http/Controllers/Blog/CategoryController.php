@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Blog;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Blog\Category;
-use App\Models\Settings\General;
 use Illuminate\Support\Facades\Auth;
 
 

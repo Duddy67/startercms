@@ -98,7 +98,7 @@ class Role extends SpatieRole
      */
     public function getItems($request)
     {
-        $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
+        $perPage = $request->input('per_page', General::getValue('pagination', 'per_page'));
         $search = $request->input('search', null);
 
 	$query = Role::query();

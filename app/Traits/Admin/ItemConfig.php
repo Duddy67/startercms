@@ -265,7 +265,7 @@ trait ItemConfig
 		//
 		if ($filter->name == 'per_page') {
 		    $options = General::$function();
-		    $default = General::getGeneralValue('pagination', 'per_page');
+		    $default = General::getValue('pagination', 'per_page');
 		}
 		elseif ($filter->name == 'sorted_by') {
 		    $options = General::$function($this->pluginName, $this->modelName);

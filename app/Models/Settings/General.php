@@ -62,7 +62,7 @@ class General extends Model
      * @param  string  $key
      * @return string
      */
-    public static function getGeneralValue($group, $key)
+    public static function getValue($group, $key)
     {
         return General::where(['group' => $group, 'key' => $key])->pluck('value')->first();
     }

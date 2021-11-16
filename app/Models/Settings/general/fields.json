@@ -16,6 +16,13 @@
     "options": [] 
   },
   {
+    "label": "labels.settings.date_format",
+    "type": "text",
+    "name": "date_format",
+    "id": "date_format",
+    "group": "app"
+  },
+  {
     "label": "labels.settings.per_page",
     "type": "select",
     "name": "per_page",

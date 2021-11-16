@@ -123,7 +123,7 @@ class User extends Authenticatable
      */
     public function getItems($request)
     {
-        $perPage = $request->input('per_page', General::getGeneralValue('pagination', 'per_page'));
+        $perPage = $request->input('per_page', General::getValue('pagination', 'per_page'));
         $sortedBy = $request->input('sorted_by', null);
         $roles = $request->input('roles', []);
         $groups = $request->input('groups', []);

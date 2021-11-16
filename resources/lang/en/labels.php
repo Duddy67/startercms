@@ -83,6 +83,12 @@ return [
 	'create_email' => 'Create an email',
 	'edit_email' => 'Edit an email',
     ],
+    'settings' => [
+	'name' => 'Site name',
+	'timezone' => 'Timezone',
+	'date_format' => 'Date format',
+	'per_page' => 'Number of items per page',
+    ],
     'generic' => [
 	'title' => 'Title',
 	'name' => 'Name',
