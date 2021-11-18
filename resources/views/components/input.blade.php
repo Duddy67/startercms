@@ -14,7 +14,7 @@
     $dataset = ''; 
     if (isset($field->dataset)) {
         foreach($field->dataset as $key => $val) {
-            $dataset .= $key.'='.$val.' ';
+            $dataset .= 'data-'.$key.'='.$val.' ';
         }
     }
 @endphp
@@ -46,6 +46,10 @@
 
     @if ($value)
 	value="{{ $value }}"
+    @endif
+
+    @if ($dataset)
+	{{ $dataset }}
     @endif
 
     >

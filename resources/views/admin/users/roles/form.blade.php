@@ -57,11 +57,15 @@
     @endif
 @endsection
 
+@push ('style')
+    <link rel="stylesheet" href="{{ asset('/vendor/adminlte/plugins/daterangepicker/daterangepicker.css') }}">
+@endpush
+
 @push ('scripts')
-    <script type="text/javascript" src="{{ url('/') }}/vendor/adminlte/plugins/jquery-ui/jquery-ui.min.js"></script>
-    <link rel="stylesheet" href="{{ url('/') }}/vendor/adminlte/plugins/jquery-ui/jquery-ui.min.css"></script>
-    <script type="text/javascript" src="{{ url('/') }}/js/admin/datepicker.js"></script>
-    <script type="text/javascript" src="{{ url('/') }}/js/admin/form.js"></script>
-    <script type="text/javascript" src="{{ url('/') }}/js/admin/roles/settings.js"></script>
-    <script type="text/javascript" src="{{ url('/') }}/js/admin/disable.toolbars.js"></script>
+    <script type="text/javascript" src="{{ asset('/vendor/adminlte/plugins/moment/moment.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('/vendor/adminlte/plugins/daterangepicker/daterangepicker.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('/js/admin/daterangepicker.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('/js/admin/form.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('/js/admin/disable.toolbars.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('/js/admin/roles/settings.js') }}"></script>
 @endpush

@@ -23,7 +23,9 @@
     "label": "labels.generic.created_at",
     "type": "date",
     "name": "created_at",
-    "id": "created_at"
+    "dataset": {"date":"0", "time":"0"},
+    "id": "created_at",
+    "extra": ["disabled"]
   },
   {
     "label": "labels.generic.updated_by",
@@ -36,7 +38,9 @@
     "label": "labels.generic.updated_at",
     "type": "date",
     "name": "updated_at",
-    "id": "updated_at"
+    "dataset": {"date":"0", "time":"0"},
+    "id": "updated_at",
+    "extra": ["disabled"]
   },
   {
     "type": "textarea",

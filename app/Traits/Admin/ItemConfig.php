@@ -106,7 +106,7 @@ trait ItemConfig
 	    if (!in_array($column->name, $except)) {
 
 		if ($column->type == 'date') {
-		    $row->{$column->name} = $item->{$column->name}->toFormattedDateString();
+		    $row->{$column->name} = $item->{$column->name}->tz(General::getValue('app', 'timezone'))->toFormattedDateString();
 		}
 		elseif ($column->name == 'owned_by') {
 		    $row->owned_by = $item->owner_name;
@@ -178,7 +178,14 @@ trait ItemConfig
 		    $fields[$key]->value = $item->getSelectedValue($field->name);
 		}
 		elseif ($field->type == 'date') {
-		    $fields[$key]->value = $item->{$field->name}->toDateString();
+		    $datetime = $item->{$field->name}->tz(General::getValue('app', 'timezone'))->toDateTimeString();
+		    $fields[$key]->value = $datetime;
+
+		    if (isset($fields[$key]->dataset)) {
+		        $data = explode(' ', $datetime);
+			$fields[$key]->dataset->date = $data[0];
+			$fields[$key]->dataset->time = $data[1];
+		    }
 		}
 		elseif ($field->name == 'updated_by') {
 		    $fields[$key]->value = $item->modifier_name;

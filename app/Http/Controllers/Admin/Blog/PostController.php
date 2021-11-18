@@ -14,6 +14,7 @@ use App\Http\Requests\Blog\Post\StoreRequest;
 use App\Http\Requests\Blog\Post\UpdateRequest;
 use Illuminate\Support\Str;
 use App\Models\Cms\Document;
+use Carbon\Carbon;
 
 
 class PostController extends Controller
@@ -81,8 +82,9 @@ class PostController extends Controller
         $fields = $this->getFields(null, ['updated_by', 'created_at', 'updated_at', 'owner_name']);
         $actions = $this->getActions('form', ['destroy']);
 	$query = $request->query();
+	$tab = 'details';
 
-        return view('admin.blog.posts.form', compact('fields', 'actions', 'query'));
+        return view('admin.blog.posts.form', compact('fields', 'actions', 'tab',  'query'));
     }
 
     /**

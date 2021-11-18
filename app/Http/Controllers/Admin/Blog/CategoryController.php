@@ -78,8 +78,9 @@ class CategoryController extends Controller
         $fields = $this->getFields(null, ['updated_by', 'created_at', 'updated_at', 'owner_name']);
         $actions = $this->getActions('form', ['destroy']);
 	$query = $request->query();
+	$tab = 'details';
 
-        return view('admin.blog.categories.form', compact('fields', 'actions', 'query'));
+        return view('admin.blog.categories.form', compact('fields', 'actions', 'tab', 'query'));
     }
 
     /**
