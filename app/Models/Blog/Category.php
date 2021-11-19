@@ -145,10 +145,12 @@ class Category extends Model
 
 	$query->where('posts.status', 'published');
 
-	// Extract the ordering name and direction from the setting value.
-	preg_match('#^([a-z-0-9_]+)_(asc|desc)$#', $settings['post_ordering'], $ordering);
+        if ($settings['post_ordering'] != 'no_ordering') {
+	    // Extract the ordering name and direction from the setting value.
+	    preg_match('#^([a-z-0-9_]+)_(asc|desc)$#', $settings['post_ordering'], $ordering);
 
-	$query->orderBy($ordering[1], $ordering[2]);
+	    $query->orderBy($ordering[1], $ordering[2]);
+	}
 
         return $query->paginate($perPage);
     }
