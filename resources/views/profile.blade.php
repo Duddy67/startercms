@@ -16,6 +16,11 @@
 
                     You are logged in!
                 </div>
+		@if (isset($token))
+		    <ul class="list-group list-group-flush">
+			<li class="list-group-item">Token: {{ $token }}</li>
+		    </ul>
+		@endif
             </div>
         </div>
     </div>

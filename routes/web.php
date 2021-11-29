@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\Blog\SettingController as AdminBlogSettingControl
 use App\Http\Controllers\Admin\Menus\MenuController;
 use App\Http\Controllers\Admin\Menus\MenuItemController;
 use App\Http\Controllers\SiteController;
+use App\Http\Controllers\Api\TokenController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +49,8 @@ Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::get('/profile/token', [TokenController::class, 'update'])->name('profile.token');
 
 Route::get('/cms/filemanager', [FileManagerController::class, 'index'])->name('cms.filemanager.index');
 Route::post('/cms/filemanager', [FileManagerController::class, 'upload']);

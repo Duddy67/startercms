@@ -74,6 +74,9 @@
 				    <a class="nav-link" href="{{ route('admin') }}">{{ __('Admin') }}</a>
 				</li>
 			    @endaccessadmin
+			    <li class="nav-item">
+				<a class="nav-link" href="{{ route('profile.token') }}">{{ __('New token') }}</a>
+			    </li>
                         @endguest
                     </ul>
                 </div>

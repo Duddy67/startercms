@@ -21,9 +21,13 @@ class PostController extends Controller
         // code...
     }
 
-    public function show(Post $post)
+    public function show($post)
     {
-	$post = Post::find($post);
+	if (!$post = Post::select('title', 'slug', 'content')->find($post)) {
+	    return response()->json([
+		'message' => 'Ressource not found.'
+	    ], 404);
+	}
 
         return response()->json($post);
     }
