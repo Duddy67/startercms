@@ -11,7 +11,7 @@ class PostController extends Controller
 {
     public function index()
     {
-        $posts = Post::all();
+        $posts = Post::select('id', 'title', 'slug', 'excerpt', 'content')->get();
 
         return response()->json($posts);
     }
@@ -23,7 +23,7 @@ class PostController extends Controller
 
     public function show($post)
     {
-	if (!$post = Post::select('title', 'slug', 'content')->find($post)) {
+	if (!$post = Post::select('id', 'title', 'slug', 'excerpt', 'content')->find($post)) {
 	    return response()->json([
 		'message' => 'Ressource not found.'
 	    ], 404);
