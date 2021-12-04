@@ -24,7 +24,14 @@
 	    <h5 class="font-weight-bold">{{ $section }}</h5>
 	    <table class="table table-striped">
 		<tbody>
-		    @foreach ($checkboxes as $checkbox)
+		    @foreach ($checkboxes as $key => $checkbox)
+
+			@if (is_array(old('permissions')) && in_array($checkbox->value, old('permissions')))
+			    @php $checkbox->checked = true; @endphp
+			@elseif (is_array(old('permissions')) && !in_array($checkbox->value, old('permissions')))
+			    @php $checkbox->checked = false; @endphp
+			@endif
+
 			<tr>
 			    <td>
                                 <div class="form-check">
@@ -39,6 +46,7 @@
 
 	<input type="hidden" id="cancelEdit" value="{{ route('admin.users.roles.cancel', $query) }}">
 	<input type="hidden" id="close" name="_close" value="0">
+	<input type="hidden" id="reloaded" value="{{ is_array(old('permissions')) ? 1 : 0 }}">
 
 	@if (!isset($role))
 	    <input type="hidden" id="permissions" name="_permissions" value="{{ $permissions }}">

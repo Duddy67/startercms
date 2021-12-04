@@ -380,7 +380,7 @@ class RoleController extends Controller
 		$checkbox->id = $permission->name;
 		$checkbox->name = 'permissions[]';
 		$checkbox->value = $permission->name;
-		$checkbox->dataset = ['data-section' => $section];
+		$checkbox->dataset = ['section' => $section];
 		$checkbox->checked = false;
 
 		if ($role) {

@@ -6,7 +6,7 @@
       // A new role is being created.
       if ($('#permissions').length) {
 	  $('#role_type').change( function() {
-	      $.fn.setCheckboxes();
+	      $.fn.setCheckboxes(true);
 	  });
 
 	  $.fn.setCheckboxes();
@@ -62,30 +62,36 @@
   /*
    * Sets the role permissions according to the permission list.
    */
-  $.fn.setCheckboxes = function() {
+  $.fn.setCheckboxes = function(hasChanged) {
       let permissions = JSON.parse($('#permissions').val());
+      let reloaded = $('#reloaded').val();
+      let regex = new RegExp($('#role_type').val());
 
       $('input[type="checkbox"]').each( function() {
 	  let name = $(this).prop('id');
 	  let section = $(this).data('section');
 
-
 	  for (let i = 0; i < permissions[section].length; i++) {
 	      if (permissions[section][i].name == name) {
-
-		  let regex = new RegExp($('#role_type').val());
-		  if (regex.test(permissions[section][i].roles)) {
-		      $('#'+name).prop('checked', true);
-		  }
-		  else {
-		      $('#'+name).prop('checked', false);
-		  }
 		 
 		  if (permissions[section][i].optional !== undefined && regex.test(permissions[section][i].optional)) {
 		      $('#'+name).prop('disabled', false);
 		  }
 		  else {
 		      $('#'+name).prop('disabled', true);
+		  }
+
+		  // The page has been reloaded due to a validation error.
+		  if (permissions[section][i].optional !== undefined && reloaded && hasChanged === undefined) {
+		      // Let the old() function handle the checked and unchecked values of the optional checkboxes.
+		      break;
+		  }
+
+		  if (regex.test(permissions[section][i].roles)) {
+		      $('#'+name).prop('checked', true);
+		  }
+		  else {
+		      $('#'+name).prop('checked', false);
 		  }
 
 		  break;

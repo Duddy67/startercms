@@ -142,7 +142,8 @@ class General extends Model
                 // The item is part of this private group. 
 		if ($item && in_array($group->id, $item->getGroupIds())) {
 		    // Show the group.
-		    // N.B: This option is disabled for the form field.
+		    // N.B: This option is disabled in the form field.
+		    //      This option is available in the search filter (list view).
 		    $extra[] = ($isFilter) ? null : 'disabled';
 		}
 		else {
