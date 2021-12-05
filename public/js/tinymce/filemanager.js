@@ -39,7 +39,14 @@ tinymce.init({
 		);
 	    }
 	});
+
+        if ($('#canEdit').val() !== undefined && !$('#canEdit').val()) {
+	    editor.settings.menubar = false;
+	    editor.settings.toolbar = false;
+	    editor.settings.readonly = 1;
+	}
     },
 
     content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
 });
+

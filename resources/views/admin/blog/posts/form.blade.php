@@ -43,6 +43,7 @@
 	<input type="hidden" id="close" name="_close" value="0">
 	<input type="hidden" id="siteUrl" name="_siteUrl" value="{{ url('/') }}">
 	<input type="hidden" id="activeTab" name="_tab" value="{{ $tab }}">
+	<input type="hidden" id="canEdit" value="{{ $post->canEdit() }}">
     </form>
     <x-toolbar :items=$actions />
 

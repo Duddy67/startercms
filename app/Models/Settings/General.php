@@ -186,13 +186,16 @@ class General extends Model
 		      ->orWhere($table.'.owned_by', auth()->user()->id);
 	    });
 
-	    $groupIds = auth()->user()->getGroupIds();
+	    // N.B: The Group model has no group relationship (ie: relationship with itself).
+	    if ($table != 'groups') {
+		$groupIds = auth()->user()->getGroupIds();
 
-	    if (!empty($groupIds)) {
-		// Check for access through groups.
-		$query->orWhereHas('groups', function ($query)  use ($groupIds) {
-		    $query->whereIn('id', $groupIds);
-		});
+		if (!empty($groupIds)) {
+		    // Check for access through groups.
+		    $query->orWhereHas('groups', function ($query)  use ($groupIds) {
+			$query->whereIn('id', $groupIds);
+		    });
+		}
 	    }
 	});
 
