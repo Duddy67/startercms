@@ -36,7 +36,10 @@
 	<input type="hidden" id="cancelEdit" value="{{ route('admin.blog.categories.cancel', $query) }}">
 	<input type="hidden" id="close" name="_close" value="0">
 	<input type="hidden" id="activeTab" name="_tab" value="{{ $tab }}">
-	<input type="hidden" id="canEdit" value="{{ $category->canEdit() }}">
+
+	@if (isset($category))
+	    <input type="hidden" id="canEdit" value="{{ $category->canEdit() }}">
+	@endif
     </form>
     <x-toolbar :items=$actions />
 

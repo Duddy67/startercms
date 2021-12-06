@@ -30,7 +30,8 @@ class UpdateRequest extends FormRequest
 	    'email' => ['bail', 'required', 'email',
 			Rule::unique('users')->ignore($this->user->id)
 	    ],
-	    'password' => 'nullable|confirmed|min:8'
+	    'password' => 'nullable|confirmed|min:8',
+	    'photo' => ['nullable', 'image', 'mimes:jpg,png,jpeg,gif,svg', 'max:2048', 'dimensions:min_width=100,min_height=100,max_width=1000,max_height=1000'],
         ];
 
 	if (auth()->user()->id != $this->user->id && !$this->user->isRolePrivate()) {
