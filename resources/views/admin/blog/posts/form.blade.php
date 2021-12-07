@@ -11,6 +11,10 @@
 	    @method('put')
 	@endif
 
+	 @php $value = (isset($post)) ? old('title', $fields[0]->value) : old('title'); @endphp
+         <x-input :field="$fields[0]" :value="$value" />
+	 @php array_shift($fields); // Remove the very first field (ie: title) from the array. @endphp
+
 	<nav class="nav nav-tabs">
 	    <a class="nav-item nav-link" href="#details" data-toggle="tab">@php echo __('labels.generic.details'); @endphp</a>
 	    <a class="nav-item nav-link" href="#extra" data-toggle="tab">@php echo __('labels.generic.extra'); @endphp</a>
@@ -28,9 +32,13 @@
 		<x-input :field="$field" :value="$value" />
 
 		@if ($field->name == 'image')
+		    <div class="col post-image">
 		    @if (isset($post) && $post->image) 
 			<img src="{{ url('/').$post->image->getThumbnailUrl() }}" >
+		    @else
+			<img src="{{ asset('/images/camera.png') }}" height="100" width="100" alt="post-photo">
 		    @endif
+		    </div>
 		@endif
 
 		@if (!next($fields) || isset($fields[$key + 1]->tab))

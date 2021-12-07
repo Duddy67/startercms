@@ -4,7 +4,6 @@
     "type": "text",
     "name": "title",
     "id": "title",
-    "tab": "details",
     "placeholder": "labels.generic.title"
   },
   {
@@ -12,6 +11,7 @@
     "type": "text",
     "name": "slug",
     "id": "slug",
+    "tab": "details",
     "placeholder": "labels.posts.slug"
   },
   {

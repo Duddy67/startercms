@@ -11,6 +11,10 @@
 	    @method('put')
 	@endif
 
+	 @php $value = (isset($category)) ? old('name', $fields[0]->value) : old('name'); @endphp
+         <x-input :field="$fields[0]" :value="$value" />
+	 @php array_shift($fields); // Remove the very first field (ie: name) from the array. @endphp
+
 	<nav class="nav nav-tabs">
 	    <a class="nav-item nav-link" href="#details" data-toggle="tab">@php echo __('labels.generic.details'); @endphp</a>
 	    <a class="nav-item nav-link" href="#settings" data-toggle="tab">@php echo __('labels.title.settings'); @endphp</a>
