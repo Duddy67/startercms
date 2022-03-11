@@ -42,7 +42,7 @@ class CategoryController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('admin.blog.categories');
-	$this->model = new Category;
+        $this->model = new Category;
     }
 
     /**
@@ -57,10 +57,10 @@ class CategoryController extends Controller
         $columns = $this->getColumns();
         $actions = $this->getActions('list');
         $filters = $this->getFilters($request);
-	$items = $this->model->getItems($request);
-	$rows = $this->getRowTree($columns, $items);
-	$query = $request->query();
-	$url = ['route' => 'admin.blog.categories', 'item_name' => 'category', 'query' => $query];
+        $items = $this->model->getItems($request);
+        $rows = $this->getRowTree($columns, $items);
+        $query = $request->query();
+        $url = ['route' => 'admin.blog.categories', 'item_name' => 'category', 'query' => $query];
 
         return view('admin.blog.categories.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
     }
@@ -77,8 +77,8 @@ class CategoryController extends Controller
 
         $fields = $this->getFields(null, ['updated_by', 'created_at', 'updated_at', 'owner_name']);
         $actions = $this->getActions('form', ['destroy']);
-	$query = $request->query();
-	$tab = 'details';
+        $query = $request->query();
+        $tab = 'details';
 
         return view('admin.blog.categories.form', compact('fields', 'actions', 'tab', 'query'));
     }
@@ -93,36 +93,36 @@ class CategoryController extends Controller
     public function edit(Request $request, $id, $tab = null)
     {
         $category = Category::select('blog_categories.*', 'users.name as owner_name')
-			      ->selectRaw('IFNULL(users2.name, ?) as modifier_name', [__('labels.generic.unknown_user')])
-			      ->leftJoin('users', 'blog_categories.owned_by', '=', 'users.id')
-			      ->leftJoin('users as users2', 'blog_categories.updated_by', '=', 'users2.id')
-			      ->findOrFail($id);
+                              ->selectRaw('IFNULL(users2.name, ?) as modifier_name', [__('labels.generic.unknown_user')])
+                              ->leftJoin('users', 'blog_categories.owned_by', '=', 'users.id')
+                              ->leftJoin('users as users2', 'blog_categories.updated_by', '=', 'users2.id')
+                              ->findOrFail($id);
 
-	if (!$category->canAccess()) {
-	    return redirect()->route('admin.blog.categories.index')->with('error',  __('messages.generic.access_not_auth'));
-	}
+        if (!$category->canAccess()) {
+            return redirect()->route('admin.blog.categories.index')->with('error',  __('messages.generic.access_not_auth'));
+        }
 
-	if ($category->checked_out && $category->checked_out != auth()->user()->id) {
-	    return redirect()->route('admin.blog.categories.index')->with('error',  __('messages.generic.checked_out'));
-	}
+        if ($category->checked_out && $category->checked_out != auth()->user()->id) {
+            return redirect()->route('admin.blog.categories.index')->with('error',  __('messages.generic.checked_out'));
+        }
 
-	$category->checkOut();
+        $category->checkOut();
 
         // Gather the needed data to build the form.
 
-	$except = (auth()->user()->getRoleLevel() > $category->getOwnerRoleLevel() || $category->owned_by == auth()->user()->id) ? ['owner_name'] : ['owned_by'];
+        $except = (auth()->user()->getRoleLevel() > $category->getOwnerRoleLevel() || $category->owned_by == auth()->user()->id) ? ['owner_name'] : ['owned_by'];
 
-	if ($category->updated_by === null) {
-	    array_push($except, 'updated_by', 'updated_at');
-	}
+        if ($category->updated_by === null) {
+            array_push($except, 'updated_by', 'updated_at');
+        }
 
         $fields = $this->getFields($category, $except);
-	$this->setFieldValues($fields, $category);
-	$except = (!$category->canEdit()) ? ['destroy', 'save', 'saveClose'] : [];
+        $this->setFieldValues($fields, $category);
+        $except = (!$category->canEdit()) ? ['destroy', 'save', 'saveClose'] : [];
         $actions = $this->getActions('form', $except);
-	// Add the id parameter to the query.
-	$query = array_merge($request->query(), ['category' => $id]);
-	$tab = ($tab) ? $tab : 'details';
+        // Add the id parameter to the query.
+        $query = array_merge($request->query(), ['category' => $id]);
+        $tab = ($tab) ? $tab : 'details';
 
         return view('admin.blog.categories.form', compact('category', 'fields', 'actions', 'tab', 'query'));
     }
@@ -137,10 +137,10 @@ class CategoryController extends Controller
     public function cancel(Request $request, Category $category = null)
     {
         if ($category) {
-	    $category->checkIn();
-	}
+            $category->checkIn();
+        }
 
-	return redirect()->route('admin.blog.categories.index', $request->query());
+        return redirect()->route('admin.blog.categories.index', $request->query());
     }
 
     /**
@@ -152,88 +152,88 @@ class CategoryController extends Controller
      */
     public function update(UpdateRequest $request, Category $category)
     {
-	if ($category->checked_out != auth()->user()->id) {
-	    return redirect()->route('admin.blog.categories.index', $request->query())->with('error',  __('messages.generic.user_id_does_not_match'));
-	}
+        if ($category->checked_out != auth()->user()->id) {
+            return redirect()->route('admin.blog.categories.index', $request->query())->with('error',  __('messages.generic.user_id_does_not_match'));
+        }
 
-	if (!$category->canEdit()) {
-	    return redirect()->route('admin.blog.categories.index', $request->query())->with('error',  __('messages.generic.edit_not_auth'));
-	}
+        if (!$category->canEdit()) {
+            return redirect()->route('admin.blog.categories.index', $request->query())->with('error',  __('messages.generic.edit_not_auth'));
+        }
 
-	if ($request->input('parent_id')) {
-	    $parent = Category::findOrFail($request->input('parent_id'));
+        if ($request->input('parent_id')) {
+            $parent = Category::findOrFail($request->input('parent_id'));
 
-	    // Check the selected parent is not the category itself or a descendant.
-	    if ($category->id == $request->input('parent_id') || $parent->isDescendantOf($category)) {
-		return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.must_not_be_descendant'));
-	    }
+            // Check the selected parent is not the category itself or a descendant.
+            if ($category->id == $request->input('parent_id') || $parent->isDescendantOf($category)) {
+                return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.must_not_be_descendant'));
+            }
 
-	    if ($parent->access_level == 'private' && $parent->owned_by != auth()->user()->id) {
-		return redirect()->route('admin.blog.categories.create', $request->query())->with('error',  __('messages.generic.item_is_private', ['name' => $parent->name]));
-	    }
-	}
+            if ($parent->access_level == 'private' && $parent->owned_by != auth()->user()->id) {
+                return redirect()->route('admin.blog.categories.create', $request->query())->with('error',  __('messages.generic.item_is_private', ['name' => $parent->name]));
+            }
+        }
 
-	$category->name = $request->input('name');
-	$category->slug = ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('name'), '-');
-	$category->description = $request->input('description');
-	$category->settings = $request->input('settings');
-	$category->updated_by = auth()->user()->id;
+        $category->name = $request->input('name');
+        $category->slug = ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('name'), '-');
+        $category->description = $request->input('description');
+        $category->settings = $request->input('settings');
+        $category->updated_by = auth()->user()->id;
 
-	if ($category->canChangeAttachments()) {
+        if ($category->canChangeAttachments()) {
 
-	    if ($category->access_level != 'private') {
-		$category->owned_by = $request->input('owned_by');
-	    }
+            if ($category->access_level != 'private') {
+                $category->owned_by = $request->input('owned_by');
+            }
 
-	    $groups = array_merge($request->input('groups', []), Group::getPrivateGroups($category));
+            $groups = array_merge($request->input('groups', []), Group::getPrivateGroups($category));
 
-	    if (!empty($groups)) {
-		$category->groups()->sync($groups);
-	    }
-	    else {
-		// Remove all groups for this post.
-		$category->groups()->sync([]);
-	    }
-	}
+            if (!empty($groups)) {
+                $category->groups()->sync($groups);
+            }
+            else {
+                // Remove all groups for this post.
+                $category->groups()->sync([]);
+            }
+        }
 
-	if ($category->canChangeAccessLevel()) {
+        if ($category->canChangeAccessLevel()) {
 
-	    if ($category->access_level != 'private') {
-		// The access level has just been set to private. Check first for descendants.
-		if ($request->input('access_level') == 'private' && !$category->canDescendantsBePrivate()) {
-		    return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.descendants_cannot_be_private'));
-		}
+            if ($category->access_level != 'private') {
+                // The access level has just been set to private. Check first for descendants.
+                if ($request->input('access_level') == 'private' && !$category->canDescendantsBePrivate()) {
+                    return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.descendants_cannot_be_private'));
+                }
 
-		if ($request->input('access_level') == 'private' && $category->anyDescendantCheckedOut()) {
-		    return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.descendants_checked_out'));
-		}
+                if ($request->input('access_level') == 'private' && $category->anyDescendantCheckedOut()) {
+                    return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.descendants_checked_out'));
+                }
 
-		if ($request->input('access_level') == 'private') {
-		    $category->setDescendantAccessToPrivate();
-		}
-	    }
+                if ($request->input('access_level') == 'private') {
+                    $category->setDescendantAccessToPrivate();
+                }
+            }
 
-	    if ($category->access_level != 'private' || ($category->access_level == 'private' && !$category->isParentPrivate())) {
-		$category->access_level = $request->input('access_level');
-		// N.B: The nested set model is updated automatically.
-		$category->parent_id = $request->input('parent_id');
-	    }
+            if ($category->access_level != 'private' || ($category->access_level == 'private' && !$category->isParentPrivate())) {
+                $category->access_level = $request->input('access_level');
+                // N.B: The nested set model is updated automatically.
+                $category->parent_id = $request->input('parent_id');
+            }
 
-	    if ($category->access_level == 'private' && $category->isParentPrivate() && $category->owned_by == auth()->user()->id) {
-		// Only the owner of the descendants private items can change their parents.
-		$category->parent_id = $request->input('parent_id');
-	    }
-	}
+            if ($category->access_level == 'private' && $category->isParentPrivate() && $category->owned_by == auth()->user()->id) {
+                // Only the owner of the descendants private items can change their parents.
+                $category->parent_id = $request->input('parent_id');
+            }
+        }
 
-	$category->save();
+        $category->save();
 
         if ($request->input('_close', null)) {
-	    $category->checkIn();
-	    // Redirect to the list.
-	    return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.update_success'));
-	}
+            $category->checkIn();
+            // Redirect to the list.
+            return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.update_success'));
+        }
 
-	return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id, 'tab' => $request->input('_tab')]))->with('success', __('messages.categories.update_success'));
+        return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id, 'tab' => $request->input('_tab')]))->with('success', __('messages.categories.update_success'));
     }
 
     /**
@@ -245,43 +245,43 @@ class CategoryController extends Controller
     public function store(StoreRequest $request)
     {
         // Check first for parent id.
-	if ($request->input('parent_id')) {
-	    $parent = Category::findOrFail($request->input('parent_id'));
+        if ($request->input('parent_id')) {
+            $parent = Category::findOrFail($request->input('parent_id'));
 
-	    if ($parent->access_level == 'private' && $parent->owned_by != auth()->user()->id) {
-		return redirect()->route('admin.blog.categories.create', $request->query())->with('error',  __('messages.generic.item_is_private', ['name' => $parent->name]));
-	    }
+            if ($parent->access_level == 'private' && $parent->owned_by != auth()->user()->id) {
+                return redirect()->route('admin.blog.categories.create', $request->query())->with('error',  __('messages.generic.item_is_private', ['name' => $parent->name]));
+            }
 
-	    if ($parent->access_level == 'private' && $request->input('access_level') != 'private') {
-		return redirect()->route('admin.blog.categories.create', $request->query())->with('error',  __('messages.generic.access_level_must_be_private'));
-	    }
+            if ($parent->access_level == 'private' && $request->input('access_level') != 'private') {
+                return redirect()->route('admin.blog.categories.create', $request->query())->with('error',  __('messages.generic.access_level_must_be_private'));
+            }
 
-	    if ($parent->access_level == 'private' && $request->input('owned_by') != $parent->owned_by) {
-		return redirect()->route('admin.blog.categories.create', $request->query())->with('error',  __('messages.generic.owner_must_match_parent_category'));
-	    }
-	}
+            if ($parent->access_level == 'private' && $request->input('owned_by') != $parent->owned_by) {
+                return redirect()->route('admin.blog.categories.create', $request->query())->with('error',  __('messages.generic.owner_must_match_parent_category'));
+            }
+        }
 
-	$category = Category::create([
-	    'name' => $request->input('name'), 
-	    'slug' => ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('name'), '-'),
-	    'status' => $request->input('status'), 
-	    'description' => $request->input('description'), 
-	    'access_level' => $request->input('access_level'), 
-	    'owned_by' => $request->input('owned_by'),
-	    'parent_id' => (empty($request->input('parent_id'))) ? null : $request->input('parent_id'),
-	    'settings' => $request->input('settings'),
-	]);
+        $category = Category::create([
+            'name' => $request->input('name'), 
+            'slug' => ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('name'), '-'),
+            'status' => $request->input('status'), 
+            'description' => $request->input('description'), 
+            'access_level' => $request->input('access_level'), 
+            'owned_by' => $request->input('owned_by'),
+            'parent_id' => (empty($request->input('parent_id'))) ? null : $request->input('parent_id'),
+            'settings' => $request->input('settings'),
+        ]);
 
         if ($category->parent_id) {
-	    $parent = Category::findOrFail($category->parent_id);
-	    $parent->appendNode($category);
-	}
+            $parent = Category::findOrFail($category->parent_id);
+            $parent->appendNode($category);
+        }
 
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.create_success'));
-	}
+            return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.create_success'));
+        }
 
-	return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('success', __('messages.categories.create_success'));
+        return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('success', __('messages.categories.create_success'));
     }
 
     /**
@@ -293,16 +293,16 @@ class CategoryController extends Controller
      */
     public function destroy(Request $request, Category $category)
     {
-	if (!$category->canDelete() || !$category->canDeleteDescendants()) {
-	    return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.delete_not_auth'));
-	}
+        if (!$category->canDelete() || !$category->canDeleteDescendants()) {
+            return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('error',  __('messages.generic.delete_not_auth'));
+        }
 
-	$name = $category->name;
+        $name = $category->name;
 
-	//$category->categories()->detach();
-	//$category->delete();
+        //$category->categories()->detach();
+        //$category->delete();
 
-	return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.delete_success', ['name' => $name]));
+        return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.delete_success', ['name' => $name]));
     }
 
     /**
@@ -316,23 +316,23 @@ class CategoryController extends Controller
         $deleted = 0;
         // Remove the categories selected from the list.
         foreach ($request->input('ids') as $id) {
-	    $category = Category::findOrFail($id);
+            $category = Category::findOrFail($id);
 
-	    if (!$category->canDelete() || !$category->canDeleteDescendants()) {
-	      return redirect()->route('admin.blog.categories.index', $request->query())->with(
-		  [
-		      'error' => __('messages.generic.delete_not_auth'), 
-		      'success' => __('messages.categories.delete_list_success', ['number' => $deleted])
-		  ]);
-	    }
+            if (!$category->canDelete() || !$category->canDeleteDescendants()) {
+              return redirect()->route('admin.blog.categories.index', $request->query())->with(
+                  [
+                      'error' => __('messages.generic.delete_not_auth'), 
+                      'success' => __('messages.categories.delete_list_success', ['number' => $deleted])
+                  ]);
+            }
 
-	    //$category->categories()->detach();
-	    $category->delete();
+            //$category->categories()->detach();
+            $category->delete();
 
-	    $deleted++;
-	}
+            $deleted++;
+        }
 
-	return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.delete_list_success', ['number' => $deleted]));
+        return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.delete_list_success', ['number' => $deleted]));
     }
 
     /**
@@ -345,7 +345,7 @@ class CategoryController extends Controller
     {
         $messages = CheckInCheckOut::checkInMultiple($request->input('ids'), '\\App\\Models\\Blog\\Category');
 
-	return redirect()->route('admin.blog.categories.index', $request->query())->with($messages);
+        return redirect()->route('admin.blog.categories.index', $request->query())->with($messages);
     }
 
     public function massPublish(Request $request)
@@ -353,29 +353,29 @@ class CategoryController extends Controller
         $changed = 0;
 
         foreach ($request->input('ids') as $id) {
-	    $category = Category::findOrFail($id);
-	    // Cannot published a category if its parent is unpublished.
-	    if ($category->parent && $category->parent->status == 'unpublished') {
-	        continue;
-	    }
+            $category = Category::findOrFail($id);
+            // Cannot published a category if its parent is unpublished.
+            if ($category->parent && $category->parent->status == 'unpublished') {
+                continue;
+            }
 
-	    if (!$category->canChangeStatus()) {
-	      $messages = ['error' => __('messages.generic.change_status_not_auth')];
+            if (!$category->canChangeStatus()) {
+              $messages = ['error' => __('messages.generic.change_status_not_auth')];
 
-	      if ($changed) {
-		  $messages['success'] = __('messages.categories.change_status_list_success', ['number' => $changed]);
-	      }
+              if ($changed) {
+                  $messages['success'] = __('messages.categories.change_status_list_success', ['number' => $changed]);
+              }
 
-	      return redirect()->route('admin.blog.categories.index', $request->query())->with($messages);
-	    }
+              return redirect()->route('admin.blog.categories.index', $request->query())->with($messages);
+            }
 
-	    $category->status = 'published';
-	    $category->save();
+            $category->status = 'published';
+            $category->save();
 
-	    $changed++;
-	}
+            $changed++;
+        }
 
-	return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.change_status_list_success', ['number' => $changed]));
+        return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.change_status_list_success', ['number' => $changed]));
     }
 
     public function massUnpublish(Request $request)
@@ -384,38 +384,38 @@ class CategoryController extends Controller
         $changed = 0;
 
         foreach ($request->input('ids') as $id) {
-	    //
-	    if (in_array($id, $treated)) {
-	        continue;
-	    }
+            //
+            if (in_array($id, $treated)) {
+                continue;
+            }
 
-	    $category = Category::findOrFail($id);
+            $category = Category::findOrFail($id);
 
-	    if (!$category->canChangeStatus()) {
-	      $messages = ['error' => __('messages.generic.change_status_not_auth')];
+            if (!$category->canChangeStatus()) {
+              $messages = ['error' => __('messages.generic.change_status_not_auth')];
 
-	      if ($changed) {
-		  $messages['success'] = __('messages.categories.change_status_list_success', ['number' => $changed]);
-	      }
+              if ($changed) {
+                  $messages['success'] = __('messages.categories.change_status_list_success', ['number' => $changed]);
+              }
 
-	      return redirect()->route('admin.blog.categories.index', $request->query())->with($messages);
-	    }
+              return redirect()->route('admin.blog.categories.index', $request->query())->with($messages);
+            }
 
-	    $category->status = 'unpublished';
-	    $category->save();
+            $category->status = 'unpublished';
+            $category->save();
 
-	    $changed++;
+            $changed++;
 
-	    // All the descendants must be unpublished as well.
-	    foreach ($category->descendants as $descendant) {
-	        $descendant->status = 'unpublished';
-		$descendant->save();
-		// Prevent this descendant to be treated twice.
-		$treated[] = $descendant->id;
-	    }
-	}
+            // All the descendants must be unpublished as well.
+            foreach ($category->descendants as $descendant) {
+                $descendant->status = 'unpublished';
+                $descendant->save();
+                // Prevent this descendant to be treated twice.
+                $treated[] = $descendant->id;
+            }
+        }
 
-	return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.change_status_list_success', ['number' => $changed]));
+        return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.change_status_list_success', ['number' => $changed]));
     }
 
     /**
@@ -427,8 +427,8 @@ class CategoryController extends Controller
      */
     public function up(Request $request, Category $category)
     {
-	$category->up();
-	return redirect()->route('admin.blog.categories.index', $request->query());
+        $category->up();
+        return redirect()->route('admin.blog.categories.index', $request->query());
     }
 
     /**
@@ -440,8 +440,8 @@ class CategoryController extends Controller
      */
     public function down(Request $request, Category $category)
     {
-	$category->down();
-	return redirect()->route('admin.blog.categories.index', $request->query());
+        $category->down();
+        return redirect()->route('admin.blog.categories.index', $request->query());
     }
 
     /*
@@ -455,17 +455,17 @@ class CategoryController extends Controller
     {
         foreach ($fields as $field) {
             if ($field->name == 'parent_id') {
-	        foreach ($field->options as $key => $option) {
-		    if ($option['value'] == $category->id) {
-		        // Category cannot be its own children.
-		        $field->options[$key]['extra'] = ['disabled'];
-		    }
-		}
-	    }
+                foreach ($field->options as $key => $option) {
+                    if ($option['value'] == $category->id) {
+                        // Category cannot be its own children.
+                        $field->options[$key]['extra'] = ['disabled'];
+                    }
+                }
+            }
 
-	    if (isset($field->group) && $field->group == 'settings') {
-	        $field->value = (isset($category->settings[$field->name])) ? $category->settings[$field->name] : null;
-	    }
+            if (isset($field->group) && $field->group == 'settings') {
+                $field->value = (isset($category->settings[$field->name])) ? $category->settings[$field->name] : null;
+            }
         }
     }
 }

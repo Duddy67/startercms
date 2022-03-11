@@ -19,7 +19,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Allows unauthenticated users to access the public posts.
+Route::get('posts', [PostController::class, 'index']);
+
 Route::group(['middleware' => 'auth:api'], function () {
-    Route::apiResource('posts', PostController::class);
+    // Users must be authenticated to access these methods.
+    Route::apiResource('posts', PostController::class)->except(['index']);
 });
 

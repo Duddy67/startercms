@@ -9,9 +9,14 @@ use App\Models\Blog\Post;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::select('id', 'title', 'slug', 'excerpt', 'content')->get();
+        if (auth('api')->user()) {
+            $posts = Post::select('id', 'title', 'slug', 'excerpt', 'content')->get();
+        }
+        else {
+            $posts = Post::select('id', 'title', 'content')->get();
+        }
 
         return response()->json($posts);
     }
@@ -19,15 +24,16 @@ class PostController extends Controller
     public function store(Request $request)
     {
         // code...
+        return $request->all();
     }
 
     public function show($post)
     {
-	if (!$post = Post::select('id', 'title', 'slug', 'excerpt', 'content')->find($post)) {
-	    return response()->json([
-		'message' => 'Ressource not found.'
-	    ], 404);
-	}
+        if (!$post = Post::select('id', 'title', 'slug', 'excerpt', 'content')->find($post)) {
+            return response()->json([
+                'message' => 'Ressource not found.'
+            ], 404);
+        }
 
         return response()->json($post);
     }

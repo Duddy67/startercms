@@ -46,7 +46,7 @@ class PostController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('admin.blog.posts');
-	$this->model = new Post;
+        $this->model = new Post;
     }
 
     /**
@@ -61,10 +61,10 @@ class PostController extends Controller
         $columns = $this->getColumns();
         $actions = $this->getActions('list');
         $filters = $this->getFilters($request);
-	$items = $this->model->getItems($request);
-	$rows = $this->getRows($columns, $items);
-	$query = $request->query();
-	$url = ['route' => 'admin.blog.posts', 'item_name' => 'post', 'query' => $query];
+        $items = $this->model->getItems($request);
+        $rows = $this->getRows($columns, $items);
+        $query = $request->query();
+        $url = ['route' => 'admin.blog.posts', 'item_name' => 'post', 'query' => $query];
 
         return view('admin.blog.posts.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
     }
@@ -81,8 +81,8 @@ class PostController extends Controller
 
         $fields = $this->getFields(null, ['updated_by', 'created_at', 'updated_at', 'owner_name']);
         $actions = $this->getActions('form', ['destroy']);
-	$query = $request->query();
-	$tab = 'details';
+        $query = $request->query();
+        $tab = 'details';
 
         return view('admin.blog.posts.form', compact('fields', 'actions', 'tab',  'query'));
     }
@@ -97,36 +97,36 @@ class PostController extends Controller
     public function edit(Request $request, $id, $tab = null)
     {
         $post = Post::select('posts.*', 'users.name as owner_name')
-			->selectRaw('IFNULL(users2.name, ?) as modifier_name', [__('labels.generic.unknown_user')])
-			->leftJoin('users', 'posts.owned_by', '=', 'users.id')
-			->leftJoin('users as users2', 'posts.updated_by', '=', 'users2.id')
-			->findOrFail($id);
+                        ->selectRaw('IFNULL(users2.name, ?) as modifier_name', [__('labels.generic.unknown_user')])
+                        ->leftJoin('users', 'posts.owned_by', '=', 'users.id')
+                        ->leftJoin('users as users2', 'posts.updated_by', '=', 'users2.id')
+                        ->findOrFail($id);
 
-	if (!$post->canAccess()) {
-	    return redirect()->route('admin.blog.posts.index')->with('error',  __('messages.generic.access_not_auth'));
-	}
+        if (!$post->canAccess()) {
+            return redirect()->route('admin.blog.posts.index')->with('error',  __('messages.generic.access_not_auth'));
+        }
 
-	if ($post->checked_out && $post->checked_out != auth()->user()->id) {
-	    return redirect()->route('admin.blog.posts.index')->with('error',  __('messages.generic.checked_out'));
-	}
+        if ($post->checked_out && $post->checked_out != auth()->user()->id) {
+            return redirect()->route('admin.blog.posts.index')->with('error',  __('messages.generic.checked_out'));
+        }
 
-	$post->checkOut();
+        $post->checkOut();
 
         // Gather the needed data to build the form.
-	
-	$except = (auth()->user()->getRoleLevel() > $post->getOwnerRoleLevel() || $post->owned_by == auth()->user()->id) ? ['owner_name'] : ['owned_by'];
+        
+        $except = (auth()->user()->getRoleLevel() > $post->getOwnerRoleLevel() || $post->owned_by == auth()->user()->id) ? ['owner_name'] : ['owned_by'];
 
-	if ($post->updated_by === null) {
-	    array_push($except, 'updated_by', 'updated_at');
-	}
+        if ($post->updated_by === null) {
+            array_push($except, 'updated_by', 'updated_at');
+        }
 
         $fields = $this->getFields($post, $except);
-	$this->setFieldValues($fields, $post);
-	$except = (!$post->canEdit()) ? ['destroy', 'save', 'saveClose'] : [];
+        $this->setFieldValues($fields, $post);
+        $except = (!$post->canEdit()) ? ['destroy', 'save', 'saveClose'] : [];
         $actions = $this->getActions('form', $except);
-	// Add the id parameter to the query.
-	$query = array_merge($request->query(), ['post' => $id]);
-	$tab = ($tab) ? $tab : 'details';
+        // Add the id parameter to the query.
+        $query = array_merge($request->query(), ['post' => $id]);
+        $tab = ($tab) ? $tab : 'details';
 
         return view('admin.blog.posts.form', compact('post', 'fields', 'actions', 'tab', 'query'));
     }
@@ -141,10 +141,10 @@ class PostController extends Controller
     public function cancel(Request $request, Post $post = null)
     {
         if ($post) {
-	    $post->checkIn();
-	}
+            $post->checkIn();
+        }
 
-	return redirect()->route('admin.blog.posts.index', $request->query());
+        return redirect()->route('admin.blog.posts.index', $request->query());
     }
 
     /**
@@ -156,76 +156,76 @@ class PostController extends Controller
      */
     public function update(UpdateRequest $request, Post $post)
     {
-	if ($post->checked_out != auth()->user()->id) {
-	    return redirect()->route('admin.blog.posts.index', $request->query())->with('error',  __('messages.generic.user_id_does_not_match'));
-	}
+        if ($post->checked_out != auth()->user()->id) {
+            return redirect()->route('admin.blog.posts.index', $request->query())->with('error',  __('messages.generic.user_id_does_not_match'));
+        }
 
-	if (!$post->canEdit()) {
-	    return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id]))->with('error',  __('messages.generic.edit_not_auth'));
-	}
+        if (!$post->canEdit()) {
+            return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id]))->with('error',  __('messages.generic.edit_not_auth'));
+        }
 
-	$post->title = $request->input('title');
-	$post->slug = ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('title'), '-');
-	$post->content = $request->input('content');
-	$post->excerpt = $request->input('excerpt');
-	$post->settings = $request->input('settings');
-	$post->updated_by = auth()->user()->id;
+        $post->title = $request->input('title');
+        $post->slug = ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('title'), '-');
+        $post->content = $request->input('content');
+        $post->excerpt = $request->input('excerpt');
+        $post->settings = $request->input('settings');
+        $post->updated_by = auth()->user()->id;
 
-	if ($post->canChangeAccessLevel()) {
-	    $post->access_level = $request->input('access_level');
+        if ($post->canChangeAccessLevel()) {
+            $post->access_level = $request->input('access_level');
 
-	    // N.B: Get also the private groups (if any) that are not returned by the form as they're disabled.
-	    $groups = array_merge($request->input('groups', []), Group::getPrivateGroups($post));
+            // N.B: Get also the private groups (if any) that are not returned by the form as they're disabled.
+            $groups = array_merge($request->input('groups', []), Group::getPrivateGroups($post));
 
-	    if (!empty($groups)) {
-		$post->groups()->sync($groups);
-	    }
-	    else {
-		// Remove all groups for this post.
-		$post->groups()->sync([]);
-	    }
-	}
+            if (!empty($groups)) {
+                $post->groups()->sync($groups);
+            }
+            else {
+                // Remove all groups for this post.
+                $post->groups()->sync([]);
+            }
+        }
 
-	if ($post->canChangeAttachments()) {
+        if ($post->canChangeAttachments()) {
 
-	    $post->owned_by = $request->input('owned_by');
+            $post->owned_by = $request->input('owned_by');
 
-	    // N.B: Get also the private categories (if any) that are not returned by the form as they're disabled.
-	    $categories = array_merge($request->input('categories', []), $post->getPrivateCategories());
+            // N.B: Get also the private categories (if any) that are not returned by the form as they're disabled.
+            $categories = array_merge($request->input('categories', []), $post->getPrivateCategories());
 
-	    if (!empty($categories)) {
-		$post->categories()->sync($categories);
-	    }
-	    else {
-		// Remove all categories for this post.
-		$post->categories()->sync([]);
-	    }
+            if (!empty($categories)) {
+                $post->categories()->sync($categories);
+            }
+            else {
+                // Remove all categories for this post.
+                $post->categories()->sync([]);
+            }
 
-	    $post->main_cat_id = $request->input('main_cat_id');
-	}
+            $post->main_cat_id = $request->input('main_cat_id');
+        }
 
-	if ($post->canChangeStatus()) {
-	    $post->status = $request->input('status');
-	}
+        if ($post->canChangeStatus()) {
+            $post->status = $request->input('status');
+        }
 
-	$post->save();
+        $post->save();
 
-	if ($image = $this->uploadImage($request)) {
-	    // Delete the previous post image if any.
-	    if ($post->image) {
-	        $post->image->delete();
-	    }
+        if ($image = $this->uploadImage($request)) {
+            // Delete the previous post image if any.
+            if ($post->image) {
+                $post->image->delete();
+            }
 
-	    $post->image()->save($image);
-	}
+            $post->image()->save($image);
+        }
 
         if ($request->input('_close', null)) {
-	    $post->checkIn();
-	    // Redirect to the list.
-	    return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.update_success'));
-	}
+            $post->checkIn();
+            // Redirect to the list.
+            return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.update_success'));
+        }
 
-	return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id, 'tab' => $request->input('_tab')]))->with('success', __('messages.posts.update_success'));
+        return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id, 'tab' => $request->input('_tab')]))->with('success', __('messages.posts.update_success'));
     }
 
     /**
@@ -236,35 +236,35 @@ class PostController extends Controller
      */
     public function store(StoreRequest $request)
     {
-	$post = Post::create([
-	  'title' => $request->input('title'), 
-	  'slug' => ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('title'), '-'),
-	  'status' => $request->input('status'), 
-	  'content' => $request->input('content'), 
-	  'access_level' => $request->input('access_level'), 
-	  'owned_by' => $request->input('owned_by'),
-	  'main_cat_id' => $request->input('main_cat_id'),
-	  'settings' => $request->input('settings'),
-	  'excerpt' => $request->input('excerpt'),
-	]);
+        $post = Post::create([
+          'title' => $request->input('title'), 
+          'slug' => ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('title'), '-'),
+          'status' => $request->input('status'), 
+          'content' => $request->input('content'), 
+          'access_level' => $request->input('access_level'), 
+          'owned_by' => $request->input('owned_by'),
+          'main_cat_id' => $request->input('main_cat_id'),
+          'settings' => $request->input('settings'),
+          'excerpt' => $request->input('excerpt'),
+        ]);
 
-	if ($request->input('groups') !== null) {
-	    $post->groups()->attach($request->input('groups'));
-	}
+        if ($request->input('groups') !== null) {
+            $post->groups()->attach($request->input('groups'));
+        }
 
-	if ($request->input('categories') !== null) {
-	    $post->categories()->attach($request->input('categories'));
-	}
+        if ($request->input('categories') !== null) {
+            $post->categories()->attach($request->input('categories'));
+        }
 
-	if ($image = $this->uploadImage($request)) {
-	    $post->image()->save($image);
-	}
+        if ($image = $this->uploadImage($request)) {
+            $post->image()->save($image);
+        }
 
         if ($request->input('_close', null)) {
-	    return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.create_success'));
-	}
+            return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.create_success'));
+        }
 
-	return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id]))->with('success', __('messages.posts.create_success'));
+        return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id]))->with('success', __('messages.posts.create_success'));
     }
 
     /**
@@ -276,14 +276,14 @@ class PostController extends Controller
      */
     public function destroy(Request $request, Post $post)
     {
-	if (!$post->canDelete()) {
-	    return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id]))->with('error',  __('messages.generic.delete_not_auth'));
-	}
+        if (!$post->canDelete()) {
+            return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id]))->with('error',  __('messages.generic.delete_not_auth'));
+        }
 
-	$name = $post->name;
-	$post->delete();
+        $name = $post->name;
+        $post->delete();
 
-	return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.delete_success', ['name' => $name]));
+        return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.delete_success', ['name' => $name]));
     }
 
     /**
@@ -298,22 +298,22 @@ class PostController extends Controller
 
         // Remove the posts selected from the list.
         foreach ($request->input('ids') as $id) {
-	    $post = Post::findOrFail($id);
+            $post = Post::findOrFail($id);
 
-	    if (!$post->canDelete()) {
-	      return redirect()->route('admin.blog.posts.index', $request->query())->with(
-		  [
-		      'error' => __('messages.generic.delete_not_auth'), 
-		      'success' => __('messages.posts.delete_list_success', ['number' => $deleted])
-		  ]);
-	    }
+            if (!$post->canDelete()) {
+              return redirect()->route('admin.blog.posts.index', $request->query())->with(
+                  [
+                      'error' => __('messages.generic.delete_not_auth'), 
+                      'success' => __('messages.posts.delete_list_success', ['number' => $deleted])
+                  ]);
+            }
 
-	    $post->delete();
+            $post->delete();
 
-	    $deleted++;
-	}
+            $deleted++;
+        }
 
-	return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.delete_list_success', ['number' => $deleted]));
+        return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.delete_list_success', ['number' => $deleted]));
     }
 
     /**
@@ -326,7 +326,7 @@ class PostController extends Controller
     {
         $messages = CheckInCheckOut::checkInMultiple($request->input('ids'), '\\App\\Models\\Blog\\Post');
 
-	return redirect()->route('admin.blog.posts.index', $request->query())->with($messages);
+        return redirect()->route('admin.blog.posts.index', $request->query())->with($messages);
     }
 
     /**
@@ -339,8 +339,8 @@ class PostController extends Controller
     {
         $fields = $this->getSpecificFields(['access_level', 'owned_by', 'groups']);
         $actions = $this->getActions('batch');
-	$query = $request->query();
-	$route = 'admin.blog.posts';
+        $query = $request->query();
+        $route = 'admin.blog.posts';
 
         return view('admin.share.batch', compact('fields', 'actions', 'query', 'route'));
     }
@@ -354,52 +354,52 @@ class PostController extends Controller
     public function massUpdate(Request $request)
     {
         $updates = 0;
-	$messages = [];
+        $messages = [];
 
         foreach ($request->input('ids') as $key => $id) {
-	    $post = Post::findOrFail($id);
-	    $updated = false;
+            $post = Post::findOrFail($id);
+            $updated = false;
 
-	    // Check for authorisation.
-	    if (!$post->canEdit()) {
-		$messages['error'] = __('messages.generic.mass_update_not_auth');
-		continue;
-	    }
+            // Check for authorisation.
+            if (!$post->canEdit()) {
+                $messages['error'] = __('messages.generic.mass_update_not_auth');
+                continue;
+            }
 
-	    if ($request->input('owned_by') !== null && $post->canChangeAttachments()) {
-		$post->owned_by = $request->input('owned_by');
-		$updated = true;
-	    }
+            if ($request->input('owned_by') !== null && $post->canChangeAttachments()) {
+                $post->owned_by = $request->input('owned_by');
+                $updated = true;
+            }
 
-	    if ($request->input('access_level') !== null && $post->canChangeAccessLevel()) {
-		$post->access_level = $request->input('access_level');
-		$updated = true;
-	    }
+            if ($request->input('access_level') !== null && $post->canChangeAccessLevel()) {
+                $post->access_level = $request->input('access_level');
+                $updated = true;
+            }
 
-	    if ($request->input('groups') !== null && $post->canChangeAccessLevel()) {
-		if ($request->input('_selected_groups') == 'add') {
-		    $post->groups()->syncWithoutDetaching($request->input('groups'));
-		}
-		else {
-		    // Remove the selected groups from the current groups and get the remaining groups.
-		    $groups = array_diff($post->getGroupIds(), $request->input('groups'));
-		    $post->groups()->sync($groups);
-		}
+            if ($request->input('groups') !== null && $post->canChangeAccessLevel()) {
+                if ($request->input('_selected_groups') == 'add') {
+                    $post->groups()->syncWithoutDetaching($request->input('groups'));
+                }
+                else {
+                    // Remove the selected groups from the current groups and get the remaining groups.
+                    $groups = array_diff($post->getGroupIds(), $request->input('groups'));
+                    $post->groups()->sync($groups);
+                }
 
-		$updated = true;
-	    }
+                $updated = true;
+            }
 
-	    if ($updated) {
-		$post->save();
-		$updates++;
-	    }
-	}
+            if ($updated) {
+                $post->save();
+                $updates++;
+            }
+        }
 
-	if ($updates) {
-	    $messages['success'] = __('messages.generic.mass_update_success', ['number' => $updates]);
-	}
+        if ($updates) {
+            $messages['success'] = __('messages.generic.mass_update_success', ['number' => $updates]);
+        }
 
-	return redirect()->route('admin.blog.posts.index')->with($messages);
+        return redirect()->route('admin.blog.posts.index')->with($messages);
     }
 
     /**
@@ -413,24 +413,24 @@ class PostController extends Controller
         $published = 0;
 
         foreach ($request->input('ids') as $id) {
-	    $post = Post::findOrFail($id);
+            $post = Post::findOrFail($id);
 
-	    if (!$post->canChangeStatus()) {
-	      return redirect()->route('admin.blog.posts.index', $request->query())->with(
-		  [
-		      'error' => __('messages.generic.mass_publish_not_auth'), 
-		      'success' => __('messages.posts.publish_list_success', ['number' => $published])
-		  ]);
-	    }
+            if (!$post->canChangeStatus()) {
+              return redirect()->route('admin.blog.posts.index', $request->query())->with(
+                  [
+                      'error' => __('messages.generic.mass_publish_not_auth'), 
+                      'success' => __('messages.posts.publish_list_success', ['number' => $published])
+                  ]);
+            }
 
-	    $post->status = 'published';
+            $post->status = 'published';
 
-	    $post->save();
+            $post->save();
 
-	    $published++;
-	}
+            $published++;
+        }
 
-	return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.publish_list_success', ['number' => $published]));
+        return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.publish_list_success', ['number' => $published]));
     }
 
     /**
@@ -444,24 +444,24 @@ class PostController extends Controller
         $unpublished = 0;
 
         foreach ($request->input('ids') as $id) {
-	    $post = Post::findOrFail($id);
+            $post = Post::findOrFail($id);
 
-	    if (!$post->canChangeStatus()) {
-	      return redirect()->route('admin.blog.posts.index', $request->query())->with(
-		  [
-		      'error' => __('messages.generic.mass_unpublish_not_auth'), 
-		      'success' => __('messages.posts.unpublish_list_success', ['number' => $unpublished])
-		  ]);
-	    }
+            if (!$post->canChangeStatus()) {
+              return redirect()->route('admin.blog.posts.index', $request->query())->with(
+                  [
+                      'error' => __('messages.generic.mass_unpublish_not_auth'), 
+                      'success' => __('messages.posts.unpublish_list_success', ['number' => $unpublished])
+                  ]);
+            }
 
-	    $post->status = 'unpublished';
+            $post->status = 'unpublished';
 
-	    $post->save();
+            $post->save();
 
-	    $unpublished++;
-	}
+            $unpublished++;
+        }
 
-	return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.unpublish_list_success', ['number' => $unpublished]));
+        return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.unpublish_list_success', ['number' => $unpublished]));
     }
 
     /*
@@ -473,13 +473,13 @@ class PostController extends Controller
     private function uploadImage($request)
     {
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
-	    $image = new Document;
-	    $image->upload($request->file('image'), 'post', 'image');
+            $image = new Document;
+            $image->upload($request->file('image'), 'post', 'image');
 
-	    return $image;
-	}
+            return $image;
+        }
 
-	return null;
+        return null;
     }
 
     /*
@@ -492,9 +492,9 @@ class PostController extends Controller
     private function setFieldValues(&$fields, $post)
     {
         foreach ($fields as $field) {
-	    if (isset($field->group) && $field->group == 'settings') {
-		$field->value = (isset($post->settings[$field->name])) ? $post->settings[$field->name] : null;
-	    }
-	}
+            if (isset($field->group) && $field->group == 'settings') {
+                $field->value = (isset($post->settings[$field->name])) ? $post->settings[$field->name] : null;
+            }
+        }
     }
 }
