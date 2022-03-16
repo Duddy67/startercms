@@ -12,6 +12,7 @@ use App\Models\Users\Group;
 use App\Models\Cms\Document;
 use App\Models\Settings\General;
 use App\Traits\Admin\CheckInCheckOut;
+use Illuminate\Support\Str;
 
 
 class User extends Authenticatable
@@ -427,6 +428,23 @@ class User extends Authenticatable
 	}
 
 	return null;
+    }
+
+    /**
+     * Update (or create) the authenticated user's API token.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function updateApiToken()
+    {
+        $token = Str::random(60);
+
+        $this->forceFill([
+            'api_token' => hash('sha256', $token),
+        ])->save();
+
+        return $token;
     }
 
     /*

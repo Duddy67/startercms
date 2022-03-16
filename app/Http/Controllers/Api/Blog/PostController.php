@@ -11,14 +11,14 @@ class PostController extends Controller
 {
     public function index(Request $request)
     {
+        $query = Post::query();
+        $query->select('id', 'title', 'content')->where('access_level', 'public_ro')->orWhere('access_level', 'public_ro');
+
         if (auth('api')->user()) {
-            $posts = Post::select('id', 'title', 'slug', 'excerpt', 'content')->get();
-        }
-        else {
-            $posts = Post::select('id', 'title', 'content')->get();
+            $query->orWhere('owned_by', auth('api')->user()->id);
         }
 
-        return response()->json($posts);
+        return response()->json($query->get());
     }
 
     public function store(Request $request)

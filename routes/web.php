@@ -23,7 +23,7 @@ use App\Http\Controllers\Admin\Blog\SettingController as AdminBlogSettingControl
 use App\Http\Controllers\Admin\Menus\MenuController;
 use App\Http\Controllers\Admin\Menus\MenuItemController;
 use App\Http\Controllers\SiteController;
-use App\Http\Controllers\Api\TokenController;
+use App\Http\Controllers\TokenController;
 
 /*
 |--------------------------------------------------------------------------

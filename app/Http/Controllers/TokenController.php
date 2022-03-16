@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class TokenController extends Controller
 {
@@ -26,11 +25,7 @@ class TokenController extends Controller
      */
     public function update(Request $request)
     {
-        $token = Str::random(60);
-
-        $request->user()->forceFill([
-            'api_token' => hash('sha256', $token),
-        ])->save();
+        $token = $request->user()->updateApiToken();
 
         return view('profile', compact('token'));
     }
