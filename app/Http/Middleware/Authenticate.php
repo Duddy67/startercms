@@ -15,8 +15,8 @@ class Authenticate extends Middleware
     protected function redirectTo($request)
     {
         if (! $request->expectsJson()) {
-	    // Prevent the login page to be loaded in the document iframe.
-	    $route = (substr($request->path(), 0, 13) === 'cms/documents') ? 'expired' : 'login';
+            // Prevent the login page to be loaded in the document iframe.
+            $route = (substr($request->path(), 0, 13) === 'cms/documents') ? 'expired' : 'login';
 
             return route($route);
         }

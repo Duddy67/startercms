@@ -90,9 +90,9 @@ class Post extends Model
         $this->categories()->detach();
         $this->groups()->detach();
 
-	if ($this->image) {
-	    $this->image->delete();
-	}
+        if ($this->image) {
+            $this->image->delete();
+        }
 
         parent::delete();
     }
@@ -109,59 +109,59 @@ class Post extends Model
         $groups = $request->input('groups', []);
         $categories = $request->input('categories', []);
 
-	$query = Post::query();
-	$query->select('posts.*', 'users.name as owner_name')->leftJoin('users', 'posts.owned_by', '=', 'users.id');
-	// Join the role tables to get the owner's role level.
-	$query->join('model_has_roles', 'posts.owned_by', '=', 'model_id')->join('roles', 'roles.id', '=', 'role_id');
+        $query = Post::query();
+        $query->select('posts.*', 'users.name as owner_name')->leftJoin('users', 'posts.owned_by', '=', 'users.id');
+        // Join the role tables to get the owner's role level.
+        $query->join('model_has_roles', 'posts.owned_by', '=', 'model_id')->join('roles', 'roles.id', '=', 'role_id');
 
-	if ($search !== null) {
-	    $query->where('posts.title', 'like', '%'.$search.'%');
-	}
+        if ($search !== null) {
+            $query->where('posts.title', 'like', '%'.$search.'%');
+        }
 
-	if ($sortedBy !== null) {
-	    preg_match('#^([a-z0-9_]+)_(asc|desc)$#', $sortedBy, $matches);
-	    $query->orderBy($matches[1], $matches[2]);
-	}
+        if ($sortedBy !== null) {
+            preg_match('#^([a-z0-9_]+)_(asc|desc)$#', $sortedBy, $matches);
+            $query->orderBy($matches[1], $matches[2]);
+        }
 
-	// Filter by owners
-	if ($ownedBy !== null) {
-	    $query->whereIn('posts.owned_by', $ownedBy);
-	}
+        // Filter by owners
+        if ($ownedBy !== null) {
+            $query->whereIn('posts.owned_by', $ownedBy);
+        }
 
-	// Filter by groups
-	if (!empty($groups)) {
-	    $query->whereHas('groups', function($query) use($groups) {
-		$query->whereIn('id', $groups);
-	    });
-	}
+        // Filter by groups
+        if (!empty($groups)) {
+            $query->whereHas('groups', function($query) use($groups) {
+                $query->whereIn('id', $groups);
+            });
+        }
 
-	// Filter by categories
-	if (!empty($categories)) {
-	    $query->whereHas('categories', function($query) use($categories) {
-		$query->whereIn('id', $categories);
-	    });
-	}
+        // Filter by categories
+        if (!empty($categories)) {
+            $query->whereHas('categories', function($query) use($categories) {
+                $query->whereIn('id', $categories);
+            });
+        }
 
 
-	// N.B: Put the following part of the query into brackets.
-	$query->where(function($query) {
+        // N.B: Put the following part of the query into brackets.
+        $query->where(function($query) {
 
-	    // Check for access levels.
-	    $query->where(function($query) {
-		$query->where('roles.role_level', '<', auth()->user()->getRoleLevel())
-		      ->orWhereIn('posts.access_level', ['public_ro', 'public_rw'])
-		      ->orWhere('posts.owned_by', auth()->user()->id);
-	    });
+            // Check for access levels.
+            $query->where(function($query) {
+                $query->where('roles.role_level', '<', auth()->user()->getRoleLevel())
+                      ->orWhereIn('posts.access_level', ['public_ro', 'public_rw'])
+                      ->orWhere('posts.owned_by', auth()->user()->id);
+            });
 
-	    $groupIds = auth()->user()->getGroupIds();
+            $groupIds = auth()->user()->getGroupIds();
 
-	    if (!empty($groupIds)) {
-		// Check for access through groups.
-		$query->orWhereHas('groups', function ($query)  use ($groupIds) {
-		    $query->whereIn('id', $groupIds);
-		});
-	    }
-	});
+            if (!empty($groupIds)) {
+                // Check for access through groups.
+                $query->orWhereHas('groups', function ($query)  use ($groupIds) {
+                    $query->whereIn('id', $groupIds);
+                });
+            }
+        });
 
         return $query->paginate($perPage);
     }
@@ -173,37 +173,37 @@ class Post extends Model
 
     public function getOwnedByOptions()
     {
-	$users = auth()->user()->getAssignableUsers();
-	$options = [];
+        $users = auth()->user()->getAssignableUsers();
+        $options = [];
 
-	foreach ($users as $user) {
-	    $options[] = ['value' => $user->id, 'text' => $user->name];
-	}
+        foreach ($users as $user) {
+            $options[] = ['value' => $user->id, 'text' => $user->name];
+        }
 
-	return $options;
+        return $options;
     }
 
     public function getCategoriesOptions()
     {
-	$nodes = Category::get()->toTree();
-	$options = [];
-	$userGroupIds = auth()->user()->getGroupIds();
+        $nodes = Category::get()->toTree();
+        $options = [];
+        $userGroupIds = auth()->user()->getGroupIds();
 
-	$traverse = function ($categories, $prefix = '-') use (&$traverse, &$options, $userGroupIds) {
-	    foreach ($categories as $category) {
-	        // Check wether the current user groups match the category groups (if any).
-	        $belongsToGroups = (!empty(array_intersect($userGroupIds, $category->getGroupIds()))) ? true : false;
-		// Set the category option accordingly.
-		$extra = ($category->access_level == 'private' && $category->owned_by != auth()->user()->id && !$belongsToGroups) ? ['disabled'] : [];
-		$options[] = ['value' => $category->id, 'text' => $prefix.' '.$category->name, 'extra' => $extra];
+        $traverse = function ($categories, $prefix = '-') use (&$traverse, &$options, $userGroupIds) {
+            foreach ($categories as $category) {
+                // Check wether the current user groups match the category groups (if any).
+                $belongsToGroups = (!empty(array_intersect($userGroupIds, $category->getGroupIds()))) ? true : false;
+                // Set the category option accordingly.
+                $extra = ($category->access_level == 'private' && $category->owned_by != auth()->user()->id && !$belongsToGroups) ? ['disabled'] : [];
+                $options[] = ['value' => $category->id, 'text' => $prefix.' '.$category->name, 'extra' => $extra];
 
-		$traverse($category->children, $prefix.'-');
-	    }
-	};
+                $traverse($category->children, $prefix.'-');
+            }
+        };
 
-	$traverse($nodes);
+        $traverse($nodes);
 
-	return $options;
+        return $options;
     }
 
     public function getSettings()
@@ -217,21 +217,21 @@ class Post extends Model
     public function getSelectedValue($fieldName)
     {
         if ($fieldName == 'groups') {
-	    return $this->groups->pluck('id')->toArray();
-	}
+            return $this->groups->pluck('id')->toArray();
+        }
 
         if ($fieldName == 'categories') {
-	    return $this->categories->pluck('id')->toArray();
-	}
+            return $this->categories->pluck('id')->toArray();
+        }
 
-	return $this->{$fieldName};
+        return $this->{$fieldName};
     }
 
     public function getPrivateCategories()
     {
         return $this->categories()->where([
-					    ['blog_categories.access_level', '=', 'private'], 
-					    ['blog_categories.owned_by', '!=', auth()->user()->id]
-				      ])->pluck('blog_categories.id')->toArray();
+            ['blog_categories.access_level', '=', 'private'], 
+            ['blog_categories.owned_by', '!=', auth()->user()->id]
+        ])->pluck('blog_categories.id')->toArray();
     }
 }

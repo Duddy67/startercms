@@ -22,16 +22,16 @@ class Admin
     {
         if (in_array(auth()->user()->getRoleType(), ['super-admin', 'admin', 'manager', 'assistant'])) {
 
-	    $settings = Cache::rememberForever('settings', function () {
-	        // Updates the config app parameters.
-		return  General::getAppSettings();
-	    });
+            $settings = Cache::rememberForever('settings', function () {
+                // Updates the config app parameters.
+                return  General::getAppSettings();
+            });
 
-	    config($settings); // Any DB settings will overwrite app config
+            config($settings); // Any DB settings will overwrite app config
 
-	    return $next($request);
-	}
+            return $next($request);
+        }
 
-	return redirect()->route('profile');
+        return redirect()->route('profile');
     }
 }

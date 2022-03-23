@@ -45,6 +45,6 @@ class AuthController extends Controller
         }
        
         // Returns a new api token.
-        return response()->json($user->updateApiToken());
+        return response()->json(['api_token' => $user->updateApiToken()]);
     }
 }
