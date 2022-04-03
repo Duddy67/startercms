@@ -27,7 +27,7 @@ Route::get('posts', [PostController::class, 'index']);
 Route::get('posts/{post}', [PostController::class, 'show']);
 
 Route::group(['middleware' => 'auth:api'], function () {
-    // Users must be authenticated to access these methods.
+    // Users must be authenticated to access CUD methods.
     Route::apiResource('posts', PostController::class)->except(['index', 'show']);
 });
 
