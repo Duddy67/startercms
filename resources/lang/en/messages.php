@@ -59,7 +59,7 @@ return [
         'create_success' => 'category successfully created.',
         'update_success' => 'category successfully updated.',
         'change_status_list_success' => 'category statuses successfully changed.',
-	'no_subcategories' => 'No sub-categories',
+        'no_subcategories' => 'No sub-categories',
     ],
     'emails' => [
         'create_success' => 'Email successfully created.',
@@ -80,6 +80,7 @@ return [
         'update_success' => 'Parameters successfully saved.',
     ],
     'generic' => [
+        'ressource_not_found' => 'Ressource not found.',
         'access_not_auth' => 'You are not authorised to access this resource.',
         'edit_not_auth' => 'You are not authorised to edit this resource.',
         'create_not_auth' => 'You are not authorised to create a resource.',
@@ -97,7 +98,7 @@ return [
         'mass_delete_not_auth' => 'You are not authorised to delete some of the selected items.',
         'mass_publish_not_auth' => 'You are not authorised to publish some of the selected items.',
         'mass_unpublish_not_auth' => 'You are not authorised to unpublish some of the selected items.',
-	'must_not_be_descendant' => 'Node must not be a descendant.',
+        'must_not_be_descendant' => 'Node must not be a descendant.',
         'item_is_private' => ':name item is private.',
     ]
 ];

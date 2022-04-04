@@ -28,23 +28,25 @@ class UpdateRequest extends FormRequest
     public function rules()
     {
         $rules = [
-	    'title' => 'required',
-	    'content' => 'required',
-	    'image' => ['nullable', 'image', 'mimes:jpg,png,jpeg,gif,svg', 'max:2048', 'dimensions:min_width=100,min_height=100,max_width=1000,max_height=1000'],
+            'title' => 'required',
+            'content' => 'required',
+            'image' => ['nullable', 'image', 'mimes:jpg,png,jpeg,gif,svg', 'max:2048', 'dimensions:min_width=100,min_height=100,max_width=1000,max_height=1000'],
         ];
 
-	if ($this->post->canChangeAccessLevel()) {
-	    $rules['access_level'] = 'required';
-	}
+        if ($this->post->canChangeAccessLevel()) {
+            $rules['access_level'] = 'required';
+        }
 
-	if ($this->post->canChangeStatus()) {
-	    $rules['status'] = 'required';
-	}
+        if ($this->post->canChangeStatus()) {
+            // Some rules don't apply whith the API.
+            $rules['status'] = $this->wantsJson() ? '' : 'required';
+        }
 
-	if ($this->post->canChangeAttachments()) {
-	    $rules['owned_by'] = 'required';
-	}
+        if ($this->post->canChangeAttachments()) {
+            // Some rules don't apply whith the API.
+            $rules['owned_by'] = $this->wantsJson() ? '' : 'required';
+        }
 
-	return $rules;
+        return $rules;
     }
 }

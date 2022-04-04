@@ -42,14 +42,14 @@ class PostController extends Controller
     {
         if (!$post = Post::select('id', 'title', 'slug', 'access_level', 'owned_by', 'excerpt', 'content')->find($post)) {
             return response()->json([
-                'message' => 'Ressource not found.'
+                'message' => __('messages.generic.ressource_not_found')
             ], 404);
         }
 
         // Check for private posts.
         if ($post->access_level == 'private' && (!auth('api')->user() || auth('api')->user()->id != $post->owned_by)) {
             return response()->json([
-                'message' => 'You are not authorised to access this ressource.'
+                'message' => __('messages.generic.access_not_auth')
             ], 403);
         }
 
@@ -71,17 +71,49 @@ class PostController extends Controller
         ]);
         
         return response()->json([
-            'message' => 'Post successfully created.'
+            'message' => __('messages.posts.create_success')
         ], 201);
     }
 
     public function update(UpdateRequest $request, Post $post)
     {
-        // code...
+        if (!$post->canEdit()) {
+            return response()->json([
+                'message' => __('messages.generic.edit_not_auth')
+            ], 403);
+        }
+
+        $post->title = $request->input('title');
+        $post->slug = ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('title'), '-');
+        $post->content = $request->input('content');
+        $post->excerpt = $request->input('excerpt', null);
+        $post->settings = $request->input('settings', $this->settings);
+        $post->updated_by = auth('api')->user()->id;
+
+        if ($post->canChangeAccessLevel()) {
+            $post->access_level = $request->input('access_level');
+        }
+
+        $post->save();
+        
+        return response()->json([
+            'message' => __('messages.posts.update_success')
+        ], 200);
     }
 
     public function destroy(Post $post)
     {
-        // code...
+        if (!$post->canDelete()) {
+            return response()->json([
+                'message' => __('messages.generic.delete_not_auth')
+            ], 403);
+        }
+
+        $name = $post->title;
+        $post->delete();
+
+        return response()->json([
+            'message' => __('messages.posts.delete_success', ['name' => $name])
+        ], 200);
     }
 }
