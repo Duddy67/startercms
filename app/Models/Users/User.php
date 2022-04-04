@@ -28,6 +28,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'last_login_at',
+        'last_login_ip',
     ];
 
     /**
@@ -57,7 +59,8 @@ class User extends Authenticatable
     protected $dates = [
         'created_at',
         'updated_at',
-        'checked_out_time'
+        'checked_out_time',
+        'last_login_at',
     ];
 
 

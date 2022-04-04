@@ -2,6 +2,10 @@
 
 return [
 
+    'dashboard' => [
+        'welcome' => 'Hello :name. Welcome to Starter CMS.',
+        'last_connection' => 'Your last connection dates back to :date.',
+    ],
     'users' => [
         'update_success' => 'User successfully updated.',
         'create_success' => 'User successfully created.',
