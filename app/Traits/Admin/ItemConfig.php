@@ -106,7 +106,7 @@ trait ItemConfig
 	    if (!in_array($column->name, $except)) {
 
 		if ($column->type == 'date') {
-		    $row->{$column->name} = $item->{$column->name}->tz(General::getValue('app', 'timezone'))->toFormattedDateString();
+		    $row->{$column->name} = $item->{$column->name}->tz(General::getValue('app', 'timezone'))->format(General::getValue('app', 'date_format'));
 		}
 		elseif ($column->name == 'owned_by') {
 		    $row->owned_by = $item->owner_name;

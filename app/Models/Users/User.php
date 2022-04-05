@@ -30,6 +30,7 @@ class User extends Authenticatable
         'password',
         'last_login_at',
         'last_login_ip',
+        'last_seen_at',
     ];
 
     /**
@@ -61,6 +62,7 @@ class User extends Authenticatable
         'updated_at',
         'checked_out_time',
         'last_login_at',
+        'last_seen_at',
     ];
 
 

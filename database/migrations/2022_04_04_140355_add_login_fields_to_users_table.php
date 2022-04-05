@@ -16,6 +16,7 @@ class AddLoginFieldsToUsersTable extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->timestamp('last_logged_in_at')->after('updated_by')->nullable();
             $table->string('last_logged_in_ip')->after('last_logged_in_at')->nullable();
+            $table->timestamp('last_seen_at')->after('last_logged_in_ip')->nullable();
         });
     }
 
@@ -29,6 +30,7 @@ class AddLoginFieldsToUsersTable extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('last_logged_in_at');
             $table->dropColumn('last_logged_in_ip');
+            $table->dropColumn('last_seen_at');
         });
     }
 }

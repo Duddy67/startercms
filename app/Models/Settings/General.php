@@ -43,17 +43,17 @@ class General extends Model
     public static function getData()
     {
         $results = General::all()->toArray();
-	$data = [];
+        $data = [];
 
-	foreach ($results as $param) {
-	    if (!isset($data[$param['group']])) {
-		$data[$param['group']] = [];
-	    }
+        foreach ($results as $param) {
+            if (!isset($data[$param['group']])) {
+                $data[$param['group']] = [];
+            }
 
-	    $data[$param['group']][$param['key']] = $param['value'];
-	}
+            $data[$param['group']][$param['key']] = $param['value'];
+        }
 
-	return $data;
+        return $data;
     }
 
     /*
@@ -70,54 +70,54 @@ class General extends Model
     public static function getPerPageOptions()
     {
       return [
-	  ['value' => 2, 'text' => 2],
-	  ['value' => 5, 'text' => 5],
-	  ['value' => 10, 'text' => 10],
-	  ['value' => 15, 'text' => 15],
-	  ['value' => 20, 'text' => 20],
-	  ['value' => 25, 'text' => 25],
+          ['value' => 2, 'text' => 2],
+          ['value' => 5, 'text' => 5],
+          ['value' => 10, 'text' => 10],
+          ['value' => 15, 'text' => 15],
+          ['value' => 20, 'text' => 20],
+          ['value' => 25, 'text' => 25],
       ];
     }
 
     public static function getAccessLevelOptions()
     {
       return [
-	  ['value' => 'private', 'text' => __('labels.generic.private')],
-	  ['value' => 'public_ro', 'text' => __('labels.generic.public_ro')],
-	  ['value' => 'public_rw', 'text' => __('labels.generic.public_rw')],
+          ['value' => 'private', 'text' => __('labels.generic.private')],
+          ['value' => 'public_ro', 'text' => __('labels.generic.public_ro')],
+          ['value' => 'public_rw', 'text' => __('labels.generic.public_rw')],
       ];
     }
 
     public static function getStatusOptions()
     {
-	return [
-	    ['value' => 'published', 'text' => __('labels.generic.published')],
-	    ['value' => 'unpublished', 'text' => __('labels.generic.unpublished')],
-	];
+        return [
+            ['value' => 'published', 'text' => __('labels.generic.published')],
+            ['value' => 'unpublished', 'text' => __('labels.generic.unpublished')],
+        ];
     }
 
     public static function getYesNoOptions()
     {
-	return [
-	    ['value' => 1, 'text' => __('labels.generic.yes')],
-	    ['value' => 0, 'text' => __('labels.generic.no')],
-	];
+        return [
+            ['value' => 1, 'text' => __('labels.generic.yes')],
+            ['value' => 0, 'text' => __('labels.generic.no')],
+        ];
     }
 
     public static function getSortedByOptions($pluginName, $modelName)
     {
-	$json = file_get_contents(app_path().'/Models/'.ucfirst($pluginName).'/'.$modelName.'/columns.json', true);
-	$columns = json_decode($json);
-	$options = [];
+        $json = file_get_contents(app_path().'/Models/'.ucfirst($pluginName).'/'.$modelName.'/columns.json', true);
+        $columns = json_decode($json);
+        $options = [];
 
-	foreach ($columns as $column) {
-	    if (isset($column->extra) && in_array('sortable', $column->extra)) {
-	        $options[] = ['value' => $column->name.'_asc', 'text' => $column->name.' asc'];
-	        $options[] = ['value' => $column->name.'_desc', 'text' => $column->name.' desc'];
-	    }
-	}
+        foreach ($columns as $column) {
+            if (isset($column->extra) && in_array('sortable', $column->extra)) {
+                $options[] = ['value' => $column->name.'_asc', 'text' => $column->name.' asc'];
+                $options[] = ['value' => $column->name.'_desc', 'text' => $column->name.' desc'];
+            }
+        }
 
-	return $options;
+        return $options;
     }
 
     /*
@@ -128,34 +128,34 @@ class General extends Model
     public static function getGroupsOptions($item = null)
     {
         $groups = Group::all();
-	$options = [];
-	// Check whether the dropdown list is used as a filter on the item list view.
+        $options = [];
+        // Check whether the dropdown list is used as a filter on the item list view.
         $isFilter = ($item && debug_backtrace()[1]['function'] == 'getFilters') ? true : false; 
 
-	foreach ($groups as $group) {
-	    // Get the owner of this group.
-	    $owner = ($group->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($group->owned_by);
-	    $extra = [];
+        foreach ($groups as $group) {
+            // Get the owner of this group.
+            $owner = ($group->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($group->owned_by);
+            $extra = [];
 
-	    // Ensure the current user can use this group.
-	    if ($group->access_level == 'private' && $owner->getRoleLevel() >= auth()->user()->getRoleLevel() && $group->owned_by != auth()->user()->id) {
+            // Ensure the current user can use this group.
+            if ($group->access_level == 'private' && $owner->getRoleLevel() >= auth()->user()->getRoleLevel() && $group->owned_by != auth()->user()->id) {
                 // The item is part of this private group. 
-		if ($item && in_array($group->id, $item->getGroupIds())) {
-		    // Show the group.
-		    // N.B: This option is disabled in the form field.
-		    //      This option is available in the search filter (list view).
-		    $extra[] = ($isFilter) ? null : 'disabled';
-		}
-		else {
-		    // Don't show the group.
-		    continue;
-		}
-	    }
+                if ($item && in_array($group->id, $item->getGroupIds())) {
+                    // Show the group.
+                    // N.B: This option is disabled in the form field.
+                    //      This option is available in the search filter (list view).
+                    $extra[] = ($isFilter) ? null : 'disabled';
+                }
+                else {
+                    // Don't show the group.
+                    continue;
+                }
+            }
 
-	    $options[] = ['value' => $group->id, 'text' => $group->name, 'extra' => $extra];
-	}
+            $options[] = ['value' => $group->id, 'text' => $group->name, 'extra' => $extra];
+        }
 
-	return $options;
+        return $options;
     }
 
     /*
@@ -168,58 +168,58 @@ class General extends Model
      */  
     public static function getOwnedByOptions($model)
     {
-	$table = $model->getTable();
-	$query = get_class($model)::query();
+        $table = $model->getTable();
+        $query = get_class($model)::query();
 
-	$query->select(['users.id', 'users.name'])
-	      ->leftJoin('users', $table.'.owned_by', '=', 'users.id')
-	      ->join('model_has_roles', $table.'.owned_by', '=', 'model_id')
-	      ->join('roles', 'roles.id', '=', 'role_id');
+        $query->select(['users.id', 'users.name'])
+              ->leftJoin('users', $table.'.owned_by', '=', 'users.id')
+              ->join('model_has_roles', $table.'.owned_by', '=', 'model_id')
+              ->join('roles', 'roles.id', '=', 'role_id');
 
-	// N.B: Put the following part of the query into brackets.
-	$query->where(function($query) use($table) {
+        // N.B: Put the following part of the query into brackets.
+        $query->where(function($query) use($table) {
 
-	    // Check for access levels.
-	    $query->where(function($query) use($table) {
-		$query->where('roles.role_level', '<', auth()->user()->getRoleLevel())
-		      ->orWhereIn($table.'.access_level', ['public_ro', 'public_rw'])
-		      ->orWhere($table.'.owned_by', auth()->user()->id);
-	    });
+            // Check for access levels.
+            $query->where(function($query) use($table) {
+                $query->where('roles.role_level', '<', auth()->user()->getRoleLevel())
+                      ->orWhereIn($table.'.access_level', ['public_ro', 'public_rw'])
+                      ->orWhere($table.'.owned_by', auth()->user()->id);
+            });
 
-	    // N.B: The Group model has no group relationship (ie: relationship with itself).
-	    if ($table != 'groups') {
-		$groupIds = auth()->user()->getGroupIds();
+            // N.B: The Group model has no group relationship (ie: relationship with itself).
+            if ($table != 'groups') {
+                $groupIds = auth()->user()->getGroupIds();
 
-		if (!empty($groupIds)) {
-		    // Check for access through groups.
-		    $query->orWhereHas('groups', function ($query)  use ($groupIds) {
-			$query->whereIn('id', $groupIds);
-		    });
-		}
-	    }
-	});
+                if (!empty($groupIds)) {
+                    // Check for access through groups.
+                    $query->orWhereHas('groups', function ($query)  use ($groupIds) {
+                        $query->whereIn('id', $groupIds);
+                    });
+                }
+            }
+        });
 
-	$owners = $query->distinct()->get();
+        $owners = $query->distinct()->get();
 
-	$options = [];
+        $options = [];
 
-	foreach ($owners as $owner) {
-	    $options[] = ['value' => $owner->id, 'text' => $owner->name];
-	}
+        foreach ($owners as $owner) {
+            $options[] = ['value' => $owner->id, 'text' => $owner->name];
+        }
 
-	return $options;
+        return $options;
     }
 
     public static function getTimezoneOptions()
     {
         $timezoneIdentifiers = \DateTimeZone::listIdentifiers();
-	$options = [];
+        $options = [];
 
-	foreach ($timezoneIdentifiers as $identifier) {
-	    $options[] = ['value' => $identifier, 'text' => $identifier];
-	}
+        foreach ($timezoneIdentifiers as $identifier) {
+            $options[] = ['value' => $identifier, 'text' => $identifier];
+        }
 
-	return $options;
+        return $options;
     }
 
     /*
@@ -228,19 +228,19 @@ class General extends Model
     public function getSelectedValue($fieldName)
     {
         if ($fieldName == 'per_page') {
-	    return $this->where(['group' => 'pagination', 'key' => 'per_page'])->pluck('value')->first();
-	}
+            return $this->where(['group' => 'pagination', 'key' => 'per_page'])->pluck('value')->first();
+        }
     }
 
     public static function getAppSettings()
     {
         $data = DB::table('settings_general')->where('group', 'app')->get();
-	$settings = [];
+        $settings = [];
 
-	foreach ($data as $row) {
-	    $settings['app.'.$row->key] = $row->value;
-	}
+        foreach ($data as $row) {
+            $settings['app.'.$row->key] = $row->value;
+        }
 
-	return $settings;
+        return $settings;
     }
 }
