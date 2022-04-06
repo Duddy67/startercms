@@ -6,19 +6,20 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">{{ __('messages.dashboard.welcome', ['name' => Auth::user()->name]) }}</h5>
-          <p class="card-text">{{ __('messages.dashboard.last_connection', ['date' => Auth::user()->last_seen_at->tz($general::getValue('app', 'timezone'))->format($general::getValue('app', 'date_format'))]) }}</p>
+          <p class="card-text">{{ __('messages.dashboard.last_connection', ['date' => $general::getFormattedDate(Auth::user()->last_seen_at)]) }}</p>
           <a href="#" class="btn btn-primary">Go somewhere</a>
         </div>
       </div>
     </div>
-    <div class="col-sm-6">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Special title treatment</h5>
-          <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-          <a href="#" class="btn btn-primary">Go somewhere</a>
+    <div class="card col-sm-6" style="width: 18rem;">
+        <div class="card-header">
+          Featured
         </div>
+        <ul class="list-group list-group-flush">
+            @foreach ($users as $user)
+                <li class="list-group-item"><span class="font-weight-bold mr-4">{{ $user->name }}</span> {{ $general::getFormattedDate($user->last_logged_in_at) }}</li>
+            @endforeach
+        </ul>
       </div>
-    </div>
     </div>
 @endsection

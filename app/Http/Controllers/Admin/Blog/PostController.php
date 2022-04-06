@@ -101,7 +101,7 @@ class PostController extends Controller
                         ->leftJoin('users', 'posts.owned_by', '=', 'users.id')
                         ->leftJoin('users as users2', 'posts.updated_by', '=', 'users2.id')
                         ->findOrFail($id);
-
+                        
         if (!$post->canAccess()) {
             return redirect()->route('admin.blog.posts.index')->with('error',  __('messages.generic.access_not_auth'));
         }
@@ -169,6 +169,7 @@ class PostController extends Controller
         $post->content = $request->input('content');
         $post->excerpt = $request->input('excerpt');
         $post->settings = $request->input('settings');
+        $post->updated_at = Carbon::now();
         $post->updated_by = auth()->user()->id;
 
         if ($post->canChangeAccessLevel()) {

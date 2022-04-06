@@ -222,6 +222,13 @@ class General extends Model
         return $options;
     }
 
+    public static function getFormattedDate($date, $format = '')
+    {
+        $format = (!empty($format)) ? $format : self::getValue('app', 'date_format');
+
+        return $date->tz(self::getValue('app', 'timezone'))->format($format);
+    }
+
     /*
      * Generic function that returns model values which are handled by select inputs. 
      */
