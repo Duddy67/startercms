@@ -3,7 +3,6 @@
 namespace App\Traits\Admin;
 
 use App\Models\Settings\General;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Users\User;
 
@@ -19,8 +18,10 @@ trait CheckInCheckOut
     public function checkOut()
     {
         $this->checked_out = auth()->user()->id;
-	$this->checked_out_time = Carbon::now();
-	$this->save();
+        $this->checked_out_time = Carbon::now();
+        // Prevent updated_at field to be updated.
+        $this->timestamps = false;
+        $this->save();
     }
 
     /**
@@ -32,8 +33,10 @@ trait CheckInCheckOut
     public function checkIn()
     {
         $this->checked_out = null;
-	$this->checked_out_time = null;
-	$this->save();
+        $this->checked_out_time = null;
+        // Prevent updated_at field to be updated.
+        $this->timestamps = false;
+        $this->save();
     }
 
     /**
@@ -45,14 +48,14 @@ trait CheckInCheckOut
     public function canCheckIn()
     {
         // Get the user for whom the record is checked out .
-	$user = User::findOrFail($this->checked_out);
+        $user = User::findOrFail($this->checked_out);
 
-	// Ensure the current user has a higher role level or that they are the user for whom the record is checked out. 
-	if (auth()->user()->getRoleLevel() > $user->getRoleLevel() || $this->checked_out == auth()->user()->id) {
-	    return true;
-	}
+        // Ensure the current user has a higher role level or that they are the user for whom the record is checked out. 
+        if (auth()->user()->getRoleLevel() > $user->getRoleLevel() || $this->checked_out == auth()->user()->id) {
+            return true;
+        }
 
-	return false;
+        return false;
     }
 
     /**
@@ -65,30 +68,30 @@ trait CheckInCheckOut
     public static function checkInMultiple($recordIds, $model)
     {
         $checkedIn = 0;
-	$messages = [];
+        $messages = [];
 
         // Check in the groups selected from the list.
         foreach ($recordIds as $id) {
-	    $record = $model::findOrFail($id);
+            $record = $model::findOrFail($id);
 
-	    if ($record->checked_out === null) {
-	        continue;
-	    }
+            if ($record->checked_out === null) {
+                continue;
+            }
 
-	    if (!$record->canCheckIn()) {
-	        $messages['error'] = __('messages.generic.check_in_not_auth');
-	        continue;
-	    }
+            if (!$record->canCheckIn()) {
+                $messages['error'] = __('messages.generic.check_in_not_auth');
+                continue;
+            }
 
-	    $record->checkIn();
-	    $checkedIn++;
-	}
+            $record->checkIn();
+            $checkedIn++;
+        }
 
-	if ($checkedIn) {
-	    $messages['success'] = __('messages.generic.check_in_success', ['number' => $checkedIn]);
-	}
+        if ($checkedIn) {
+            $messages['success'] = __('messages.generic.check_in_success', ['number' => $checkedIn]);
+        }
 
-	return $messages;
+        return $messages;
 
     }
 

@@ -169,7 +169,6 @@ class PostController extends Controller
         $post->content = $request->input('content');
         $post->excerpt = $request->input('excerpt');
         $post->settings = $request->input('settings');
-        $post->updated_at = Carbon::now();
         $post->updated_by = auth()->user()->id;
 
         if ($post->canChangeAccessLevel()) {

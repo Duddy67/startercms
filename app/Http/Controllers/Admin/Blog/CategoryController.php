@@ -11,7 +11,6 @@ use App\Traits\Admin\CheckInCheckOut;
 use App\Http\Requests\Blog\Category\StoreRequest;
 use App\Http\Requests\Blog\Category\UpdateRequest;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 
 
 class CategoryController extends Controller
@@ -178,7 +177,6 @@ class CategoryController extends Controller
         $category->slug = ($request->input('slug')) ? Str::slug($request->input('slug'), '-') : Str::slug($request->input('name'), '-');
         $category->description = $request->input('description');
         $category->settings = $request->input('settings');
-        $category->updated_at = Carbon::now();
         $category->updated_by = auth()->user()->id;
 
         if ($category->canChangeAttachments()) {
