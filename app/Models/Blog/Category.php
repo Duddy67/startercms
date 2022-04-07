@@ -84,12 +84,12 @@ class Category extends Model
     {
         $search = $request->input('search', null);
 
-	if ($search !== null) {
-	    return Category::where('name', 'like', '%'.$search.'%')->get();
-	}
-	else {
-	    return Category::select('blog_categories.*', 'users.name as owner_name')->leftJoin('users', 'blog_categories.owned_by', '=', 'users.id')->defaultOrder()->get()->toTree();
-	}
+        if ($search !== null) {
+            return Category::where('name', 'like', '%'.$search.'%')->get();
+        }
+        else {
+            return Category::select('blog_categories.*', 'users.name as owner_name')->leftJoin('users', 'blog_categories.owned_by', '=', 'users.id')->defaultOrder()->get()->toTree();
+        }
     }
 
     public function getUrl()
@@ -101,121 +101,121 @@ class Category extends Model
     {
         $perPage = $request->input('per_page', General::getValue('pagination', 'per_page'));
         $search = $request->input('search', null);
-	$settings = $this->getSettings();
+        $settings = $this->getSettings();
 
-	$query = Post::query();
-	$query->select('posts.*', 'users.name as owner_name')->leftJoin('users', 'posts.owned_by', '=', 'users.id');
-	// Join the role tables to get the owner's role level.
-	$query->join('model_has_roles', 'posts.owned_by', '=', 'model_id')->join('roles', 'roles.id', '=', 'role_id');
+        $query = Post::query();
+        $query->select('posts.*', 'users.name as owner_name')->leftJoin('users', 'posts.owned_by', '=', 'users.id');
+        // Join the role tables to get the owner's role level.
+        $query->join('model_has_roles', 'posts.owned_by', '=', 'model_id')->join('roles', 'roles.id', '=', 'role_id');
 
-	// Get only the posts related to this category. 
-	$query->whereHas('categories', function ($query) {
-	    $query->where('id', $this->id);
-	});
+        // Get only the posts related to this category. 
+        $query->whereHas('categories', function ($query) {
+            $query->where('id', $this->id);
+        });
 
-	if ($search !== null) {
-	    $query->where('posts.title', 'like', '%'.$search.'%');
-	}
+        if ($search !== null) {
+            $query->where('posts.title', 'like', '%'.$search.'%');
+        }
 
-	if (Auth::check()) {
+        if (Auth::check()) {
 
-	    // N.B: Put the following part of the query into brackets.
-	    $query->where(function($query) {
+            // N.B: Put the following part of the query into brackets.
+            $query->where(function($query) {
 
-		// Check for access levels.
-		$query->where(function($query) {
-		    $query->where('roles.role_level', '<', auth()->user()->getRoleLevel())
-			  ->orWhereIn('posts.access_level', ['public_ro', 'public_rw'])
-			  ->orWhere('posts.owned_by', auth()->user()->id);
-		});
+                // Check for access levels.
+                $query->where(function($query) {
+                    $query->where('roles.role_level', '<', auth()->user()->getRoleLevel())
+                          ->orWhereIn('posts.access_level', ['public_ro', 'public_rw'])
+                          ->orWhere('posts.owned_by', auth()->user()->id);
+                });
 
-		$groupIds = auth()->user()->getGroupIds();
+                $groupIds = auth()->user()->getGroupIds();
 
-		if (!empty($groupIds)) {
-		    // Check for access through groups.
-		    $query->orWhereHas('groups', function ($query)  use ($groupIds) {
-			$query->whereIn('id', $groupIds);
-		    });
-		}
-	    });
-	}
-	else {
-	    $query->whereIn('posts.access_level', ['public_ro', 'public_rw']);
-	}
+                if (!empty($groupIds)) {
+                    // Check for access through groups.
+                    $query->orWhereHas('groups', function ($query)  use ($groupIds) {
+                        $query->whereIn('id', $groupIds);
+                    });
+                }
+            });
+        }
+        else {
+            $query->whereIn('posts.access_level', ['public_ro', 'public_rw']);
+        }
 
-	$query->where('posts.status', 'published');
+        $query->where('posts.status', 'published');
 
         if ($settings['post_ordering'] != 'no_ordering') {
-	    // Extract the ordering name and direction from the setting value.
-	    preg_match('#^([a-z-0-9_]+)_(asc|desc)$#', $settings['post_ordering'], $ordering);
+            // Extract the ordering name and direction from the setting value.
+            preg_match('#^([a-z-0-9_]+)_(asc|desc)$#', $settings['post_ordering'], $ordering);
 
-	    $query->orderBy($ordering[1], $ordering[2]);
-	}
+            $query->orderBy($ordering[1], $ordering[2]);
+        }
 
         return $query->paginate($perPage);
     }
 
     public function getParentIdOptions()
     {
-	$nodes = Category::get()->toTree();
-	$options = [];
-	// Defines the state of the current instance.
-	$isNew = ($this->id) ? false : true;
+        $nodes = Category::get()->toTree();
+        $options = [];
+        // Defines the state of the current instance.
+        $isNew = ($this->id) ? false : true;
 
-	$traverse = function ($categories, $prefix = '-') use (&$traverse, &$options, $isNew) {
+        $traverse = function ($categories, $prefix = '-') use (&$traverse, &$options, $isNew) {
 
-	    foreach ($categories as $category) {
-	        if (!$isNew && $this->access_level != 'private') {
-		    // A non private category cannot be a private category's children.
-		    $extra = ($category->access_level == 'private') ? ['disabled'] : [];
-		}
-		elseif (!$isNew && $this->access_level == 'private' && $category->access_level == 'private') {
-		      // Only the category's owner can access it.
-		      $extra = ($category->owned_by == auth()->user()->id) ? [] : ['disabled'];
-		}
-		elseif ($isNew && $category->access_level == 'private') {
-		      // Only the category's owner can access it.
-		      $extra = ($category->owned_by == auth()->user()->id) ? [] : ['disabled'];
-		}
-		else {
-		    $extra = [];
-		}
+            foreach ($categories as $category) {
+                if (!$isNew && $this->access_level != 'private') {
+                    // A non private category cannot be a private category's children.
+                    $extra = ($category->access_level == 'private') ? ['disabled'] : [];
+                }
+                elseif (!$isNew && $this->access_level == 'private' && $category->access_level == 'private') {
+                      // Only the category's owner can access it.
+                      $extra = ($category->owned_by == auth()->user()->id) ? [] : ['disabled'];
+                }
+                elseif ($isNew && $category->access_level == 'private') {
+                      // Only the category's owner can access it.
+                      $extra = ($category->owned_by == auth()->user()->id) ? [] : ['disabled'];
+                }
+                else {
+                    $extra = [];
+                }
 
-		$options[] = ['value' => $category->id, 'text' => $prefix.' '.$category->name, 'extra' => $extra];
+                $options[] = ['value' => $category->id, 'text' => $prefix.' '.$category->name, 'extra' => $extra];
 
-		$traverse($category->children, $prefix.'-');
-	    }
-	};
+                $traverse($category->children, $prefix.'-');
+            }
+        };
 
-	$traverse($nodes);
+        $traverse($nodes);
 
-	return $options;
+        return $options;
     }
 
     public function getOwnedByOptions($category = null)
     {
-	$users = auth()->user()->getAssignableUsers(['assistant', 'registered']);
-	$options = [];
+        $users = auth()->user()->getAssignableUsers(['assistant', 'registered']);
+        $options = [];
 
-	foreach ($users as $user) {
-	    $extra = [];
+        foreach ($users as $user) {
+            $extra = [];
 
-	    // The user is a manager who doesn't or no longer have the create-blog-category permission.
-	    if ($user->getRoleType() == 'manager' && !$user->can('create-blog-category')) {
+            // The user is a manager who doesn't or no longer have the create-blog-category permission.
+            if ($user->getRoleType() == 'manager' && !$user->can('create-blog-category')) {
                 // The user owns this category.
-	        // N.B: A new owner will be required when updating this category. 
-		if ($category && $category->access_level != 'private') {
-		    // Don't show this user.
-		    continue;
-		}
+                // N.B: A new owner will be required when updating this category. 
+                if ($category && $category->access_level != 'private') {
+                    // Don't show this user.
+                    continue;
+                }
 
-		// If the user owns a private category his name wil be shown until the category is no longer private.
-	    }
+                // If the user owns a private category his name will be shown until the category is no longer private.
+            }
 
-	    $options[] = ['value' => $user->id, 'text' => $user->name, 'extra' => $extra];
-	}
+            $options[] = ['value' => $user->id, 'text' => $user->name, 'extra' => $extra];
+        }
 
-	return $options;
+        return $options;
     }
 
     public function getSettings()
@@ -234,9 +234,9 @@ class Category extends Model
     public function getSelectedValue($fieldName)
     {
         if ($fieldName == 'groups') {
-	    return $this->groups->pluck('id')->toArray();
-	}
+            return $this->groups->pluck('id')->toArray();
+        }
 
-	return $this->{$fieldName};
+        return $this->{$fieldName};
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Blog\Category;
 use App\Models\Users\Group;
+use App\Models\Users\User;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
 use App\Http\Requests\Blog\Category\StoreRequest;
@@ -123,8 +124,10 @@ class CategoryController extends Controller
         // Add the id parameter to the query.
         $query = array_merge($request->query(), ['category' => $id]);
         $tab = ($tab) ? $tab : 'details';
+        // Get the owner of the category in order to check (in the template) if they're still allowed to create categories.
+        $owner = User::find($category->owned_by);
 
-        return view('admin.blog.categories.form', compact('category', 'fields', 'actions', 'tab', 'query'));
+        return view('admin.blog.categories.form', compact('category', 'owner', 'fields', 'actions', 'tab', 'query'));
     }
 
     /**
@@ -223,6 +226,17 @@ class CategoryController extends Controller
                 // Only the owner of the descendants private items can change their parents.
                 $category->parent_id = $request->input('parent_id');
             }
+
+            // The status has just been set to unpublished.
+            if ($category->status != 'unpublished' && $request->input('status') == 'unpublished') {
+                // All the descendants must be unpublished as well.
+                foreach ($category->descendants as $descendant) {
+                    $descendant->status = 'unpublished';
+                    $descendant->save();
+                }
+            }
+
+            $category->status = $request->input('status');
         }
 
         $category->save();

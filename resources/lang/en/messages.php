@@ -4,7 +4,8 @@ return [
 
     'dashboard' => [
         'welcome' => 'Hello :name. Welcome to Starter CMS.',
-        'last_connection' => 'Your last connection dates back to :date.',
+        'last_connection' => 'Your last connection dates back to: :date.',
+        'last_users_logged_in' => 'The last users logged in',
     ],
     'users' => [
         'update_success' => 'User successfully updated.',
@@ -104,5 +105,6 @@ return [
         'mass_unpublish_not_auth' => 'You are not authorised to unpublish some of the selected items.',
         'must_not_be_descendant' => 'Node must not be a descendant.',
         'item_is_private' => ':name item is private.',
+        'can_no_longer_create_item' => 'Warning: The user ":name" is currently the owner of this item. However, he or she is no longer allowed to create this item type. Please assign this item to a different user.',
     ]
 ];

@@ -16,7 +16,7 @@ trait AccessLevel
      */
     public function canChangeAccessLevel()
     {
-	return ($this->owned_by == auth()->user()->id || auth()->user()->getRoleLevel() > $this->getOwnerRoleLevel()) ? true: false;
+        return ($this->owned_by == auth()->user()->id || auth()->user()->getRoleLevel() > $this->getOwnerRoleLevel()) ? true: false;
     }
 
     /*
@@ -39,15 +39,15 @@ trait AccessLevel
     public function canEdit()
     {
         if (!Auth::check()) {
-	    // The user must be authenticated to edit.
-	    return false;
-	}
+            // The user must be authenticated to edit.
+            return false;
+        }
 
         if ($this->access_level == 'public_rw' || $this->getOwnerRoleLevel() < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id || $this->shareReadWriteGroups()) {
-	    return true;
-	}
+            return true;
+        }
 
-	return false;
+        return false;
     }
 
     /*
@@ -58,12 +58,12 @@ trait AccessLevel
      */
     public function canDelete()
     {
-	// The owner role level is lower than the current user's or the current user owns the item.
-	if ($this->getOwnerRoleLevel() < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id) {
-	    return true;
-	}
+        // The owner role level is lower than the current user's or the current user owns the item.
+        if ($this->getOwnerRoleLevel() < auth()->user()->getRoleLevel() || $this->owned_by == auth()->user()->id) {
+            return true;
+        }
 
-	return false;
+        return false;
     }
 
     /*
@@ -74,9 +74,9 @@ trait AccessLevel
      */
     public function getOwnerRoleLevel()
     {
-	$owner = ($this->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($this->owned_by);
+        $owner = ($this->owned_by == auth()->user()->id) ? auth()->user() : User::findOrFail($this->owned_by);
 
-	return $owner->getRoleLevel();
+        return $owner->getRoleLevel();
     }
 
     /*
@@ -87,7 +87,7 @@ trait AccessLevel
     public function canChangeStatus()
     {
         // Use the access level constraints.
-	return $this->canChangeAccessLevel();
+        return $this->canChangeAccessLevel();
     }
 
     /*
@@ -99,7 +99,7 @@ trait AccessLevel
     public function canChangeAttachments()
     {
         // Use the access level constraints.
-	return $this->canChangeAccessLevel();
+        return $this->canChangeAccessLevel();
     }
 
     /**
@@ -130,13 +130,13 @@ trait AccessLevel
     public function shareGroups()
     {
         if (!Auth::check()) {
-	    // The user must be authenticated to share groups.
-	    return false;
-	}
+            // The user must be authenticated to share groups.
+            return false;
+        }
 
         $groups = array_intersect($this->getGroupIds(), auth()->user()->getGroupIds());
 
-	return (!empty($groups)) ? true : false;
+        return (!empty($groups)) ? true : false;
     }
 
     /*
@@ -148,7 +148,7 @@ trait AccessLevel
     {
         $groups = array_intersect($this->getReadWriteGroupIds(), auth()->user()->getReadWriteGroupIds());
 
-	return (!empty($groups)) ? true : false;
+        return (!empty($groups)) ? true : false;
     }
 }
 

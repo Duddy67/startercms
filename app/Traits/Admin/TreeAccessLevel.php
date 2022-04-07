@@ -12,44 +12,44 @@ trait TreeAccessLevel
 
     public function anyDescendantCheckedOut()
     {
-	foreach ($this->descendants as $descendant) {
-	    if ($descendant->checked_out !== null) {
-	        return true;
-	    }
-	}
+        foreach ($this->descendants as $descendant) {
+            if ($descendant->checked_out !== null) {
+                return true;
+            }
+        }
 
-	return false;
+        return false;
     }
 
     public function canDeleteDescendants()
     {
-	foreach ($this->descendants as $descendant) {
-	    if (!$descendant->canDelete()) {
-		return false;
-	    }
-	}
+        foreach ($this->descendants as $descendant) {
+            if (!$descendant->canDelete()) {
+                return false;
+            }
+        }
 
-	return true;
+        return true;
     }
 
     public function canDescendantsBePrivate()
     {
         // All the descendants must be owned by the parent owner.
-	foreach ($this->descendants as $descendant) {
-	    if ($descendant->owned_by != $this->owned_by) {
-	        return false;
-	    }
-	}
+        foreach ($this->descendants as $descendant) {
+            if ($descendant->owned_by != $this->owned_by) {
+                return false;
+            }
+        }
 
-	return true;
+        return true;
     }
 
     public function setDescendantAccessToPrivate()
     {
-	foreach ($this->descendants as $descendant) {
-	    $descendant->access_level = 'private';
-	    $descendant->save();
-	}
+        foreach ($this->descendants as $descendant) {
+            $descendant->access_level = 'private';
+            $descendant->save();
+        }
     }
 
     public function isParentPrivate()
