@@ -3,7 +3,7 @@
 @section ('main')
     <h3>@php echo (isset($category)) ? __('labels.categories.edit_category') : __('labels.categories.create_category'); @endphp</h3>
 
-    @if (!$owner->hasPermissionTo('create-blog-category'))
+    @if (isset($category) && !$owner->hasPermissionTo('create-blog-category'))
         <div class="alert alert-warning alert-block">
         <button type="button" class="close" data-dismiss="alert">×</button>	
         <strong>{{ __('messages.generic.can_no_longer_create_item', ['name' => $owner->name]) }}</strong>
