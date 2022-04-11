@@ -179,8 +179,11 @@ trait ItemConfig
                 }
                 elseif ($field->type == 'date') {
                     $datetime = $item->{$field->name}->tz(General::getValue('app', 'timezone'))->toDateTimeString();
-                    $fields[$key]->value = $datetime;
+		    // For whatever reason Daterangepicker prevent the field value to be
+		    // set. So do not use it !
+                    $fields[$key]->value = null;
 
+		    // Set date and time values through datasets.
                     if (isset($fields[$key]->dataset)) {
                         $data = explode(' ', $datetime);
                         $fields[$key]->dataset->date = $data[0];

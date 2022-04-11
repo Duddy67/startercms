@@ -130,6 +130,10 @@
     <input type="hidden" name="{{ $name }}" id="{{ $field->id }}" value="{{ $value }}"> 
 @endif
 
+@if ($field->type == 'date' && !$disabled)
+    <input type="hidden" id="_{{ $field->name }}" name="_{{ $field->name }}" value="" />
+@endif
+
 @if ($name)
     @error($name)
 	<div class="text-danger">{{ $message }}</div>

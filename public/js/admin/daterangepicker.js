@@ -31,29 +31,29 @@
 
   $.fn.initStartDates = function() {
       // The fields to initialized.
-      let fields = ['created_at', 'updated_at'];
+      let fields = $('.date');
       
       for (let i = 0; i < fields.length; i++) {
           // Check first whether the element exists.
-          if ($('#'+fields[i]).length) {
+          if ($('#'+fields[i].id).length) {
               // Set to the current date.
               let startDate = moment().format('DD/MM/YYYY HH:mm');
 
               // A datetime has been previously set.
-              if ($('#'+fields[i]).data('date') != 0) {
+              if ($('#'+fields[i].id).data('date') != 0) {
                   // Concatenate date and time dataset parameters. 
-                  let datetime = $('#'+fields[i]).data('date')+' '+$('#'+fields[i]).data('time');
+                  let datetime = $('#'+fields[i].id).data('date')+' '+$('#'+fields[i].id).data('time');
                   startDate = moment(datetime).format('DD/MM/YYYY HH:mm');
                   // Set the hidden field to the datetime previously set.
-                  $('#_'+fields[i]).val(datetime);
+                  $('#_'+fields[i].id).val(datetime);
               }
               else {
                   // Set the hidden field to the current datetime
-                  $('#_'+fields[i]).val(moment().format('YYYY-MM-DD HH:mm'));
+                  $('#_'+fields[i].id).val(moment().format('YYYY-MM-DD HH:mm'));
               }
 
               // Initialize the date field.
-              $('#'+fields[i]).data('daterangepicker').setStartDate(startDate);
+              $('#'+fields[i].id).data('daterangepicker').setStartDate(startDate);
           }
       }
   }
