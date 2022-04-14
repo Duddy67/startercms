@@ -411,8 +411,8 @@ class User extends Authenticatable
             'categories' => '\\App\\Models\\Blog\\Category',
             'roles' => '\\App\\Models\\User\\Role',
             'groups' => '\\App\\Models\\User\\Group',
-            'menus' => '\\App\\Models\\Menus\\Menu',
-            'menuitems' => '\\App\\Models\\Menus\\MenuItem',
+            'menus' => '\\App\\Models\\Menu\\Menu',
+            'menuitems' => '\\App\\Models\\Menu\\MenuItem',
             'documents' => '\\App\\Models\\Cms\\Document',
         ];
 

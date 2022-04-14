@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Menus;
+namespace App\Http\Controllers\Admin\Menu;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Menus\Menu;
+use App\Models\Menu\Menu;
 use App\Models\User\Group;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
-use App\Http\Requests\Menus\Menus\StoreRequest;
-use App\Http\Requests\Menus\Menus\UpdateRequest;
+use App\Http\Requests\Menu\Menu\StoreRequest;
+use App\Http\Requests\Menu\Menu\UpdateRequest;
 use Illuminate\Support\Str;
 
-use App\Models\Menus\MenuItem;
+use App\Models\Menu\MenuItem;
 
 class MenuController extends Controller
 {
@@ -31,7 +31,7 @@ class MenuController extends Controller
     /*
      * Name of the plugin.
      */
-    protected $pluginName = 'menus';
+    protected $pluginName = 'menu';
 
 
     /**
@@ -42,7 +42,7 @@ class MenuController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('admin.menus.menus');
+        $this->middleware('admin.menu.menus');
         $this->model = new Menu;
     }
 
@@ -61,9 +61,9 @@ class MenuController extends Controller
         $items = $this->model->getItems($request);
         $rows = $this->getRows($columns, $items);
         $query = $request->query();
-        $url = ['route' => 'admin.menus.menus', 'item_name' => 'menu', 'query' => $query];
+        $url = ['route' => 'admin.menu.menus', 'item_name' => 'menu', 'query' => $query];
 
-        return view('admin.menus.menus.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
+        return view('admin.menu.menus.list', compact('items', 'columns', 'rows', 'actions', 'filters', 'url', 'query'));
     }
 
     /**
@@ -80,7 +80,7 @@ class MenuController extends Controller
         $actions = $this->getActions('form', ['destroy']);
         $query = $request->query();
 
-        return view('admin.menus.menus.form', compact('fields', 'actions', 'query'));
+        return view('admin.menu.menus.form', compact('fields', 'actions', 'query'));
     }
 
     /**
@@ -99,11 +99,11 @@ class MenuController extends Controller
                         ->findOrFail($id);
 
         if (!$menu->canAccess()) {
-            return redirect()->route('admin.menus.menus.index')->with('error',  __('messages.generic.access_not_auth'));
+            return redirect()->route('admin.menu.menus.index')->with('error',  __('messages.generic.access_not_auth'));
         }
 
         if ($menu->checked_out && $menu->checked_out != auth()->user()->id) {
-            return redirect()->route('admin.menus.menus.index')->with('error',  __('messages.generic.checked_out'));
+            return redirect()->route('admin.menu.menus.index')->with('error',  __('messages.generic.checked_out'));
         }
 
         $menu->checkOut();
@@ -123,14 +123,14 @@ class MenuController extends Controller
         // Add the id parameter to the query.
         $query = array_merge($request->query(), ['menu' => $id]);
 
-        return view('admin.menus.menus.form', compact('menu', 'fields', 'actions', 'query'));
+        return view('admin.menu.menus.form', compact('menu', 'fields', 'actions', 'query'));
     }
 
     /**
      * Checks the record back in.
      *
      * @param  Request  $request
-     * @param  \App\Models\Menus\Menu  $menu (optional)
+     * @param  \App\Models\Menu\Menu  $menu (optional)
      * @return Response
      */
     public function cancel(Request $request, Menu $menu = null)
@@ -139,24 +139,24 @@ class MenuController extends Controller
             $menu->checkIn();
         }
 
-        return redirect()->route('admin.menus.menus.index', $request->query());
+        return redirect()->route('admin.menu.menus.index', $request->query());
     }
 
     /**
      * Update the specified menu.
      *
-     * @param  \App\Http\Requests\Menus\Menu\UpdateRequest  $request
-     * @param  \App\Models\Menus\Menu  $menu
+     * @param  \App\Http\Requests\Menu\Menu\UpdateRequest  $request
+     * @param  \App\Models\Menu\Menu  $menu
      * @return Response
      */
     public function update(UpdateRequest $request, Menu $menu)
     {
         if ($menu->checked_out != auth()->user()->id) {
-            return redirect()->route('admin.menus.menus.index', $request->query())->with('error',  __('messages.generic.user_id_does_not_match'));
+            return redirect()->route('admin.menu.menus.index', $request->query())->with('error',  __('messages.generic.user_id_does_not_match'));
         }
 
         if (!$menu->canEdit()) {
-            return redirect()->route('admin.menus.menus.edit', array_merge($request->query(), ['menu' => $menu->id]))->with('error',  __('messages.generic.edit_not_auth'));
+            return redirect()->route('admin.menu.menus.edit', array_merge($request->query(), ['menu' => $menu->id]))->with('error',  __('messages.generic.edit_not_auth'));
         }
 
         $menu->title = $request->input('title');
@@ -190,16 +190,16 @@ class MenuController extends Controller
         if ($request->input('_close', null)) {
             $menu->checkIn();
             // Redirect to the list.
-            return redirect()->route('admin.menus.menus.index', $request->query())->with('success', __('messages.menus.update_success'));
+            return redirect()->route('admin.menu.menus.index', $request->query())->with('success', __('messages.menu.update_success'));
         }
 
-        return redirect()->route('admin.menus.menus.edit', array_merge($request->query(), ['menu' => $menu->id]))->with('success', __('messages.menus.update_success'));
+        return redirect()->route('admin.menu.menus.edit', array_merge($request->query(), ['menu' => $menu->id]))->with('success', __('messages.menu.update_success'));
     }
 
     /**
      * Store a new menu.
      *
-     * @param  \App\Http\Requests\Menus\Menu\StoreRequest  $request
+     * @param  \App\Http\Requests\Menu\Menu\StoreRequest  $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreRequest $request)
@@ -217,31 +217,31 @@ class MenuController extends Controller
         }
 
         if ($request->input('_close', null)) {
-            return redirect()->route('admin.menus.menus.index', $request->query())->with('success', __('messages.menus.create_success'));
+            return redirect()->route('admin.menu.menus.index', $request->query())->with('success', __('messages.menu.create_success'));
         }
 
-        return redirect()->route('admin.menus.menus.edit', array_merge($request->query(), ['menu' => $menu->id]))->with('success', __('messages.menus.create_success'));
+        return redirect()->route('admin.menu.menus.edit', array_merge($request->query(), ['menu' => $menu->id]))->with('success', __('messages.menu.create_success'));
     }
 
     /**
      * Remove the specified menu from storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Menus\Menu  $menu
+     * @param  \App\Models\Menu\Menu  $menu
      * @return Response
      */
     public function destroy(Request $request, Menu $menu)
     {
         // Prevent the main menu to be deleted. 
         if (!$menu->canDelete() || $menu->code == 'main-menu') {
-            return redirect()->route('admin.menus.menus.edit', array_merge($request->query(), ['menu' => $menu->id]))->with('error',  __('messages.generic.delete_not_auth'));
+            return redirect()->route('admin.menu.menus.edit', array_merge($request->query(), ['menu' => $menu->id]))->with('error',  __('messages.generic.delete_not_auth'));
         }
 
         $name = $menu->name;
 
         $menu->delete();
 
-        return redirect()->route('admin.menus.menus.index', $request->query())->with('success', __('messages.menus.delete_success', ['name' => $name]));
+        return redirect()->route('admin.menu.menus.index', $request->query())->with('success', __('messages.menu.delete_success', ['name' => $name]));
     }
 
     /**
@@ -265,10 +265,10 @@ class MenuController extends Controller
                 $messages['error'] = __('messages.generic.delete_not_auth'); 
 
                 if ($deleted) {
-                    $messages['success'] = __('messages.menus.mass_delete_success', ['number' => $deleted]);
+                    $messages['success'] = __('messages.menu.mass_delete_success', ['number' => $deleted]);
                 }
 
-                return redirect()->route('admin.menus.menus.index', $request->query())->with($messages);
+                return redirect()->route('admin.menu.menus.index', $request->query())->with($messages);
             }
 
             $menu->delete();
@@ -276,7 +276,7 @@ class MenuController extends Controller
             $deleted++;
         }
 
-        return redirect()->route('admin.menus.menus.index', $request->query())->with('success', __('messages.menus.delete_list_success', ['number' => $deleted]));
+        return redirect()->route('admin.menu.menus.index', $request->query())->with('success', __('messages.menu.delete_list_success', ['number' => $deleted]));
     }
 
     /**
@@ -287,9 +287,9 @@ class MenuController extends Controller
      */
     public function massCheckIn(Request $request)
     {
-        $messages = CheckInCheckOut::checkInMultiple($request->input('ids'), '\\App\\Models\\Menus\\Menu');
+        $messages = CheckInCheckOut::checkInMultiple($request->input('ids'), '\\App\\Models\\Menu\\Menu');
 
-        return redirect()->route('admin.menus.menus.index', $request->query())->with($messages);
+        return redirect()->route('admin.menu.menus.index', $request->query())->with($messages);
     }
 
     /**
@@ -306,10 +306,10 @@ class MenuController extends Controller
             $menu = Menu::findOrFail($id);
 
             if (!$menu->canChangeStatus()) {
-              return redirect()->route('admin.menus.menus.index', $request->query())->with(
+              return redirect()->route('admin.menu.menus.index', $request->query())->with(
                   [
                       'error' => __('messages.generic.mass_publish_not_auth'), 
-                      'success' => __('messages.menus.publish_list_success', ['number' => $published])
+                      'success' => __('messages.menu.publish_list_success', ['number' => $published])
                   ]);
             }
 
@@ -320,7 +320,7 @@ class MenuController extends Controller
             $published++;
         }
 
-        return redirect()->route('admin.menus.menus.index', $request->query())->with('success', __('messages.menus.publish_list_success', ['number' => $published]));
+        return redirect()->route('admin.menu.menus.index', $request->query())->with('success', __('messages.menu.publish_list_success', ['number' => $published]));
     }
 
     /**
@@ -337,10 +337,10 @@ class MenuController extends Controller
             $menu = Menu::findOrFail($id);
 
             if (!$menu->canChangeStatus()) {
-              return redirect()->route('admin.menus.menus.index', $request->query())->with(
+              return redirect()->route('admin.menu.menus.index', $request->query())->with(
                   [
                       'error' => __('messages.generic.mass_unpublish_not_auth'), 
-                      'success' => __('messages.menus.unpublish_list_success', ['number' => $unpublished])
+                      'success' => __('messages.menu.unpublish_list_success', ['number' => $unpublished])
                   ]);
             }
 
@@ -351,14 +351,14 @@ class MenuController extends Controller
             $unpublished++;
         }
 
-        return redirect()->route('admin.menus.menus.index', $request->query())->with('success', __('messages.menus.unpublish_list_success', ['number' => $unpublished]));
+        return redirect()->route('admin.menu.menus.index', $request->query())->with('success', __('messages.menu.unpublish_list_success', ['number' => $unpublished]));
     }
 
     /*
      * Sets field values specific to the Menu model.
      *
      * @param  Array of stdClass Objects  $fields
-     * @param  \App\Models\Menus\Menu $menu
+     * @param  \App\Models\Menu\Menu $menu
      * @return void
      */
     private function setFieldValues(&$fields, $menu)

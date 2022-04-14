@@ -1,4 +1,4 @@
-@inject ('menu', 'App\Models\Menus\Menu')
+@inject ('menu', 'App\Models\Menu\Menu')
 
 <nav class="navbar navbar-expand-md navbar-light bg-light">
   @if ($menu = $menu::getMenu('main-menu'))

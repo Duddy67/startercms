@@ -73,7 +73,7 @@ class Kernel extends HttpKernel
         'admin.blog.posts' => \App\Http\Middleware\AdminBlogPosts::class,
         'admin.blog.categories' => \App\Http\Middleware\AdminBlogCategories::class,
         'admin.blog.settings' => \App\Http\Middleware\AdminBlogSettings::class,
-        'admin.menus.menus' => \App\Http\Middleware\AdminMenusMenus::class,
-        'admin.menus.menuitems' => \App\Http\Middleware\AdminMenusMenuItems::class,
+        'admin.menu.menus' => \App\Http\Middleware\AdminMenuMenus::class,
+        'admin.menu.menuitems' => \App\Http\Middleware\AdminMenuMenuItems::class,
     ];
 }

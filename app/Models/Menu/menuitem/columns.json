@@ -22,7 +22,7 @@
     "type": "string"
   },
   {
-    "label": "labels.menuitems.url",
+    "label": "labels.menuitem.url",
     "name": "url",
     "extra": ["sortable"],
     "type": "string"

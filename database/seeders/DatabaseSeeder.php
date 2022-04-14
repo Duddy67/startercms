@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Menus\Menu;
-use App\Models\Menus\MenuItem;
+use App\Models\Menu\Menu;
+use App\Models\Menu\MenuItem;
 
 class DatabaseSeeder extends Seeder
 {

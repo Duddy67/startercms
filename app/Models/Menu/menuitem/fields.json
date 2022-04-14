@@ -7,14 +7,14 @@
     "placeholder": "labels.generic.title"
   },
   {
-    "label": "labels.menuitems.url",
+    "label": "labels.menuitem.url",
     "type": "text",
     "name": "url",
     "id": "url",
-    "placeholder": "labels.menuitems.url"
+    "placeholder": "labels.menuitem.url"
   },
   {
-    "label": "labels.menuitems.parent_item",
+    "label": "labels.menuitem.parent_item",
     "type": "select",
     "name": "parent_id",
     "id": "parent_id",

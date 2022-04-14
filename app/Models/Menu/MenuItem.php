@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Models\Menus;
+namespace App\Models\Menu;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Settings\General;
-use App\Models\Menus\Menu;
+use App\Models\Menu\Menu;
 use Kalnoy\Nestedset\NodeTrait;
 use App\Models\User\Group;
 use App\Traits\Admin\CheckInCheckOut;
@@ -47,12 +47,12 @@ class MenuItem extends Model
     {
         $search = $request->input('search', null);
 
-	if ($search !== null) {
-	    return MenuItem::where('title', 'like', '%'.$search.'%')->get();
-	}
-	else {
-	  return MenuItem::where('menu_code', $code)->defaultOrder()->get()->toTree();
-	}
+        if ($search !== null) {
+            return MenuItem::where('title', 'like', '%'.$search.'%')->get();
+        }
+        else {
+          return MenuItem::where('menu_code', $code)->defaultOrder()->get()->toTree();
+        }
     }
 
     public function getParentIdOptions()
@@ -60,31 +60,31 @@ class MenuItem extends Model
         // Get the parent menu code.
         $code = Request::route()->parameter('code');
 
-	$nodes = MenuItem::whereIn('menu_code', ['root', $code])->get()->toTree();
-	// Defines the state of the current instance.
-	$isNew = ($this->id) ? false : true;
-	$options = [];
+        $nodes = MenuItem::whereIn('menu_code', ['root', $code])->get()->toTree();
+        // Defines the state of the current instance.
+        $isNew = ($this->id) ? false : true;
+        $options = [];
 
-	$traverse = function ($menuItems, $prefix = '-') use (&$traverse, &$options, $isNew) {
+        $traverse = function ($menuItems, $prefix = '-') use (&$traverse, &$options, $isNew) {
 
-	    foreach ($menuItems as $menuItem) {
-		$options[] = ['value' => $menuItem->id, 'text' => $prefix.' '.$menuItem->title];
+            foreach ($menuItems as $menuItem) {
+                $options[] = ['value' => $menuItem->id, 'text' => $prefix.' '.$menuItem->title];
 
-		$traverse($menuItem->children, $prefix.'-');
-	    }
-	};
+                $traverse($menuItem->children, $prefix.'-');
+            }
+        };
 
-	$traverse($nodes);
+        $traverse($nodes);
 
-	return $options;
+        return $options;
     }
 
     public function canChangeStatus()
     {
-	// Rely on the parent menu for authorisations.
-	$menu = Menu::where('code', $this->menu_code)->first();
+        // Rely on the parent menu for authorisations.
+        $menu = Menu::where('code', $this->menu_code)->first();
 
-	return $menu->canChangeStatus();
+        return $menu->canChangeStatus();
     }
 
     /*
@@ -92,6 +92,6 @@ class MenuItem extends Model
      */
     public function getSelectedValue($fieldName)
     {
-	return $this->{$fieldName};
+        return $this->{$fieldName};
     }
 }

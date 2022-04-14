@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Menus\MenuItems;
+namespace App\Http\Requests\Menu\MenuItems;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreRequest extends FormRequest
+class UpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,12 +23,11 @@ class StoreRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-	    'title' => [
-		'required',
-	    ],
-	    'url' => 'required',
-	    'status' => 'required',
+        $rules = [
+            'title' => 'required', 
+            'url' => 'required',
         ];
+
+        return $rules;
     }
 }

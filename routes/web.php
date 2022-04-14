@@ -67,7 +67,7 @@ Route::prefix('admin')->group(function () {
 
         Route::prefix('user')->group(__DIR__.'/admin/user.php');
         Route::prefix('blog')->group(__DIR__.'/admin/blog.php');
-        Route::prefix('menus')->group(__DIR__.'/admin/menus.php');
+        Route::prefix('menu')->group(__DIR__.'/admin/menu.php');
         Route::prefix('settings')->group(__DIR__.'/admin/settings.php');
     });
 });

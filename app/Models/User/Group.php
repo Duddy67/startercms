@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\User\User;
 use App\Models\Blog\Post;
 use App\Models\Blog\Category;
-use App\Models\Menus\Menu;
+use App\Models\Menu\Menu;
 use App\Models\Settings\General;
 use App\Traits\Admin\AccessLevel;
 use App\Traits\Admin\CheckInCheckOut;
