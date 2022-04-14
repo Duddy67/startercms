@@ -20,7 +20,7 @@ return [
 	'files' => 'Files',
 	'subcategories' => 'Sub-categories',
     ],
-    'users' => [
+    'user' => [
 	'email' => 'Email',
 	'role' => 'Role',
 	'roles' => 'Roles',

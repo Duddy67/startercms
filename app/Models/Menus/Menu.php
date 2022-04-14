@@ -4,7 +4,7 @@ namespace App\Models\Menus;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Users\Group;
+use App\Models\User\Group;
 use App\Models\Menus\MenuItem;
 use App\Models\Settings\General;
 use App\Traits\Admin\AccessLevel;

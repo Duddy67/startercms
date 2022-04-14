@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Blog\Post;
 use App\Models\Blog\Setting;
 use Kalnoy\Nestedset\NodeTrait;
-use App\Models\Users\Group;
+use App\Models\User\Group;
 use App\Traits\Admin\TreeAccessLevel;
 use App\Traits\Admin\CheckInCheckOut;
 

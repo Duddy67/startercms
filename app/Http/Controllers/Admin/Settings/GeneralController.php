@@ -41,7 +41,7 @@ class GeneralController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('admin.settings.general');
-	$this->model = new General;
+        $this->model = new General;
     }
 
     /**
@@ -54,8 +54,8 @@ class GeneralController extends Controller
     {
         $fields = $this->getFields();
         $actions = $this->getActions('form');
-	$query = $request->query();
-	$data = $this->model->getData();
+        $query = $request->query();
+        $data = $this->model->getData();
 
         return view('admin.settings.general.form', compact('fields', 'actions', 'data', 'query'));
     }
@@ -69,20 +69,20 @@ class GeneralController extends Controller
     public function update(Request $request)
     {
         $post = $request->except('_token', '_method');
-	$this->truncateSettings();
+        $this->truncateSettings();
 
-	foreach ($post as $group => $params) {
-	  foreach ($params as $key => $value) {
-	      General::create(['group' => $group, 'key' => $key, 'value' => $value]);
-	  }
-	}
+        foreach ($post as $group => $params) {
+          foreach ($params as $key => $value) {
+              General::create(['group' => $group, 'key' => $key, 'value' => $value]);
+          }
+        }
 
-	if (Cache::has('settings')) {
-	    // Delete the current "settings" variable so the config app parameters will be updated in the Admin middleware.
-	    Cache::forget('settings');
-	}
+        if (Cache::has('settings')) {
+            // Delete the current "settings" variable so the config app parameters will be updated in the Admin middleware.
+            Cache::forget('settings');
+        }
 
-	return redirect()->route('admin.settings.general.index', $request->query())->with('success', __('messages.general.update_success'));
+        return redirect()->route('admin.settings.general.index', $request->query())->with('success', __('messages.general.update_success'));
     }
 
     /**
@@ -92,22 +92,22 @@ class GeneralController extends Controller
      */
     private function truncateSettings()
     {
-	Schema::disableForeignKeyConstraints();
-	DB::table('settings_general')->truncate();
-	Schema::enableForeignKeyConstraints();
+        Schema::disableForeignKeyConstraints();
+        DB::table('settings_general')->truncate();
+        Schema::enableForeignKeyConstraints();
 
-	Artisan::call('cache:clear');
+        Artisan::call('cache:clear');
     }
 
     /*
      * Sets field values specific to the General model.
      *
      * @param  Array of stdClass Objects  $fields
-     * @param  \App\Models\Users\User  $user
+     * @param  \App\Models\User\User  $user
      * @return void
      */
     private function setFieldValues(&$fields)
     {
-	// Specific operations here...
+        // Specific operations here...
     }
 }

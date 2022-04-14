@@ -7,7 +7,7 @@ return [
         'last_connection' => 'Your last connection dates back to: :date.',
         'last_users_logged_in' => 'The last users logged in',
     ],
-    'users' => [
+    'user' => [
         'update_success' => 'User successfully updated.',
         'create_success' => 'User successfully created.',
         'delete_success' => 'The user ":name" has been successfully deleted.',

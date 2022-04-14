@@ -4,7 +4,7 @@ namespace App\Traits\Admin;
 
 use App\Models\Settings\General;
 use Carbon\Carbon;
-use App\Models\Users\User;
+use App\Models\User\User;
 
 
 trait CheckInCheckOut

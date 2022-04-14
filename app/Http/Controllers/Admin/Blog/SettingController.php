@@ -40,7 +40,7 @@ class SettingController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('admin.blog.settings');
-	$this->model = new Setting;
+        $this->model = new Setting;
     }
 
 
@@ -54,9 +54,9 @@ class SettingController extends Controller
     {
         $fields = $this->getFields();
         $actions = $this->getActions('form');
-	$query = $request->query();
-	$data = Setting::getData();
-	$tab = ($tab) ? $tab : 'posts';
+        $query = $request->query();
+        $data = Setting::getData();
+        $tab = ($tab) ? $tab : 'posts';
 
         return view('admin.blog.settings.form', compact('fields', 'actions', 'data', 'tab', 'query'));
     }
@@ -70,15 +70,15 @@ class SettingController extends Controller
     public function update(Request $request)
     {
         $post = $request->except('_token', '_method', '_tab');
-	$this->truncateSettings();
+        $this->truncateSettings();
 
-	foreach ($post as $group => $params) {
-	  foreach ($params as $key => $value) {
-	      Setting::create(['group' => $group, 'key' => $key, 'value' => $value]);
-	  }
-	}
+        foreach ($post as $group => $params) {
+          foreach ($params as $key => $value) {
+              Setting::create(['group' => $group, 'key' => $key, 'value' => $value]);
+          }
+        }
 
-	return redirect()->route('admin.blog.settings.index', array_merge($request->query(), ['tab' => $request->input('_tab')]))->with('success', __('messages.general.update_success'));
+        return redirect()->route('admin.blog.settings.index', array_merge($request->query(), ['tab' => $request->input('_tab')]))->with('success', __('messages.general.update_success'));
     }
 
     /**
@@ -88,22 +88,22 @@ class SettingController extends Controller
      */
     private function truncateSettings()
     {
-	Schema::disableForeignKeyConstraints();
-	DB::table('blog_settings')->truncate();
-	Schema::enableForeignKeyConstraints();
+        Schema::disableForeignKeyConstraints();
+        DB::table('blog_settings')->truncate();
+        Schema::enableForeignKeyConstraints();
 
-	Artisan::call('cache:clear');
+        Artisan::call('cache:clear');
     }
 
     /*
      * Sets field values specific to the General model.
      *
      * @param  Array of stdClass Objects  $fields
-     * @param  \App\Models\Users\User  $user
+     * @param  \App\Models\User\User  $user
      * @return void
      */
     private function setFieldValues(&$fields)
     {
-	// Specific operations here...
+        // Specific operations here...
     }
 }

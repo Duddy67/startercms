@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Menus\MenuItem;
 use App\Models\Menus\Menu;
-use App\Models\Users\Group;
+use App\Models\User\Group;
 use App\Traits\Admin\ItemConfig;
 use App\Traits\Admin\CheckInCheckOut;
 use App\Http\Requests\Menus\MenuItems\StoreRequest;

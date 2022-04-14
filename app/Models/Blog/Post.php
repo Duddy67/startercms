@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Settings\General;
 use App\Models\Blog\Category;
-use App\Models\Users\Group;
+use App\Models\User\Group;
 use App\Traits\Admin\AccessLevel;
 use App\Traits\Admin\CheckInCheckOut;
 use App\Models\Cms\Document;

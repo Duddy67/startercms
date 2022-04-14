@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Settings\General;
 use App\Models\Menus\Menu;
 use Kalnoy\Nestedset\NodeTrait;
-use App\Models\Users\Group;
+use App\Models\User\Group;
 use App\Traits\Admin\CheckInCheckOut;
 use Request;
 
