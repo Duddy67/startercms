@@ -1,7 +1,7 @@
 @extends ('layouts.admin')
 
 @section ('main')
-    <h3>@php echo (isset($email)) ? __('labels.emails.edit_email') : __('labels.emails.create_email'); @endphp</h3>
+    <h3>@php echo (isset($email)) ? __('labels.email.edit_email') : __('labels.email.create_email'); @endphp</h3>
 
     @php $action = (isset($email)) ? route('admin.settings.emails.update', $query) : route('admin.settings.emails.store', $query) @endphp
     <form method="post" action="{{ $action }}" id="itemForm">

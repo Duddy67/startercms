@@ -30,7 +30,7 @@ return [
 	'create_user' => 'Create a user',
 	'edit_user' => 'Edit a user',
     ],
-    'roles' => [
+    'role' => [
 	'super-admin' => 'Super Administrator',
 	'admin' => 'Administrator',
 	'manager' => 'Manager',
@@ -39,14 +39,14 @@ return [
 	'create_role' => 'Create a role',
 	'edit_role' => 'Edit a role',
     ],
-    'groups' => [
+    'group' => [
 	'create_group' => 'Create a group',
 	'edit_group' => 'Edit a group',
 	'add_selected_groups' => 'Add selected groups',
 	'remove_selected_groups' => 'Remove selected groups',
 	'permission' => 'Group permission',
     ],
-    'posts' => [
+    'post' => [
 	'create_post' => 'Create a post',
 	'edit_post' => 'Edit a post',
 	'slug' => 'Slug',
@@ -61,22 +61,22 @@ return [
 	'show_post_categories' => 'Show post categories',
 	'show_post_image' => 'Show post image',
     ],
-    'categories' => [
+    'category' => [
 	'create_category' => 'Create a category',
 	'edit_category' => 'Edit a category',
 	'parent_category' => 'Parent category',
     ],
-    'menus' => [
+    'menu' => [
 	'create_menu' => 'Create a menu',
 	'edit_menu' => 'Edit a menu',
     ],
-    'menuitems' => [
+    'menuitem' => [
 	'create_menu_item' => 'Create a menu item',
 	'edit_menu_item' => 'Edit a menu item',
 	'parent_item' => 'Parent item',
 	'url' => 'URL',
     ],
-    'emails' => [
+    'email' => [
 	'subject' => 'Subject',
 	'html' => 'HTML',
 	'plain_text' => 'Plain text',

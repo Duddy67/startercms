@@ -90,7 +90,7 @@ class PermissionController extends Controller
             foreach ($permissions as $permission) {
                 // Check for missing permissions.
                 if (Permission::where('name', $permission->name)->first() === null) {
-                    $list[$section][] = $permission->name.' '.__('messages.permissions.missing_alert');
+                    $list[$section][] = $permission->name.' '.__('messages.permission.missing_alert');
                     continue;
                 }
 

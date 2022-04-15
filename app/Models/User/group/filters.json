@@ -23,7 +23,7 @@
     "options": [] 
   },
   {
-    "label": "labels.groups.permission",
+    "label": "labels.group.permission",
     "type": "select",
     "name": "permission",
     "id": "filters-permission",

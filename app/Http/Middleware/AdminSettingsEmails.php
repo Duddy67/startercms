@@ -35,11 +35,11 @@ class AdminSettingsEmails
 	}
 
 	if (in_array($routeName, $update) && !auth()->user()->isAllowedTo('update-email')) {
-	    return redirect()->route('admin.settings.emails.index')->with('error', __('messages.emails.edit_not_auth'));
+	    return redirect()->route('admin.settings.emails.index')->with('error', __('messages.email.edit_not_auth'));
 	}
 
 	if (in_array($routeName, $delete) &&  !auth()->user()->isSuperAdmin()) {
-	    return redirect()->route('admin.settings.emails.index')->with('error', __('messages.emails.delete_not_auth'));
+	    return redirect()->route('admin.settings.emails.index')->with('error', __('messages.email.delete_not_auth'));
 	}
 
         return $next($request);

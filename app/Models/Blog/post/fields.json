@@ -7,12 +7,12 @@
     "placeholder": "labels.generic.title"
   },
   {
-    "label": "labels.posts.slug",
+    "label": "labels.post.slug",
     "type": "text",
     "name": "slug",
     "id": "slug",
     "tab": "details",
-    "placeholder": "labels.posts.slug"
+    "placeholder": "labels.post.slug"
   },
   {
     "label": "labels.generic.status",
@@ -94,14 +94,14 @@
     "extra": ["disabled"]
   },
   {
-    "label": "labels.posts.content",
+    "label": "labels.post.content",
     "type": "textarea",
     "name": "content",
     "class": "tinymce-texteditor",
     "id": "content"
   },
   {
-    "label": "labels.posts.excerpt",
+    "label": "labels.post.excerpt",
     "type": "textarea",
     "name": "excerpt",
     "class": "tinymce-texteditor",
@@ -134,7 +134,7 @@
     "options": [] 
   },
   {
-    "label": "labels.posts.show_excerpt",
+    "label": "labels.post.show_excerpt",
     "type": "select",
     "name": "show_excerpt",
     "id": "show_excerpt",

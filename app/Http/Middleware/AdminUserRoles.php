@@ -27,11 +27,11 @@ class AdminUserRoles
         }
 
         if (in_array($routeName, $update) && !auth()->user()->isAllowedTo('update-role')) {
-            return redirect()->route('admin.user.roles.index')->with('error', __('messages.roles.edit_not_auth'));
+            return redirect()->route('admin.user.roles.index')->with('error', __('messages.role.edit_not_auth'));
         }
 
         if (in_array($routeName, $delete) && !auth()->user()->isAllowedTo('delete-role')) {
-            return redirect()->route('admin.user.roles.index')->with('error', __('messages.roles.delete_not_auth'));
+            return redirect()->route('admin.user.roles.index')->with('error', __('messages.role.delete_not_auth'));
         }
 
         return $next($request);

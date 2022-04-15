@@ -27,11 +27,11 @@ class AdminBlogCategories
 	}
 
 	if (in_array($routeName, $update) && !auth()->user()->isAllowedTo('update-blog-category')) {
-	    return redirect()->route('admin.blog.categories.index')->with('error', __('messages.categories.edit_not_auth'));
+	    return redirect()->route('admin.blog.categories.index')->with('error', __('messages.category.edit_not_auth'));
 	}
 
 	if (in_array($routeName, $delete) && !auth()->user()->isAllowedTo('delete-blog-category')) {
-	    return redirect()->route('admin.blog.categories.index')->with('error', __('messages.categories.delete_not_auth'));
+	    return redirect()->route('admin.blog.categories.index')->with('error', __('messages.category.delete_not_auth'));
 	}
 
         return $next($request);

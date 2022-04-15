@@ -12,7 +12,7 @@
     "type": "string"
   },
   {
-    "label": "labels.emails.subject",
+    "label": "labels.email.subject",
     "name": "subject",
     "type": "string"
   },

@@ -1,7 +1,7 @@
 @extends ('layouts.admin')
 
 @section ('header')
-    <p class="h3">Roles</p>
+    <p class="h3">{{ __('labels.title.roles') }}</p>
 @endsection
 
 @section ('main')
@@ -21,7 +21,7 @@
         <x-item-list :columns="$columns" :rows="$rows" :url="$url" />
     @else
         <div class="alert alert-info" role="alert">
-            No item has been found.
+            {{ __('messages.generic.no_item_found') }}
         </div>
     @endif
 

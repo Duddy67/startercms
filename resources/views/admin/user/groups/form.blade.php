@@ -1,7 +1,7 @@
 @extends ('layouts.admin')
 
 @section ('main')
-    <h3>@php echo (isset($group)) ? __('labels.groups.edit_group') : __('labels.groups.create_group'); @endphp</h3>
+    <h3>@php echo (isset($group)) ? __('labels.group.edit_group') : __('labels.group.create_group'); @endphp</h3>
 
     @php $action = (isset($group)) ? route('admin.user.groups.update', $query) : route('admin.user.groups.store', $query) @endphp
     <form method="post" action="{{ $action }}" id="itemForm">

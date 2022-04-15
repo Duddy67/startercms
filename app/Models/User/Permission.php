@@ -118,7 +118,7 @@ class Permission extends SpatiePermission
     {
         // Only the super-admin is allowed to perform these tasks.
         if (!auth()->user()->hasRole('super-admin')) {
-            $request->session()->flash('error', 'You are not allowed to update or rebuild permissions.');
+            $request->session()->flash('error', __('messages.generic.edit_not_allowed'));
 
             return;
         }
@@ -147,23 +147,23 @@ class Permission extends SpatiePermission
         }
 
         if (!empty($invalidNames)) {
-            $request->session()->flash('error', __('messages.permissions.invalid_permission_names', ['names' => implode(', ', $invalidNames)]));
+            $request->session()->flash('error', __('messages.permission.invalid_permission_names', ['names' => implode(', ', $invalidNames)]));
             return;
         }
 
         if ($rebuild) {
             if (self::setPermissions($request)) {
-                $request->session()->flash('success', __('messages.permissions.rebuild_success', ['number' => $count]));
+                $request->session()->flash('success', __('messages.permission.rebuild_success', ['number' => $count]));
             }
 
             return;
         }
 
         if ($count) {
-            $request->session()->flash('success', __('messages.permissions.build_success', ['number' => $count]));
+            $request->session()->flash('success', __('messages.permission.build_success', ['number' => $count]));
         }
         else {
-            $request->session()->flash('info', __('messages.permissions.no_new_permissions'));
+            $request->session()->flash('info', __('messages.permission.no_new_permissions'));
         }
     }
 
@@ -188,7 +188,7 @@ class Permission extends SpatiePermission
                             $role->givePermissionTo($permission->name);
                         }
                         catch (\Exception $e) {
-                            $request->session()->flash('error', __('messages.permissions.role_does_not_exist', ['name' => $role]));
+                            $request->session()->flash('error', __('messages.permission.role_does_not_exist', ['name' => $role]));
                             return false;
                         }
                     }

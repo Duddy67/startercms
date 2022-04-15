@@ -71,7 +71,7 @@ class PostController extends Controller
         ]);
         
         return response()->json([
-            'message' => __('messages.posts.create_success')
+            'message' => __('messages.post.create_success')
         ], 201);
     }
 
@@ -97,7 +97,7 @@ class PostController extends Controller
         $post->save();
         
         return response()->json([
-            'message' => __('messages.posts.update_success')
+            'message' => __('messages.post.update_success')
         ], 200);
     }
 
@@ -113,7 +113,7 @@ class PostController extends Controller
         $post->delete();
 
         return response()->json([
-            'message' => __('messages.posts.delete_success', ['name' => $name])
+            'message' => __('messages.post.delete_success', ['name' => $name])
         ], 200);
     }
 }

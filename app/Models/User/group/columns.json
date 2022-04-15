@@ -18,7 +18,7 @@
     "type": "string"
   },
   {
-    "label": "labels.groups.permission",
+    "label": "labels.group.permission",
     "name": "permission",
     "extra": ["sortable"],
     "type": "string"

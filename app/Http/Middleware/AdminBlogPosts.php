@@ -27,11 +27,11 @@ class AdminBlogPosts
         }
 
         if (in_array($routeName, $update) && !auth()->user()->isAllowedTo('update-post') && !auth()->user()->isAllowedTo('update-own-post')) {
-            return redirect()->route('admin.blog.posts.index')->with('error', __('messages.posts.edit_not_auth'));
+            return redirect()->route('admin.blog.posts.index')->with('error', __('messages.post.edit_not_auth'));
         }
 
         if (in_array($routeName, $delete) && !auth()->user()->isAllowedTo('delete-post') && !auth()->user()->isAllowedTo('delete-own-post')) {
-            return redirect()->route('admin.blog.posts.index')->with('error', __('messages.posts.delete_not_auth'));
+            return redirect()->route('admin.blog.posts.index')->with('error', __('messages.post.delete_not_auth'));
         }
 
         return $next($request);

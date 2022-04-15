@@ -15,7 +15,7 @@
     "placeholder": "labels.generic.slug"
   },
   {
-    "label": "labels.categories.parent_category",
+    "label": "labels.category.parent_category",
     "type": "select",
     "name": "parent_id",
     "id": "parent_id",

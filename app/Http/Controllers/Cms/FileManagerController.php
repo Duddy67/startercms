@@ -65,7 +65,7 @@ class FileManagerController extends Controller
 	    auth()->user()->documents()->save($document);
 	}
 
-	return redirect()->route('cms.filemanager.index')->with('success', __('messages.documents.create_success'));
+	return redirect()->route('cms.filemanager.index')->with('success', __('messages.document.create_success'));
     }
 
     public function destroy(Request $request)
@@ -81,7 +81,7 @@ class FileManagerController extends Controller
 	    $query['page'] = 1;
 	}
 
-	return redirect()->route('cms.filemanager.index', $query)->with('success', __('messages.documents.delete_success', ['name' => $name]));
+	return redirect()->route('cms.filemanager.index', $query)->with('success', __('messages.document.delete_success', ['name' => $name]));
     }
 
     /*

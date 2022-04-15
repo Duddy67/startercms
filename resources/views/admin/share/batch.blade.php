@@ -33,12 +33,12 @@
 		    @if ($field->name == 'groups')
 			<div class="form-check-inline">
 			    <label class="form-check-label">
-				<input type="radio" class="form-check-input" name="_selected_groups" value="add" checked>{{ __('labels.groups.add_selected_groups') }}
+				<input type="radio" class="form-check-input" name="_selected_groups" value="add" checked>{{ __('labels.group.add_selected_groups') }}
 			    </label>
 			</div>
 			<div class="form-check-inline">
 			    <label class="form-check-label">
-				<input type="radio" class="form-check-input" name="_selected_groups" value="remove">{{ __('labels.groups.remove_selected_groups') }}
+				<input type="radio" class="form-check-input" name="_selected_groups" value="remove">{{ __('labels.group.remove_selected_groups') }}
 			    </label>
 			</div>
 		    @endif

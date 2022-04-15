@@ -1,7 +1,7 @@
 @extends ('layouts.admin')
 
 @section ('header')
-    <h3>@php echo __('labels.title.groups'); @endphp</h3>
+    <p class="h3">{{ __('labels.title.groups') }}</p>
 @endsection
 
 @section ('main')
@@ -21,7 +21,7 @@
         <x-item-list :columns="$columns" :rows="$rows" :url="$url" />
     @else
         <div class="alert alert-info" role="alert">
-            No item has been found.
+            {{ __('messages.generic.no_item_found') }}
         </div>
     @endif
 

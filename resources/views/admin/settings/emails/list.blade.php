@@ -6,25 +6,25 @@
 
 @section ('main')
     @superadmin ()
-	<div class="card">
-	    <div class="card-body">
-		<x-toolbar :items=$actions />
-	    </div>
-	</div>
+        <div class="card">
+            <div class="card-body">
+                <x-toolbar :items=$actions />
+            </div>
+        </div>
     @endsuperadmin
 
     <div class="card">
-	<div class="card-body">
-	    <x-filters :filters="$filters" :url="$url" />
-	</div>
+        <div class="card-body">
+            <x-filters :filters="$filters" :url="$url" />
+        </div>
     </div>
 
     @if (!empty($rows)) 
-	<x-item-list :columns="$columns" :rows="$rows" :url="$url" />
+        <x-item-list :columns="$columns" :rows="$rows" :url="$url" />
     @else
         <div class="alert alert-info" role="alert">
-	    No item has been found.
-	</div>
+            {{ __('messages.generic.no_item_found') }}
+        </div>
     @endif
 
     <x-pagination :items=$items />
@@ -34,8 +34,8 @@
     <input type="hidden" id="checkinItems" value="{{ route('admin.settings.emails.massCheckIn', $query) }}">
 
     <form id="selectedItems" action="{{ route('admin.settings.emails.index', $query) }}" method="post">
-	@method('delete')
-	@csrf
+        @method('delete')
+        @csrf
     </form>
 @endsection
 

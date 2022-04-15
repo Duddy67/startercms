@@ -16,5 +16,5 @@
     @endphp
 </ul>
 @else
-    <p>@php echo __('messages.categories.no_subcategories'); @endphp</p>
+    <p>@php echo __('messages.category.no_subcategories'); @endphp</p>
 @endif

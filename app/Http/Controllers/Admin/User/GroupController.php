@@ -171,10 +171,10 @@ class GroupController extends Controller
         if ($request->input('_close', null)) {
             $group->checkIn();
             // Redirect to the list.
-            return redirect()->route('admin.user.groups.index', $request->query())->with('success', __('messages.groups.update_success'));
+            return redirect()->route('admin.user.groups.index', $request->query())->with('success', __('messages.group.update_success'));
         }
 
-        return redirect()->route('admin.user.groups.edit', array_merge($request->query(), ['group' => $group->id]))->with('success', __('messages.groups.update_success'));
+        return redirect()->route('admin.user.groups.edit', array_merge($request->query(), ['group' => $group->id]))->with('success', __('messages.group.update_success'));
     }
 
     /**
@@ -196,10 +196,10 @@ class GroupController extends Controller
         $group->save();
 
         if ($request->input('_close', null)) {
-            return redirect()->route('admin.user.groups.index', $request->query())->with('success', __('messages.groups.create_success'));
+            return redirect()->route('admin.user.groups.index', $request->query())->with('success', __('messages.group.create_success'));
         }
 
-        return redirect()->route('admin.user.groups.edit', array_merge($request->query(), ['group' => $group->id]))->with('success', __('messages.groups.create_success'));
+        return redirect()->route('admin.user.groups.edit', array_merge($request->query(), ['group' => $group->id]))->with('success', __('messages.group.create_success'));
     }
 
     /**
@@ -219,7 +219,7 @@ class GroupController extends Controller
 
         $group->delete();
 
-        return redirect()->route('admin.user.groups.index', $request->query())->with('success', __('messages.groups.delete_success', ['name' => $name]));
+        return redirect()->route('admin.user.groups.index', $request->query())->with('success', __('messages.group.delete_success', ['name' => $name]));
     }
 
     /**
@@ -239,7 +239,7 @@ class GroupController extends Controller
               return redirect()->route('admin.user.groups.index', $request->query())->with(
                   [
                       'error' => __('messages.generic.delete_not_auth'), 
-                      'success' => __('messages.groups.delete_list_success', ['number' => $deleted])
+                      'success' => __('messages.group.delete_list_success', ['number' => $deleted])
                   ]);
             }
 
@@ -248,7 +248,7 @@ class GroupController extends Controller
             $deleted++;
         }
 
-        return redirect()->route('admin.user.groups.index', $request->query())->with('success', __('messages.groups.delete_list_success', ['number' => $deleted]));
+        return redirect()->route('admin.user.groups.index', $request->query())->with('success', __('messages.group.delete_list_success', ['number' => $deleted]));
     }
 
     /**

@@ -132,13 +132,13 @@ class Role extends SpatieRole
     public static function getRoleTypeOptions()
     {
         $roles = [
-            ['value' => 'registered', 'text' => __('labels.roles.registered')],
-            ['value' => 'assistant', 'text' => __('labels.roles.assistant')],
-            ['value' => 'manager', 'text' => __('labels.roles.manager')]
+            ['value' => 'registered', 'text' => __('labels.role.registered')],
+            ['value' => 'assistant', 'text' => __('labels.role.assistant')],
+            ['value' => 'manager', 'text' => __('labels.role.manager')]
         ];
 
         if (auth()->user()->getRoleName() == 'super-admin') {
-            $roles[] = ['value' => 'admin', 'text' => __('labels.roles.admin')];
+            $roles[] = ['value' => 'admin', 'text' => __('labels.role.admin')];
         }
 
         return $roles;

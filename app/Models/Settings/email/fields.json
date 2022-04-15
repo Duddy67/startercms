@@ -7,7 +7,7 @@
     "placeholder": "labels.generic.code"
   },
   {
-    "label": "labels.emails.subject",
+    "label": "labels.email.subject",
     "type": "text",
     "name": "subject",
     "id": "subject"

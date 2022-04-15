@@ -165,7 +165,7 @@ class RoleController extends Controller
     public function update(UpdateRequest $request, Role $role)
     {
         if (in_array($role->id, Role::getDefaultRoleIds())) {
-            return redirect()->route('admin.user.roles.edit', $role->id)->with('error', __('messages.roles.cannot_update_default_roles'));
+            return redirect()->route('admin.user.roles.edit', $role->id)->with('error', __('messages.role.cannot_update_default_roles'));
         }
 
         if (!$role->canEdit()) {
@@ -204,10 +204,10 @@ class RoleController extends Controller
 
         if ($request->input('_close', null)) {
             $role->checkIn();
-            return redirect()->route('admin.user.roles.index', $request->query())->with('success', __('messages.roles.update_success'));
+            return redirect()->route('admin.user.roles.index', $request->query())->with('success', __('messages.role.update_success'));
         }
 
-        return redirect()->route('admin.user.roles.edit', array_merge($request->query(), ['role' => $role->id]))->with('success', __('messages.roles.update_success'));
+        return redirect()->route('admin.user.roles.edit', array_merge($request->query(), ['role' => $role->id]))->with('success', __('messages.role.update_success'));
      
     }
 
@@ -224,7 +224,7 @@ class RoleController extends Controller
         $count = array_intersect($request->input('permissions', []), $level1Perms);
 
         if (auth()->user()->getRoleType() == 'admin' && $count) {
-            return redirect()->route('admin.user.roles.edit', $role->id)->with('error', __('messages.roles.permission_not_auth'));
+            return redirect()->route('admin.user.roles.edit', $role->id)->with('error', __('messages.role.permission_not_auth'));
         }
 
         $permissions = Permission::getPermissionsWithoutSections();
@@ -260,10 +260,10 @@ class RoleController extends Controller
         $role->save();
 
         if ($request->input('_close', null)) {
-            return redirect()->route('admin.user.roles.index', $request->query())->with('success', __('messages.roles.create_success'));
+            return redirect()->route('admin.user.roles.index', $request->query())->with('success', __('messages.role.create_success'));
         }
 
-        return redirect()->route('admin.user.roles.edit', array_merge($request->query(), ['role' => $role->id]))->with('success', __('messages.roles.create_success'));
+        return redirect()->route('admin.user.roles.edit', array_merge($request->query(), ['role' => $role->id]))->with('success', __('messages.role.create_success'));
     }
 
     /**
@@ -280,17 +280,17 @@ class RoleController extends Controller
         }
 
         if (in_array($role->name, Role::getDefaultRoles())) {
-            return redirect()->route('admin.user.roles.edit', array_merge($request->query(), ['role' => $role->id]))->with('error', __('messages.roles.cannot_delete_default_roles'));
+            return redirect()->route('admin.user.roles.edit', array_merge($request->query(), ['role' => $role->id]))->with('error', __('messages.role.cannot_delete_default_roles'));
         }
 
         if ($role->user->count()) {
-            return redirect()->route('admin.user.roles.edit', array_merge($request->query(), ['role' => $role->id]))->with('error', __('messages.roles.user_assigned_to_roles', ['name' => $role->name]));
+            return redirect()->route('admin.user.roles.edit', array_merge($request->query(), ['role' => $role->id]))->with('error', __('messages.role.user_assigned_to_roles', ['name' => $role->name]));
         }
 
         $name = $role->name;
         $role->delete();
 
-        return redirect()->route('admin.user.roles.index', $request->query())->with('success', __('messages.roles.delete_success', ['name' => $name]));
+        return redirect()->route('admin.user.roles.index', $request->query())->with('success', __('messages.role.delete_success', ['name' => $name]));
     }
 
     /**
@@ -306,7 +306,7 @@ class RoleController extends Controller
         $result = array_intersect($roles, Role::getDefaultRoles());
 
         if (!empty($result)) {
-            return redirect()->route('admin.user.roles.index', $request->query())->with('error',  __('messages.roles.cannot_delete_roles', ['roles' => implode(',', $result)]));
+            return redirect()->route('admin.user.roles.index', $request->query())->with('error',  __('messages.role.cannot_delete_roles', ['roles' => implode(',', $result)]));
         }
 
         $roles = [];
@@ -317,7 +317,7 @@ class RoleController extends Controller
 
             if ($role->users->count()) {
                 // Some users are already assigned to this role.
-                return redirect()->route('admin.user.roles.index', $request->query())->with('error', __('messages.roles.users_assigned_to_roles', ['name' => $role->name]));
+                return redirect()->route('admin.user.roles.index', $request->query())->with('error', __('messages.role.users_assigned_to_roles', ['name' => $role->name]));
             }
 
             if (!$role->canDelete()) {
@@ -331,7 +331,7 @@ class RoleController extends Controller
             $role->delete();
         }
 
-        return redirect()->route('admin.user.roles.index', $request->query())->with('success', __('messages.roles.delete_list_success', ['number' => count($request->input('ids'))]));
+        return redirect()->route('admin.user.roles.index', $request->query())->with('success', __('messages.role.delete_list_success', ['number' => count($request->input('ids'))]));
     }
 
     /**

@@ -244,10 +244,10 @@ class CategoryController extends Controller
         if ($request->input('_close', null)) {
             $category->checkIn();
             // Redirect to the list.
-            return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.update_success'));
+            return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.category.update_success'));
         }
 
-        return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id, 'tab' => $request->input('_tab')]))->with('success', __('messages.categories.update_success'));
+        return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id, 'tab' => $request->input('_tab')]))->with('success', __('messages.category.update_success'));
     }
 
     /**
@@ -292,10 +292,10 @@ class CategoryController extends Controller
         }
 
         if ($request->input('_close', null)) {
-            return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.create_success'));
+            return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.category.create_success'));
         }
 
-        return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('success', __('messages.categories.create_success'));
+        return redirect()->route('admin.blog.categories.edit', array_merge($request->query(), ['category' => $category->id]))->with('success', __('messages.category.create_success'));
     }
 
     /**
@@ -316,7 +316,7 @@ class CategoryController extends Controller
         //$category->categories()->detach();
         //$category->delete();
 
-        return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.delete_success', ['name' => $name]));
+        return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.category.delete_success', ['name' => $name]));
     }
 
     /**
@@ -336,7 +336,7 @@ class CategoryController extends Controller
               return redirect()->route('admin.blog.categories.index', $request->query())->with(
                   [
                       'error' => __('messages.generic.delete_not_auth'), 
-                      'success' => __('messages.categories.delete_list_success', ['number' => $deleted])
+                      'success' => __('messages.category.delete_list_success', ['number' => $deleted])
                   ]);
             }
 
@@ -346,7 +346,7 @@ class CategoryController extends Controller
             $deleted++;
         }
 
-        return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.delete_list_success', ['number' => $deleted]));
+        return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.category.delete_list_success', ['number' => $deleted]));
     }
 
     /**
@@ -377,7 +377,7 @@ class CategoryController extends Controller
               $messages = ['error' => __('messages.generic.change_status_not_auth')];
 
               if ($changed) {
-                  $messages['success'] = __('messages.categories.change_status_list_success', ['number' => $changed]);
+                  $messages['success'] = __('messages.category.change_status_list_success', ['number' => $changed]);
               }
 
               return redirect()->route('admin.blog.categories.index', $request->query())->with($messages);
@@ -389,7 +389,7 @@ class CategoryController extends Controller
             $changed++;
         }
 
-        return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.change_status_list_success', ['number' => $changed]));
+        return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.category.change_status_list_success', ['number' => $changed]));
     }
 
     public function massUnpublish(Request $request)
@@ -409,7 +409,7 @@ class CategoryController extends Controller
               $messages = ['error' => __('messages.generic.change_status_not_auth')];
 
               if ($changed) {
-                  $messages['success'] = __('messages.categories.change_status_list_success', ['number' => $changed]);
+                  $messages['success'] = __('messages.category.change_status_list_success', ['number' => $changed]);
               }
 
               return redirect()->route('admin.blog.categories.index', $request->query())->with($messages);
@@ -429,7 +429,7 @@ class CategoryController extends Controller
             }
         }
 
-        return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.categories.change_status_list_success', ['number' => $changed]));
+        return redirect()->route('admin.blog.categories.index', $request->query())->with('success', __('messages.category.change_status_list_success', ['number' => $changed]));
     }
 
     /**

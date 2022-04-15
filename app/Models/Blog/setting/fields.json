@@ -19,7 +19,7 @@
     "options": [] 
   },
   {
-    "label": "labels.posts.show_excerpt",
+    "label": "labels.post.show_excerpt",
     "type": "select",
     "name": "show_excerpt",
     "id": "show_excerpt",

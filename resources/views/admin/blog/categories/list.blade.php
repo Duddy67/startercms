@@ -1,28 +1,28 @@
 @extends ('layouts.admin')
 
 @section ('header')
-    <p class="h3">Categories</p>
+    <p class="h3">{{ __('labels.title.categories') }}</p>
 @endsection
 
 @section ('main')
     <div class="card">
-	<div class="card-body">
-	    <x-toolbar :items=$actions />
-	</div>
+        <div class="card-body">
+            <x-toolbar :items=$actions />
+        </div>
     </div>
 
     <div class="card">
-	<div class="card-body">
-	    <x-filters :filters="$filters" :url="$url" />
-	</div>
+        <div class="card-body">
+            <x-filters :filters="$filters" :url="$url" />
+        </div>
     </div>
 
     @if (!empty($rows)) 
-	<x-item-list :columns="$columns" :rows="$rows" :url="$url" />
+        <x-item-list :columns="$columns" :rows="$rows" :url="$url" />
     @else
         <div class="alert alert-info" role="alert">
-	    No item has been found.
-	</div>
+            {{ __('messages.generic.no_item_found') }}
+        </div>
     @endif
 
     <input type="hidden" id="createItem" value="{{ route('admin.blog.categories.create', $query) }}">
@@ -32,8 +32,8 @@
     <input type="hidden" id="unpublishItems" value="{{ route('admin.blog.categories.massUnpublish', $query) }}">
 
     <form id="selectedItems" action="{{ route('admin.blog.categories.index', $query) }}" method="post">
-	@method('delete')
-	@csrf
+        @method('delete')
+        @csrf
     </form>
 @endsection
 

@@ -222,10 +222,10 @@ class PostController extends Controller
         if ($request->input('_close', null)) {
             $post->checkIn();
             // Redirect to the list.
-            return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.update_success'));
+            return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.post.update_success'));
         }
 
-        return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id, 'tab' => $request->input('_tab')]))->with('success', __('messages.posts.update_success'));
+        return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id, 'tab' => $request->input('_tab')]))->with('success', __('messages.post.update_success'));
     }
 
     /**
@@ -261,10 +261,10 @@ class PostController extends Controller
         }
 
         if ($request->input('_close', null)) {
-            return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.create_success'));
+            return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.post.create_success'));
         }
 
-        return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id]))->with('success', __('messages.posts.create_success'));
+        return redirect()->route('admin.blog.posts.edit', array_merge($request->query(), ['post' => $post->id]))->with('success', __('messages.post.create_success'));
     }
 
     /**
@@ -283,7 +283,7 @@ class PostController extends Controller
         $name = $post->name;
         $post->delete();
 
-        return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.delete_success', ['name' => $name]));
+        return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.post.delete_success', ['name' => $name]));
     }
 
     /**
@@ -304,7 +304,7 @@ class PostController extends Controller
               return redirect()->route('admin.blog.posts.index', $request->query())->with(
                   [
                       'error' => __('messages.generic.delete_not_auth'), 
-                      'success' => __('messages.posts.delete_list_success', ['number' => $deleted])
+                      'success' => __('messages.post.delete_list_success', ['number' => $deleted])
                   ]);
             }
 
@@ -313,7 +313,7 @@ class PostController extends Controller
             $deleted++;
         }
 
-        return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.delete_list_success', ['number' => $deleted]));
+        return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.post.delete_list_success', ['number' => $deleted]));
     }
 
     /**
@@ -419,7 +419,7 @@ class PostController extends Controller
               return redirect()->route('admin.blog.posts.index', $request->query())->with(
                   [
                       'error' => __('messages.generic.mass_publish_not_auth'), 
-                      'success' => __('messages.posts.publish_list_success', ['number' => $published])
+                      'success' => __('messages.post.publish_list_success', ['number' => $published])
                   ]);
             }
 
@@ -430,7 +430,7 @@ class PostController extends Controller
             $published++;
         }
 
-        return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.publish_list_success', ['number' => $published]));
+        return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.post.publish_list_success', ['number' => $published]));
     }
 
     /**
@@ -450,7 +450,7 @@ class PostController extends Controller
               return redirect()->route('admin.blog.posts.index', $request->query())->with(
                   [
                       'error' => __('messages.generic.mass_unpublish_not_auth'), 
-                      'success' => __('messages.posts.unpublish_list_success', ['number' => $unpublished])
+                      'success' => __('messages.post.unpublish_list_success', ['number' => $unpublished])
                   ]);
             }
 
@@ -461,7 +461,7 @@ class PostController extends Controller
             $unpublished++;
         }
 
-        return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.posts.unpublish_list_success', ['number' => $unpublished]));
+        return redirect()->route('admin.blog.posts.index', $request->query())->with('success', __('messages.post.unpublish_list_success', ['number' => $unpublished]));
     }
 
     /*
