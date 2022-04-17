@@ -171,18 +171,6 @@ class Post extends Model
         return '/post/'.$this->id.'/'.$this->slug;
     }
 
-    public function getOwnedByOptions()
-    {
-        $users = auth()->user()->getAssignableUsers();
-        $options = [];
-
-        foreach ($users as $user) {
-            $options[] = ['value' => $user->id, 'text' => $user->name];
-        }
-
-        return $options;
-    }
-
     public function getCategoriesOptions()
     {
         $nodes = Category::get()->toTree();

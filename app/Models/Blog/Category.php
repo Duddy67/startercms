@@ -192,7 +192,7 @@ class Category extends Model
         return $options;
     }
 
-    public function getOwnedByOptions($category = null)
+    public function getOwnedByOptions()
     {
         $users = auth()->user()->getAssignableUsers(['assistant', 'registered']);
         $options = [];
@@ -204,7 +204,7 @@ class Category extends Model
             if ($user->getRoleType() == 'manager' && !$user->can('create-blog-category')) {
                 // The user owns this category.
                 // N.B: A new owner will be required when updating this category. 
-                if ($category && $category->access_level != 'private') {
+                if ($this->id && $this->access_level != 'private') {
                     // Don't show this user.
                     continue;
                 }

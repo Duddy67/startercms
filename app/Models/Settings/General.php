@@ -120,6 +120,11 @@ class General extends Model
         return $options;
     }
 
+    public static function getGroupsFilterOptions()
+    {
+        return self::getGroupsOptions(auth()->user());
+    }
+
     /*
      * Builds the options for the 'groups' select field.
      *
@@ -159,14 +164,30 @@ class General extends Model
     }
 
     /*
+     * Returns the users that the current user is allowed to assign as owner of an item.
+     *
+     * @return Array 
+     */  
+    public static function getOwnedByOptions()
+    {
+        $users = auth()->user()->getAssignableUsers();
+        $options = [];
+
+        foreach ($users as $user) {
+            $options[] = ['value' => $user->id, 'text' => $user->name];
+        }
+
+        return $options;
+    }
+
+    /*
      * Returns the users who own a given item model according to its access level and
      * to the current user's role level and groups.
-     * N.B: This dropdown list is used as a filter.
      *
      * @param  Object  $model
      * @return Array 
      */  
-    public static function getOwnedByOptions($model)
+    public static function getOwnedByFilterOptions($model)
     {
         $table = $model->getTable();
         $query = get_class($model)::query();
@@ -177,7 +198,7 @@ class General extends Model
               ->join('roles', 'roles.id', '=', 'role_id');
 
         // N.B: Put the following part of the query into brackets.
-        $query->where(function($query) use($table) {
+        $query->where(function($query) use($table, $model) {
 
             // Check for access levels.
             $query->where(function($query) use($table) {
@@ -186,8 +207,8 @@ class General extends Model
                       ->orWhere($table.'.owned_by', auth()->user()->id);
             });
 
-            // N.B: The Group model has no group relationship (ie: relationship with itself).
-            if ($table != 'groups') {
+            // N.B: Make sure the 'groups' relationship exists in the model.
+            if (isset($model->groups)) {
                 $groupIds = auth()->user()->getGroupIds();
 
                 if (!empty($groupIds)) {

@@ -271,8 +271,8 @@ trait ItemConfig
                 // Build the function name.
                 $function = 'get'.str_replace('_', '', ucwords($filter->name, '_')).'Options';
 
-                // General filter.
-                //
+                // General filters.
+
                 if ($filter->name == 'per_page') {
                     $options = General::$function();
                     $default = General::getValue('pagination', 'per_page');
@@ -281,10 +281,10 @@ trait ItemConfig
                     $options = General::$function($this->pluginName, $this->modelName);
                 }
                 elseif ($filter->name == 'owned_by' && $this->modelName != 'document') {
-                    $options = General::$function($this->model);
+                    $options = General::getOwnedByFilterOptions($this->model);
                 }
                 elseif ($filter->name == 'groups') {
-                    $options = General::$function(auth()->user());
+                    $options = General::getGroupsFilterOptions();
                 }
                 // Specific to the model.
                 else {
@@ -369,16 +369,17 @@ trait ItemConfig
             // Pass the current item object if available.
             $options = ($field->name == 'groups') ? General::$function($item) : General::$function();
         }
-        elseif ($field->name == 'parent_id') {
-            $options = ($item) ? $item->$function() : $this->model->$function();
-        }
+
+        elseif ($field->name == 'owned_by' && !method_exists($this->model, 'getOwnedByOptions')) {
+	    // Use the General method when not availabe in the model.
+            $options = General::$function();
+	}
         // Sets the yes/no select lists. 
         elseif (isset($field->extra) && in_array('yes_no', $field->extra)) {
             $options = General::getYesNoOptions();
         }
         else {
-            // Pass the current item object if available.
-            $options = ($field->name == 'owned_by' && $item) ? $this->model->$function($item) : $this->model->$function();
+            $options = ($item) ? $item->$function() : $this->model->$function();
         }
 
         if (isset($field->extra) && in_array('global_setting', $field->extra)) {
