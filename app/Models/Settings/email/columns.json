@@ -8,7 +8,7 @@
   {
     "label": "labels.generic.code",
     "name": "code",
-    "extra": ["sortable"],
+    "extra": ["sortable", "linkable"],
     "type": "string"
   },
   {

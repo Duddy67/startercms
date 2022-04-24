@@ -44,6 +44,11 @@ trait ItemConfig
         $rows = [];
 
         foreach ($items as $item) {
+            // Check for extra attributes.
+            if (method_exists($item, 'setExtraAttributes')) {
+                $item->setExtraAttributes();
+            }
+
             $row = $this->getRow($columns, $item, $except);
             $rows[] = $row;
         }
@@ -365,20 +370,21 @@ trait ItemConfig
         $function = 'get'.str_replace('_', '', ucwords($field->name, '_')).'Options';
 
         // Common options.
-        if (in_array($field->name, ['access_level', 'groups', 'status'])) {
-            // Pass the current item object if available.
-            $options = ($field->name == 'groups') ? General::$function($item) : General::$function();
-        }
 
-        elseif ($field->name == 'owned_by' && !method_exists($this->model, 'getOwnedByOptions')) {
-	    // Use the General method when not availabe in the model.
+        if ($field->name == 'groups') {
+            // Pass the current item object if available.
+            $options = General::$function($item);
+        }
+        elseif (in_array($field->name, ['status', 'owned_by', 'access_level']) && !method_exists($this->model, $function)) {
+            // Call the General method when not availabe in the model.
             $options = General::$function();
-	}
-        // Sets the yes/no select lists. 
+        }
+        // Sets the yes/no select lists.
         elseif (isset($field->extra) && in_array('yes_no', $field->extra)) {
             $options = General::getYesNoOptions();
         }
         else {
+            // Call the model method.
             $options = ($item) ? $item->$function() : $this->model->$function();
         }
 
